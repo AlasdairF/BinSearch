@@ -45,7 +45,7 @@ func (f *Key_uint64) Find(thekey uint64) (int, bool) {
 }
 
 // Add adds this index for later building
-func (f *Key_uint64) Add(thekey uint64) {
+func (f *Key_uint64) AddKey(thekey uint64) {
 	f.Key = append(f.Key, thekey)
 	return
 }
@@ -111,7 +111,7 @@ func (f *Key_uint32) Find(thekey uint32) (int, bool) {
 }
 
 // Add adds this index for later building
-func (f *Key_uint32) Add(thekey uint32) {
+func (f *Key_uint32) AddKey(thekey uint32) {
 	f.Key = append(f.Key, thekey)
 	return
 }
@@ -177,7 +177,7 @@ func (f *Key_uint16) Find(thekey uint16) (int, bool) {
 }
 
 // Add adds this index for later building
-func (f *Key_uint16) Add(thekey uint16) {
+func (f *Key_uint16) AddKey(thekey uint16) {
 	f.Key = append(f.Key, thekey)
 	return
 }
@@ -243,7 +243,7 @@ func (f *Key_uint8) Find(thekey uint8) (int, bool) {
 }
 
 // Add adds this index for later building
-func (f *Key_uint8) Add(thekey uint8) {
+func (f *Key_uint8) AddKey(thekey uint8) {
 	f.Key = append(f.Key, thekey)
 	return
 }
@@ -309,7 +309,7 @@ func (f *Key_string) Find(thekey string) (int, bool) {
 }
 
 // Add adds this index for later building
-func (f *Key_string) Add(thekey string) {
+func (f *Key_string) AddKey(thekey string) {
 	f.Key = append(f.Key, thekey)
 	return
 }
@@ -371,7 +371,7 @@ func (f *Key_bytes) Find(thekey []byte) (int, bool) {
 }
 
 // Add adds this index for later building
-func (f *Key_bytes) Add(thekey []byte) {
+func (f *Key_bytes) AddKey(thekey []byte) {
 	f.Key = append(f.Key, thekey)
 	return
 }
