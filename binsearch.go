@@ -101,7 +101,7 @@ func (f *Key_uint32) Find(thekey uint32) (uint64, bool) {
 		if (k<0 || k>1) {
 			return min, false
 		}
-		at := uint64(min+k*(max-min))
+		at := uint64(float32(min)+k*float32(max-min))
 	
 		current := f.Key[at]
 		if thekey<current {
