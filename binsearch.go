@@ -97,11 +97,11 @@ func (f *Key_uint32) Find(thekey uint32) (uint64, bool) {
 	at := max/2
 	for {
 	
-		k = (thekey-f.Key[min])/(f.Key[max]-f.Key[min])
+		k := (thekey-f.Key[min])/(f.Key[max]-f.Key[min])
 		if (k<0 || k>1) {
 			return min, false
 		}
-		current = min+k*(max-min)
+		current := min+k*(max-min)
 	
 		//current := f.Key[at]
 		if thekey<current {
