@@ -16,9 +16,9 @@ i int
 k uint64
 }
 type sorter_uint64 []sort_uint64
-func (a *sorter_uint64) Len() int           { return len(a) }
-func (a *sorter_uint64) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a *sorter_uint64) Less(i, j int) bool { return a[i].k < a[j].k }
+func (a sorter_uint64) Len() int           { return len(a) }
+func (a sorter_uint64) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a sorter_uint64) Less(i, j int) bool { return a[i].k < a[j].k }
 
 // Find returns the index based on the key.
 func (f *Key_uint64) Find(thekey uint64) (int, bool) {
