@@ -280,7 +280,7 @@ type sort_bytes struct {
 i int
 k []byte
 }
-type sorter_bytes []sort_byte
+type sorter_bytes []sort_bytes
 func (a sorter_bytes) Len() int           { return len(a) }
 func (a sorter_bytes) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a sorter_bytes) Less(i, j int) bool { return bytes.Compare(a[i].k,a[j].k)==-1 }
