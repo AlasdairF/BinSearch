@@ -97,7 +97,7 @@ func (f *Key_uint32) Find(thekey uint32) (uint64, bool) {
 	at := max/2
 	for {
 	
-		k := (uint64(thekey)-f.Key[min])/(f.Key[max]-f.Key[min])
+		k := uint64((thekey-f.Key[min])/(f.Key[max]-f.Key[min]))
 		if (k<0 || k>1) {
 			return min, false
 		}
