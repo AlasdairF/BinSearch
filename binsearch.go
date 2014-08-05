@@ -92,7 +92,7 @@ func (a sorter_uint32) Less(i, j int) bool { return a[i].k < a[j].k }
 
 // Find returns the index based on the key.
 func (f *Key_uint32) Find(thekey uint32) (uint64, bool) {
-	l := 0
+	l := uint64(0)
 	r := f.keymax
 	for (l <= r) {
 		if (f.Key[l] == f.Key[r]) {
@@ -112,11 +112,11 @@ func (f *Key_uint32) Find(thekey uint32) (uint64, bool) {
 		} else if (thekey > f.Key[mid]) {
 			l = mid + 1;
 		} else {
-			return mid, true;
+			return mid, true
 		}
-		return 0, false;
+		return 0, false
 	}
-	
+	return 0, false
 }
 
 // Add adds this index for later building
