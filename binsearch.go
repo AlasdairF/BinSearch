@@ -295,10 +295,11 @@ func (f *Key_string) Find(thekey string) (uint64, bool) {
 		if thekey<current {
 			max = at-1
 		} else {
-		if thekey==current {
-			return at, true // found
+		if thekey>current {
+			min = at+1
 			} else {
-				min = at+1
+				
+				return at, true // found
 			}
 		}
 		if min>max {
