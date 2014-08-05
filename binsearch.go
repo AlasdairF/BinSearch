@@ -60,7 +60,7 @@ func (f *Key_uint64) Build() []int {
 	}
 	sort.Sort(temp)
 	imap := make([]int,l)
-	newkey := make([]int64,l)
+	newkey := make([]uint64,l)
 	for i:=0; i<l; i++ {
 		imap[i]=temp[i].i
 		newkey[i]=temp[i].k
