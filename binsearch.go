@@ -31,10 +31,10 @@ func (f *Key_uint64) Find(thekey uint64) (uint64, bool) {
 		if thekey<current {
 			max = at-1
 		} else {
-		if thekey==current {
-			return at, true // found
+		if thekey>current {
+			min = at+1
 			} else {
-				min = at+1
+				return at, true // found
 			}
 		}
 		if min>max {
@@ -97,10 +97,10 @@ func (f *Key_uint32) Find(thekey uint32) (uint64, bool) {
 		if thekey<current {
 			max = at-1
 		} else {
-		if thekey==current {
-			return at, true // found
+		if thekey>current {
+			min = at+1
 			} else {
-				min = at+1
+				return at, true // found
 			}
 		}
 		if min>max {
@@ -163,10 +163,10 @@ func (f *Key_uint16) Find(thekey uint16) (uint64, bool) {
 		if thekey<current {
 			max = at-1
 		} else {
-		if thekey==current {
-			return at, true // found
+		if thekey>current {
+			min = at+1
 			} else {
-				min = at+1
+				return at, true // found
 			}
 		}
 		if min>max {
@@ -229,10 +229,10 @@ func (f *Key_uint8) Find(thekey uint8) (uint64, bool) {
 		if thekey<current {
 			max = at-1
 		} else {
-		if thekey==current {
-			return at, true // found
+		if thekey>current {
+			min = at+1
 			} else {
-				min = at+1
+				return at, true // found
 			}
 		}
 		if min>max {
@@ -298,14 +298,13 @@ func (f *Key_string) Find(thekey string) (uint64, bool) {
 		if thekey>current {
 			min = at+1
 			} else {
-				
 				return at, true // found
 			}
 		}
 		if min>max {
 			return min, false // doesn't exist
 		}
-		at = min+((max-min)/2)
+		at = min+((max-min)/2) // so as not to go out of bounds
 	}
 }
 
@@ -367,7 +366,7 @@ func (f *Key_bytes) Find(thekey []byte) (uint64, bool) {
 		if min>max {
 			return min, false // doesn't exist
 		}
-		at = min+((max-min)/2)
+		at = min+((max-min)/2) // so as not to go out of bounds
 	}
 }
 
