@@ -306,7 +306,7 @@ func (f *Key_bytes) Find(thekey []byte) (int, bool) {
 
 // Add adds this index for later building
 func (f *Key_bytes) Add(thekey []byte) {
-	f.Key = append(f.Key, []byte)
+	f.Key = append(f.Key, thekey)
 	return
 }
 
