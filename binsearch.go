@@ -10,6 +10,7 @@ import (
 // Add this to any struct to make it binary searchable.
 type Key_uint64 struct {
 Key []uint64
+keymax uint64
 }
 
 type sort_uint64 struct {
@@ -24,7 +25,7 @@ func (a sorter_uint64) Less(i, j int) bool { return a[i].k < a[j].k }
 // Find returns the index based on the key.
 func (f *Key_uint64) Find(thekey uint64) (uint64, bool) {
 	var min uint64
-	max := uint64(len(f.Key)-1)
+	max := f.keymax
 	at := max/2
 	for {
 		current := f.Key[at]
@@ -67,6 +68,7 @@ func (f *Key_uint64) Build() []int {
 		newkey[i]=temp[i].k
 	}
 	f.Key = newkey
+	f.keymax = uint64(l-1)
 	return imap
 }
 
@@ -76,6 +78,7 @@ func (f *Key_uint64) Build() []int {
 // Add this to any struct to make it binary searchable.
 type Key_uint32 struct {
 Key []uint32
+keymax uint64
 }
 
 type sort_uint32 struct {
@@ -90,10 +93,17 @@ func (a sorter_uint32) Less(i, j int) bool { return a[i].k < a[j].k }
 // Find returns the index based on the key.
 func (f *Key_uint32) Find(thekey uint32) (uint64, bool) {
 	var min uint64
-	max := uint64(len(f.Key)-1)
+	max := f.keymax
 	at := max/2
 	for {
-		current := f.Key[at]
+	
+		k = (thekey-f.Key[min])/(f.Key[max]-f.Key[min])
+		if (k<0 || k>1) {
+			return min, false
+		}
+		current = min+k*(max-min)
+	
+		//current := f.Key[at]
 		if thekey<current {
 			max = at-1
 		} else {
@@ -133,6 +143,7 @@ func (f *Key_uint32) Build() []int {
 		newkey[i]=temp[i].k
 	}
 	f.Key = newkey
+	f.keymax = uint64(l-1)
 	return imap
 }
 
@@ -142,6 +153,7 @@ func (f *Key_uint32) Build() []int {
 // Add this to any struct to make it binary searchable.
 type Key_uint16 struct {
 Key []uint16
+keymax uint64
 }
 
 type sort_uint16 struct {
@@ -156,7 +168,7 @@ func (a sorter_uint16) Less(i, j int) bool { return a[i].k < a[j].k }
 // Find returns the index based on the key.
 func (f *Key_uint16) Find(thekey uint16) (uint64, bool) {
 	var min uint64
-	max := uint64(len(f.Key)-1)
+	max := f.keymax
 	at := max/2
 	for {
 		current := f.Key[at]
@@ -199,6 +211,7 @@ func (f *Key_uint16) Build() []int {
 		newkey[i]=temp[i].k
 	}
 	f.Key = newkey
+	f.keymax = uint64(l-1)
 	return imap
 }
 
@@ -208,6 +221,7 @@ func (f *Key_uint16) Build() []int {
 // Add this to any struct to make it binary searchable.
 type Key_uint8 struct {
 Key []uint8
+keymax uint64
 }
 
 type sort_uint8 struct {
@@ -222,7 +236,7 @@ func (a sorter_uint8) Less(i, j int) bool { return a[i].k < a[j].k }
 // Find returns the index based on the key.
 func (f *Key_uint8) Find(thekey uint8) (uint64, bool) {
 	var min uint64
-	max := uint64(len(f.Key)-1)
+	max := f.keymax
 	at := max/2
 	for {
 		current := f.Key[at]
@@ -265,6 +279,7 @@ func (f *Key_uint8) Build() []int {
 		newkey[i]=temp[i].k
 	}
 	f.Key = newkey
+	f.keymax = uint64(l-1)
 	return imap
 }
 
@@ -274,6 +289,7 @@ func (f *Key_uint8) Build() []int {
 // Add this to any struct to make it binary searchable.
 type Key_string struct {
 Key []string
+keymax uint64
 }
 
 type sort_string struct {
@@ -288,7 +304,7 @@ func (a sorter_string) Less(i, j int) bool { return a[i].k < a[j].k }
 // Find returns the index based on the key.
 func (f *Key_string) Find(thekey string) (uint64, bool) {
 	var min uint64
-	max := uint64(len(f.Key)-1)
+	max := f.keymax
 	at := max/2
 	for {
 		current := f.Key[at]
@@ -331,6 +347,7 @@ func (f *Key_string) Build() []int {
 		newkey[i]=temp[i].k
 	}
 	f.Key = newkey
+	f.keymax = uint64(l-1)
 	return imap
 }
 
@@ -340,6 +357,7 @@ func (f *Key_string) Build() []int {
 // Add this to any struct to make it binary searchable.
 type Key_bytes struct {
 Key [][]byte
+keymax uint64
 }
 
 type sort_bytes struct {
@@ -354,7 +372,7 @@ func (a sorter_bytes) Less(i, j int) bool { return bytes.Compare(a[i].k,a[j].k)=
 // Find returns the index based on the key.
 func (f *Key_bytes) Find(thekey []byte) (uint64, bool) {
 	var min uint64
-	max := uint64(len(f.Key)-1)
+	max := f.keymax
 	at := max/2
 	for {
 		what := bytes.Compare(thekey,f.Key[at])
@@ -393,5 +411,6 @@ func (f *Key_bytes) Build() []int {
 		newkey[i]=temp[i].k
 	}
 	f.Key = newkey
+	f.keymax = uint64(l-1)
 	return imap
 }
