@@ -269,6 +269,72 @@ func (f *Key_uint8) Build() []int {
 }
 
 
+// ---------- Key_string ----------
+
+// Add this to any struct to make it binary searchable.
+type Key_string struct {
+Key []string
+}
+
+type sort_string struct {
+i int
+k string
+}
+type sorter_string []sort_string
+func (a sorter_string) Len() int           { return len(a) }
+func (a sorter_string) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a sorter_string) Less(i, j int) bool { return a[i].k < a[j].k }
+
+// Find returns the index based on the key.
+func (f *Key_string) Find(thekey string) (int, bool) {
+	min := 0
+	max := len(f.Key)-1
+	at := max/2
+	for {
+		current := f.Key[at]
+		if thekey<current {
+			max = at-1
+		} else {
+		if thekey>current {
+			min = at+1
+			} else {
+				return at, true // found
+			}
+		}
+		if min>max {
+			return min, false // doesn't exist
+		}
+		at = (max+min)/2
+	}
+}
+
+// Add adds this index for later building
+func (f *Key_string) Add(thekey string) {
+	f.Key = append(f.Key, thekey)
+	return
+}
+
+// Build sorts the keys and returns an array telling you how to sort the values, you must do this yourself.
+func (f *Key_string) Build() []int {
+	l := len(f.Key)
+	temp := make(sorter_string,l)
+	var current uint
+	for i,k := range f.Key {
+		temp[current]=sort_string{i,k}
+		current++
+	}
+	sort.Sort(temp)
+	imap := make([]int,l)
+	newkey := make([]string,l)
+	for i:=0; i<l; i++ {
+		imap[i]=temp[i].i
+		newkey[i]=temp[i].k
+	}
+	f.Key = newkey
+	return imap
+}
+
+
 // ---------- Key_byte ----------
 
 // Add this to any struct to make it binary searchable.
