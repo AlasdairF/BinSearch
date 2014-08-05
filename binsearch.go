@@ -22,7 +22,7 @@ func (a sorter_uint64) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a sorter_uint64) Less(i, j int) bool { return a[i].k < a[j].k }
 
 // Find returns the index based on the key.
-func (f *Key_uint64) Find(thekey uint64) (int, bool) {
+func (f *Key_uint64) Find(thekey uint64) (uint64, bool) {
 	var min uint64
 	max := uint64(len(f.Key)-1)
 	at := max/2
@@ -88,7 +88,7 @@ func (a sorter_uint32) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a sorter_uint32) Less(i, j int) bool { return a[i].k < a[j].k }
 
 // Find returns the index based on the key.
-func (f *Key_uint32) Find(thekey uint32) (int, bool) {
+func (f *Key_uint32) Find(thekey uint32) (uint64, bool) {
 	var min uint64
 	max := uint64(len(f.Key)-1)
 	at := max/2
@@ -154,7 +154,7 @@ func (a sorter_uint16) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a sorter_uint16) Less(i, j int) bool { return a[i].k < a[j].k }
 
 // Find returns the index based on the key.
-func (f *Key_uint16) Find(thekey uint16) (int, bool) {
+func (f *Key_uint16) Find(thekey uint16) (uint64, bool) {
 	var min uint64
 	max := uint64(len(f.Key)-1)
 	at := max/2
@@ -220,7 +220,7 @@ func (a sorter_uint8) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a sorter_uint8) Less(i, j int) bool { return a[i].k < a[j].k }
 
 // Find returns the index based on the key.
-func (f *Key_uint8) Find(thekey uint8) (int, bool) {
+func (f *Key_uint8) Find(thekey uint8) (uint64, bool) {
 	var min uint64
 	max := uint64(len(f.Key)-1)
 	at := max/2
@@ -286,7 +286,7 @@ func (a sorter_string) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a sorter_string) Less(i, j int) bool { return a[i].k < a[j].k }
 
 // Find returns the index based on the key.
-func (f *Key_string) Find(thekey string) (int, bool) {
+func (f *Key_string) Find(thekey string) (uint64, bool) {
 	var min uint64
 	max := uint64(len(f.Key)-1)
 	at := max/2
@@ -352,7 +352,7 @@ func (a sorter_bytes) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a sorter_bytes) Less(i, j int) bool { return bytes.Compare(a[i].k,a[j].k)==-1 }
 
 // Find returns the index based on the key.
-func (f *Key_bytes) Find(thekey []byte) (int, bool) {
+func (f *Key_bytes) Find(thekey []byte) (uint64, bool) {
 	var min uint64
 	max := uint64(len(f.Key)-1)
 	at := max/2
