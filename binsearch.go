@@ -23,24 +23,24 @@ func (a sorter_uint64) Less(i, j int) bool { return a[i].k < a[j].k }
 
 // Find returns the index based on the key.
 func (f *Key_uint64) Find(thekey uint64) (int, bool) {
-	min := 0
-	max := len(f.Key)-1
+	var min uint64
+	max := uint64(len(f.Key)-1)
 	at := max/2
 	for {
 		current := f.Key[at]
 		if thekey<current {
 			max = at-1
 		} else {
-		if thekey>current {
-			min = at+1
+		if thekey==current {
+			return at, true // found
 			} else {
-				return at, true // found
+				min = at+1
 			}
 		}
 		if min>max {
 			return min, false // doesn't exist
 		}
-		at = (max+min)/2
+		at = min+((max-min)/2) // so as not to go out of bounds
 	}
 }
 
@@ -89,18 +89,18 @@ func (a sorter_uint32) Less(i, j int) bool { return a[i].k < a[j].k }
 
 // Find returns the index based on the key.
 func (f *Key_uint32) Find(thekey uint32) (int, bool) {
-	min := 0
-	max := len(f.Key)-1
+	var min uint64
+	max := uint64(len(f.Key)-1)
 	at := max/2
 	for {
 		current := f.Key[at]
 		if thekey<current {
 			max = at-1
 		} else {
-		if thekey>current {
-			min = at+1
+		if thekey==current {
+			return at, true // found
 			} else {
-				return at, true // found
+				min = at+1
 			}
 		}
 		if min>max {
@@ -155,18 +155,18 @@ func (a sorter_uint16) Less(i, j int) bool { return a[i].k < a[j].k }
 
 // Find returns the index based on the key.
 func (f *Key_uint16) Find(thekey uint16) (int, bool) {
-	min := 0
-	max := len(f.Key)-1
+	var min uint64
+	max := uint64(len(f.Key)-1)
 	at := max/2
 	for {
 		current := f.Key[at]
 		if thekey<current {
 			max = at-1
 		} else {
-		if thekey>current {
-			min = at+1
+		if thekey==current {
+			return at, true // found
 			} else {
-				return at, true // found
+				min = at+1
 			}
 		}
 		if min>max {
@@ -221,18 +221,18 @@ func (a sorter_uint8) Less(i, j int) bool { return a[i].k < a[j].k }
 
 // Find returns the index based on the key.
 func (f *Key_uint8) Find(thekey uint8) (int, bool) {
-	min := 0
-	max := len(f.Key)-1
+	var min uint64
+	max := uint64(len(f.Key)-1)
 	at := max/2
 	for {
 		current := f.Key[at]
 		if thekey<current {
 			max = at-1
 		} else {
-		if thekey>current {
-			min = at+1
+		if thekey==current {
+			return at, true // found
 			} else {
-				return at, true // found
+				min = at+1
 			}
 		}
 		if min>max {
@@ -287,24 +287,24 @@ func (a sorter_string) Less(i, j int) bool { return a[i].k < a[j].k }
 
 // Find returns the index based on the key.
 func (f *Key_string) Find(thekey string) (int, bool) {
-	min := 0
-	max := len(f.Key)-1
+	var min uint64
+	max := uint64(len(f.Key)-1)
 	at := max/2
 	for {
 		current := f.Key[at]
 		if thekey<current {
 			max = at-1
 		} else {
-		if thekey>current {
-			min = at+1
+		if thekey==current {
+			return at, true // found
 			} else {
-				return at, true // found
+				min = at+1
 			}
 		}
 		if min>max {
 			return min, false // doesn't exist
 		}
-		at = (max+min)/2
+		at = min+((max-min)/2)
 	}
 }
 
@@ -353,8 +353,8 @@ func (a sorter_bytes) Less(i, j int) bool { return bytes.Compare(a[i].k,a[j].k)=
 
 // Find returns the index based on the key.
 func (f *Key_bytes) Find(thekey []byte) (int, bool) {
-	min := 0
-	max := len(f.Key)-1
+	var min uint64
+	max := uint64(len(f.Key)-1)
 	at := max/2
 	for {
 		what := bytes.Compare(thekey,f.Key[at])
@@ -366,7 +366,7 @@ func (f *Key_bytes) Find(thekey []byte) (int, bool) {
 		if min>max {
 			return min, false // doesn't exist
 		}
-		at = (max+min)/2
+		at = min+((max-min)/2)
 	}
 }
 
