@@ -15,7 +15,7 @@ type sort_uint64 struct {
 i int
 k uint64
 }
-type sorter_uint64 []keyVal_uint
+type sorter_uint64 []sort_uint64
 func (a *sorter_uint64) Len() int           { return len(a) }
 func (a *sorter_uint64) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a *sorter_uint64) Less(i, j int) bool { return a[i].k < a[j].k }
