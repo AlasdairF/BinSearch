@@ -63,24 +63,19 @@ func (f *Key_uint64) FindInterpolation(thekey uint64) (uint64, bool) {
 	return 0, false
 }
 
-// Add adds this index for later building
+// AddKeyUnsorted adds this key to the end of the index for later building with Build.
 func (f *Key_uint64) AddKeyUnsorted(thekey uint64) {
 	f.Key = append(f.Key, thekey)
 	return
 }
 
-// Add adds this index for later building
-/*
-func (f *Key_uint64) AddKeyPosition(thekey uint64, i uint64) {
-	
+// AddKeyAt adds this key to the index in this exact position, so it does not require later rebuilding.
+func (f *Key_uint64) AddKeyAt(thekey uint64, i uint64) {
 	f.Key = append(f.Key, 0)
 	copy(s[i+1:], s[i:])
 	s[i] = thekey
-	
-	f.Key = append(f.Key, thekey)
 	return
 }
-*/
 
 // Build sorts the keys and returns an array telling you how to sort the values, you must do this yourself.
 func (f *Key_uint64) Build() []int {
@@ -163,9 +158,17 @@ func (f *Key_uint32) FindInterpolation(thekey uint32) (uint64, bool) {
 	return 0, false
 }
 
-// Add adds this index for later building
+// AddKeyUnsorted adds this key to the end of the index for later building with Build.
 func (f *Key_uint32) AddKeyUnsorted(thekey uint32) {
 	f.Key = append(f.Key, thekey)
+	return
+}
+
+// AddKeyAt adds this key to the index in this exact position, so it does not require later rebuilding.
+func (f *Key_uint32) AddKeyAt(thekey uint32, i uint64) {
+	f.Key = append(f.Key, 0)
+	copy(s[i+1:], s[i:])
+	s[i] = thekey
 	return
 }
 
@@ -249,9 +252,17 @@ func (f *Key_uint16) FindInterpolation(thekey uint16) (uint64, bool) {
 	return 0, false
 }
 
-// Add adds this index for later building
+// AddKeyUnsorted adds this key to the end of the index for later building with Build.
 func (f *Key_uint16) AddKeyUnsorted(thekey uint16) {
 	f.Key = append(f.Key, thekey)
+	return
+}
+
+// AddKeyAt adds this key to the index in this exact position, so it does not require later rebuilding.
+func (f *Key_uint16) AddKeyAt(thekey uint16, i uint64) {
+	f.Key = append(f.Key, 0)
+	copy(s[i+1:], s[i:])
+	s[i] = thekey
 	return
 }
 
@@ -335,9 +346,17 @@ func (f *Key_uint8) FindInterpolation(thekey uint8) (uint64, bool) {
 	return 0, false
 }
 
-// Add adds this index for later building
+// AddKeyUnsorted adds this key to the end of the index for later building with Build.
 func (f *Key_uint8) AddKeyUnsorted(thekey uint8) {
 	f.Key = append(f.Key, thekey)
+	return
+}
+
+// AddKeyAt adds this key to the index in this exact position, so it does not require later rebuilding.
+func (f *Key_uint8) AddKeyAt(thekey uint8, i uint64) {
+	f.Key = append(f.Key, 0)
+	copy(s[i+1:], s[i:])
+	s[i] = thekey
 	return
 }
 
@@ -402,9 +421,17 @@ func (f *Key_string) Find(thekey string) (uint64, bool) {
 	return min, false // doesn't exist
 }
 
-// Add adds this index for later building
+// AddKeyUnsorted adds this key to the end of the index for later building with Build.
 func (f *Key_string) AddKeyUnsorted(thekey string) {
 	f.Key = append(f.Key, thekey)
+	return
+}
+
+// AddKeyAt adds this key to the index in this exact position, so it does not require later rebuilding.
+func (f *Key_string) AddKeyAt(thekey string, i uint64) {
+	f.Key = append(f.Key, ``)
+	copy(s[i+1:], s[i:])
+	s[i] = thekey
 	return
 }
 
@@ -469,9 +496,18 @@ func (f *Key_bytes) Find(thekey []byte) (uint64, bool) {
 	return min, false // doesn't exist
 }
 
-// Add adds this index for later building
+// AddKeyUnsorted adds this key to the end of the index for later building with Build.
 func (f *Key_bytes) AddKeyUnsorted(thekey []byte) {
 	f.Key = append(f.Key, thekey)
+	return
+}
+
+// AddKeyAt adds this key to the index in this exact position, so it does not require later rebuilding.
+func (f *Key_bytes) AddKeyAt(thekey []byte, i uint64) {
+	temp := make([]byte,0)
+	f.Key = append(f.Key, temp)
+	copy(s[i+1:], s[i:])
+	s[i] = thekey
 	return
 }
 
