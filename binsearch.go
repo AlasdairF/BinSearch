@@ -92,7 +92,7 @@ func (f *Key_uint32) Find(thekey uint32) (uint64, bool) {
 	var min,at uint64
 	var current uint32
 	max := f.keymax
-	for min>max {
+	for min<=max {
 		at = (max+min)/2
 		if current=f.Key[at]; thekey<current {
 			max = at-1
