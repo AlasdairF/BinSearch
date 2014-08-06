@@ -30,6 +30,9 @@ func (f *Key_uint64) Find(thekey uint64) (uint64, bool) {
 	for min<=max {
 		at = min+((max-min)/2)
 		if current=f.Key[at]; thekey<current {
+			if at==0 {
+				return 0, false
+			}
 			max = at-1
 		} else {
 		if thekey>current {
