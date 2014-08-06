@@ -72,8 +72,8 @@ func (f *Key_uint64) AddKeyUnsorted(thekey uint64) {
 // AddKeyAt adds this key to the index in this exact position, so it does not require later rebuilding.
 func (f *Key_uint64) AddKeyAt(thekey uint64, i uint64) {
 	f.Key = append(f.Key, 0)
-	copy(s[i+1:], s[i:])
-	s[i] = thekey
+	copy(f.Key[i+1:], f.Key[i:])
+	f.Key[i] = thekey
 	return
 }
 
@@ -167,8 +167,8 @@ func (f *Key_uint32) AddKeyUnsorted(thekey uint32) {
 // AddKeyAt adds this key to the index in this exact position, so it does not require later rebuilding.
 func (f *Key_uint32) AddKeyAt(thekey uint32, i uint64) {
 	f.Key = append(f.Key, 0)
-	copy(s[i+1:], s[i:])
-	s[i] = thekey
+	copy(f.Key[i+1:], f.Key[i:])
+	f.Key[i] = thekey
 	return
 }
 
@@ -261,8 +261,8 @@ func (f *Key_uint16) AddKeyUnsorted(thekey uint16) {
 // AddKeyAt adds this key to the index in this exact position, so it does not require later rebuilding.
 func (f *Key_uint16) AddKeyAt(thekey uint16, i uint64) {
 	f.Key = append(f.Key, 0)
-	copy(s[i+1:], s[i:])
-	s[i] = thekey
+	copy(f.Key[i+1:], f.Key[i:])
+	f.Key[i] = thekey
 	return
 }
 
@@ -355,8 +355,8 @@ func (f *Key_uint8) AddKeyUnsorted(thekey uint8) {
 // AddKeyAt adds this key to the index in this exact position, so it does not require later rebuilding.
 func (f *Key_uint8) AddKeyAt(thekey uint8, i uint64) {
 	f.Key = append(f.Key, 0)
-	copy(s[i+1:], s[i:])
-	s[i] = thekey
+	copy(f.Key[i+1:], f.Key[i:])
+	f.Key[i] = thekey
 	return
 }
 
@@ -430,8 +430,8 @@ func (f *Key_string) AddKeyUnsorted(thekey string) {
 // AddKeyAt adds this key to the index in this exact position, so it does not require later rebuilding.
 func (f *Key_string) AddKeyAt(thekey string, i uint64) {
 	f.Key = append(f.Key, ``)
-	copy(s[i+1:], s[i:])
-	s[i] = thekey
+	copy(f.Key[i+1:], f.Key[i:])
+	f.Key[i] = thekey
 	return
 }
 
@@ -506,8 +506,8 @@ func (f *Key_bytes) AddKeyUnsorted(thekey []byte) {
 func (f *Key_bytes) AddKeyAt(thekey []byte, i uint64) {
 	temp := make([]byte,0)
 	f.Key = append(f.Key, temp)
-	copy(s[i+1:], s[i:])
-	s[i] = thekey
+	copy(f.Key[i+1:], f.Key[i:])
+	f.Key[i] = thekey
 	return
 }
 
