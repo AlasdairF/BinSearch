@@ -96,7 +96,7 @@ func (a sorter_uint32) Less(i, j int) bool { return a[i].k < a[j].k }
 func (f *Key_uint32) Find(thekey uint32) (uint64, bool) {
 	var mid,l uint64
 	r := f.keymax
-	tot := r+1
+	tot := r
 	for (l <= r) {
 		mid = l + uint64(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r-l))+0.5) // +0.5 makes it round instead of floor
 		if mid<0 || mid>tot {
