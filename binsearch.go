@@ -27,7 +27,7 @@ func (f *Key_uint64) Find(thekey uint64) (uint64, bool) {
 	var mid,l uint64
 	r := f.keymax
 	for (l <= r) {
-		mid = min+((max-min)/2)
+		mid = l+((r-l)/2)
 		if mid<l || mid>r {
 			return 0, false
 		}
