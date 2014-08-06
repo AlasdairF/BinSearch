@@ -79,6 +79,7 @@ func (f *Key_uint64) Build() []int {
 type Key_uint32 struct {
 Key []uint32
 keymax uint64
+keydistribution []uint32
 }
 
 type sort_uint32 struct {
@@ -92,21 +93,10 @@ func (a sorter_uint32) Less(i, j int) bool { return a[i].k < a[j].k }
 
 // Find returns the index based on the key.
 func (f *Key_uint32) Find(thekey uint32) (uint64, bool) {
-	l := uint64(0)
+	var mid,l uint64
 	r := f.keymax
-	for (l <= r) {
-		if (f.Key[l] == f.Key[r]) {
-			if (f.Key[l] == thekey) {
-				return l, true
-			} else {
-				return l, false
-			}
-		}
-		k := float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]);
-		if (k < 0 || k > 1) {
-			return 0, false
-		}
-		mid := uint64(float32(l) + k*float32(r-l))
+	for (l <= r) {		
+		mid = l + uint64(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r-l))+0.5) // +0.5 makes it round instead of floor
 		if (thekey < f.Key[mid]) {
 			r = mid - 1;
 		} else if (thekey > f.Key[mid]) {
@@ -114,7 +104,6 @@ func (f *Key_uint32) Find(thekey uint32) (uint64, bool) {
 		} else {
 			return mid, true
 		}
-		return 0, false
 	}
 	return 0, false
 }
