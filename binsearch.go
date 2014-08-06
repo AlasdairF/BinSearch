@@ -3,6 +3,7 @@ package binsearch
 import (
 "sort"
 "bytes"
+"fmt"
 )
 
 // ---------- Key_uint64 ----------
@@ -61,10 +62,23 @@ func (f *Key_uint64) FindInterpolation(thekey uint64) (uint64, bool) {
 }
 
 // Add adds this index for later building
-func (f *Key_uint64) AddKey(thekey uint64) {
+func (f *Key_uint64) AddKeyUnsorted(thekey uint64) {
 	f.Key = append(f.Key, thekey)
 	return
 }
+
+// Add adds this index for later building
+/*
+func (f *Key_uint64) AddKeyPosition(thekey uint64, i uint64) {
+	
+	f.Key = append(f.Key, 0)
+	copy(s[i+1:], s[i:])
+	s[i] = thekey
+	
+	f.Key = append(f.Key, thekey)
+	return
+}
+*/
 
 // Build sorts the keys and returns an array telling you how to sort the values, you must do this yourself.
 func (f *Key_uint64) Build() []int {
@@ -113,6 +127,7 @@ func (f *Key_uint32) Find(thekey uint32) (uint64, bool) {
 	max := f.keymax
 	for min<=max {
 		at = (max+min)/2
+		fmt.Println(`at`,at,`max`,max,`min`,min)
 		if current=f.Key[at]; thekey<current {
 			max = at-1
 		} else {
@@ -145,7 +160,7 @@ func (f *Key_uint32) FindInterpolation(thekey uint32) (uint64, bool) {
 }
 
 // Add adds this index for later building
-func (f *Key_uint32) AddKey(thekey uint32) {
+func (f *Key_uint32) AddKeyUnsorted(thekey uint32) {
 	f.Key = append(f.Key, thekey)
 	return
 }
@@ -228,7 +243,7 @@ func (f *Key_uint16) FindInterpolation(thekey uint16) (uint64, bool) {
 }
 
 // Add adds this index for later building
-func (f *Key_uint16) AddKey(thekey uint16) {
+func (f *Key_uint16) AddKeyUnsorted(thekey uint16) {
 	f.Key = append(f.Key, thekey)
 	return
 }
@@ -311,7 +326,7 @@ func (f *Key_uint8) FindInterpolation(thekey uint8) (uint64, bool) {
 }
 
 // Add adds this index for later building
-func (f *Key_uint8) AddKey(thekey uint8) {
+func (f *Key_uint8) AddKeyUnsorted(thekey uint8) {
 	f.Key = append(f.Key, thekey)
 	return
 }
@@ -375,7 +390,7 @@ func (f *Key_string) Find(thekey string) (uint64, bool) {
 }
 
 // Add adds this index for later building
-func (f *Key_string) AddKey(thekey string) {
+func (f *Key_string) AddKeyUnsorted(thekey string) {
 	f.Key = append(f.Key, thekey)
 	return
 }
@@ -436,7 +451,7 @@ func (f *Key_bytes) Find(thekey []byte) (uint64, bool) {
 }
 
 // Add adds this index for later building
-func (f *Key_bytes) AddKey(thekey []byte) {
+func (f *Key_bytes) AddKeyUnsorted(thekey []byte) {
 	f.Key = append(f.Key, thekey)
 	return
 }
