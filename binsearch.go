@@ -3,7 +3,6 @@ package binsearch
 import (
 "sort"
 "bytes"
-"fmt"
 )
 
 // ---------- Key_uint64 ----------
@@ -127,7 +126,6 @@ func (f *Key_uint32) Find(thekey uint32) (uint64, bool) {
 	max := f.keymax
 	for min<=max {
 		at = (max+min)/2
-		fmt.Println(`at`,at,`max`,max,`min`,min)
 		if current=f.Key[at]; thekey<current {
 			if at==0 {
 				return 0, false
