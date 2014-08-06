@@ -27,11 +27,7 @@ func (f *Key_uint64) Find(thekey uint64) (uint64, bool) {
 	var mid,l uint64
 	r := f.keymax
 	tot := r
-	for (l <= r) {
-		mid = l+((r-l)/2)
-		if mid<0 || mid>tot {
-			return 0, false
-		}
+	for l<=r && mid>=0 && mid<=tot  {
 		if (thekey < f.Key[mid]) {
 			r = mid - 1;
 		} else if (thekey > f.Key[mid]) {
@@ -39,6 +35,7 @@ func (f *Key_uint64) Find(thekey uint64) (uint64, bool) {
 		} else {
 			return mid, true
 		}
+	mid = l+((r-l)/2)
 	}
 	return 0, false
 }
@@ -91,13 +88,10 @@ func (a sorter_uint32) Less(i, j int) bool { return a[i].k < a[j].k }
 
 // Find returns the index based on the key.
 func (f *Key_uint32) Find(thekey uint32) (uint64, bool) {
-	var mid,l uint64
+	var l uint64
 	r := f.keymax
-	for (l <= r) {
-		mid = l + uint64(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r - l))+0.5) // +0.5 makes it round instead of floor
-		if mid<l || mid>r {
-			return 0, false
-		}
+	var mid uint64 = uint64(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r))+0.5)
+	for l<=r && mid>=l && mid<=r {
 		if (thekey < f.Key[mid]) {
 			r = mid - 1;
 		} else if (thekey > f.Key[mid]) {
@@ -105,6 +99,7 @@ func (f *Key_uint32) Find(thekey uint32) (uint64, bool) {
 		} else {
 			return mid, true
 		}
+	mid = l + uint64(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r - l))+0.5) // +0.5 makes it round instead of floor
 	}
 	return 0, false
 }
