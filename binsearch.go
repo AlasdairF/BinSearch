@@ -129,6 +129,9 @@ func (f *Key_uint32) Find(thekey uint32) (uint64, bool) {
 		at = (max+min)/2
 		fmt.Println(`at`,at,`max`,max,`min`,min)
 		if current=f.Key[at]; thekey<current {
+			if at==0 {
+				return 0, false
+			}
 			max = at-1
 		} else {
 		if thekey>current {
@@ -212,6 +215,9 @@ func (f *Key_uint16) Find(thekey uint16) (uint64, bool) {
 	for min<=max {
 		at = (max+min)/2
 		if current=f.Key[at]; thekey<current {
+			if at==0 {
+				return 0, false
+			}
 			max = at-1
 		} else {
 		if thekey>current {
@@ -295,6 +301,9 @@ func (f *Key_uint8) Find(thekey uint8) (uint64, bool) {
 	for min<=max {
 		at = (max+min)/2
 		if current=f.Key[at]; thekey<current {
+			if at==0 {
+				return 0, false
+			}
 			max = at-1
 		} else {
 		if thekey>current {
@@ -377,6 +386,9 @@ func (f *Key_string) Find(thekey string) (uint64, bool) {
 	for min<=max {
 		at = min+((max-min)/2)
 		if thekey<f.Key[at] {
+			if at==0 {
+				return 0, false
+			}
 			max = at-1
 		} else {
 		if thekey>f.Key[at] {
@@ -442,9 +454,15 @@ func (f *Key_bytes) Find(thekey []byte) (uint64, bool) {
 		at = min+((max-min)/2)
 		what := bytes.Compare(thekey,f.Key[at])
 		switch(what) {
-			case -1: max = at-1
-			case 1: min = at+1
-			default: return at, true
+			case -1:
+				if at==0 {
+					return 0, false
+				}
+				max = at-1
+			case 1:
+				min = at+1
+			default:
+				return at, true
 		}
 	}
 	return min, false // doesn't exist
