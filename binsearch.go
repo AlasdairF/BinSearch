@@ -27,6 +27,7 @@ func (f *Key_uint64) Find(thekey uint64) (uint64, bool) {
 	var min uint64
 	max := f.keymax
 	at := max/2
+	tot := max
 	for {
 		current := f.Key[at]
 		if thekey<current {
@@ -38,10 +39,10 @@ func (f *Key_uint64) Find(thekey uint64) (uint64, bool) {
 				return at, true // found
 			}
 		}
-		if min>max {
+		at = min+((max-min)/2) // so as not to go out of bounds
+		if min>max || at<0 || at>tot {
 			return min, false // doesn't exist
 		}
-		at = min+((max-min)/2) // so as not to go out of bounds
 	}
 }
 
