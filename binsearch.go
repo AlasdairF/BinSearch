@@ -597,7 +597,7 @@ func (f *Key_bytes) AddKeyAt(thekey []byte, i uint64) {
 		f.Keyindex = newar
 		fmt.Println(`a`)
 	} else { // already have keys of this length
-		for r:=l; r<l+2; r++ {
+		for r:=l; r<len(f.Keyindex); r++ {
 			f.Keyindex[r]++
 		}
 		fmt.Println(`b`)
