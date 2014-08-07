@@ -612,7 +612,7 @@ func (f *Key_bytes) Build() []int {
 		l2 := uint64(len(temp[i].k))
 		if l2>max {
 			max = l2
-			if l2>len(keyindex)-2 {
+			if l2>uint64(len(keyindex)-2) {
 				temp := make([]uint64,l*2)
 				copy(temp,keyindex)
 				keyindex = temp
