@@ -591,10 +591,18 @@ func (f *Key_bytes) AddKeyAt(thekey []byte, i uint64) {
 	l := len(thekey)
 	fmt.Println(`Add at`,l)
 	if l+2>len(f.Keyindex) { // first key of this length
-		newar := make([]uint64,l+2)
+		oldlen := len(f.Keyindex)
+		newlen := l+2
+		newar := make([]uint64,newlen)
 		copy(newar,f.Keyindex)
-		newar[l] = uint64(len(f.Key))
-		newar[l+1] = newar[l]
+		if oldlen>0 {
+			val := f.val[oldlen-1]
+			for r:=oldlen; r<newlen; r++ {
+				newar[r]=val
+			}
+		}
+		newar[l]++
+		newar[l+1]++
 		f.Keyindex = newar
 		fmt.Println(`a`)
 	} else { // already have keys of this length
