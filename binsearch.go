@@ -506,7 +506,27 @@ k []byte
 type sorter_bytes []sort_bytes
 func (a sorter_bytes) Len() int           { return len(a) }
 func (a sorter_bytes) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a sorter_bytes) Less(i, j int) bool { return bytes.Compare(a[i].k,a[j].k)==-1 }
+func (a sorter_bytes) Less(i, j int) bool { return comparebytes(a[i].k,a[j].k)==-1 }
+
+// Faster compare bytes function
+func comparebytes(a, b []byte) int8 {
+	if len(a)<len(b) {
+		return -1
+	} else {
+		if len(a)>len(b) {
+			return 1
+		} else {
+			for i:=0; i<len(a); i++ {
+				if a[i]<b[i] {
+					return -1
+				} else {
+					if a[i]>b[i] return 1
+				}
+			}
+			return 0
+		}
+	}
+}
 
 // Find returns the index based on the key.
 func (f *Key_bytes) Find(thekey []byte) (uint64, bool) {
@@ -519,7 +539,7 @@ func (f *Key_bytes) Find(thekey []byte) (uint64, bool) {
 	}
 	for min<=max {
 		at = min+((max-min)/2)
-		what := bytes.Compare(thekey,f.Key[at])
+		what := comparebytes(thekey,f.Key[at])
 		switch(what) {
 			case -1:
 				if at==0 {
