@@ -533,6 +533,8 @@ func comparebytes(a, b []byte) int8 {
 func (f *Key_bytes) Find(thekey []byte) (uint64, bool) {
 	var min,at uint64
 	max := uint64(len(f.Key))
+	keylen := len(thekey)
+	same := true
 	if max>0 {
 		max--
 	} else {
@@ -540,17 +542,34 @@ func (f *Key_bytes) Find(thekey []byte) (uint64, bool) {
 	}
 	for min<=max {
 		at = min+((max-min)/2)
-		what := comparebytes(thekey,f.Key[at])
-		switch(what) {
-			case -1:
-				if at==0 {
-					return 0, false
-				}
-				max = at-1
-			case 1:
+		if keylen<len(b) {
+			if at==0 {
+				return 0, false
+			}
+			max = at-1
+		} else {
+			if keylen>len(b) {
 				min = at+1
-			default:
-				return at, true
+			} else {
+				same = true
+				for i:=0; i<keylen; i++ {
+					if a[i]<b[i] {
+						if at==0 {
+							return 0, false
+						}
+						max = at-1
+						same=false
+					} else {
+						if a[i]>b[i] {
+						min = at+1
+						}
+						same=false
+					}
+				}
+				if same {
+					return at, true
+				}
+			}
 		}
 	}
 	return min, false // doesn't exist
