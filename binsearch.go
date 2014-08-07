@@ -550,12 +550,12 @@ func (f *Key_bytes) Find(thekey []byte) (uint64, bool) {
 					return 0, false
 				}
 				max = at-1
-				same=false
+				same = false
 			} else {
 				if thekey[i]>f.Key[at][i] {
 				min = at+1
 				}
-				same=false
+				same = false
 			}
 		}
 		if same {
@@ -583,7 +583,7 @@ func (f *Key_bytes) AddKeyAt(thekey []byte, i uint64) {
 		newar := make([]uint64,l+2)
 		copy(newar,f.keyindex)
 		newar[l] = i
-		newar[l+1] = len(f.Key)
+		newar[l+1] = uint64(len(f.Key))
 	} else { // already have keys of this length
 		for r:=l+1; r<l+2; r++ {
 			f.keyindex[r]++
@@ -609,21 +609,21 @@ func (f *Key_bytes) Build() []int {
 	for i:=0; i<l; i++ {
 		imap[i]=temp[i].i
 		newkey[i]=temp[i].k
-		l := len(temp[i].k)
-		if l>max {
-			max = l
-			if l>len(keyindex)-2 {
+		l2 := len(temp[i].k)
+		if l2>max {
+			max = l2
+			if l2>len(keyindex)-2 {
 				temp := make([]uint64,l*2)
 				copy(temp,keyindex)
 				keyindex = temp
 			}
 		}
-		keyindex[l]++
+		keyindex[l2]++
 	}
 	f.Key = newkey
 	var at uint64
 	newar := make([]uint64,max+2)
-	for i:=0; i<max+2; i++ {
+	for i:=uint64(0); i<max+2; i++ {
 		newar[i]=at
 		at+=keyindex[i]
 	}
