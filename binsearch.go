@@ -609,7 +609,7 @@ func (f *Key_bytes) Build() []int {
 	for i:=0; i<l; i++ {
 		imap[i]=temp[i].i
 		newkey[i]=temp[i].k
-		l2 := len(temp[i].k)
+		l2 := uint64(len(temp[i].k))
 		if l2>max {
 			max = l2
 			if l2>len(keyindex)-2 {
