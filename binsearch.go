@@ -2,6 +2,7 @@ package binsearch
 
 import (
 "sort"
+"fmt"
 )
 
 // ---------- Key_uint64 ----------
@@ -584,6 +585,9 @@ func (f *Key_bytes) AddKeyAt(thekey []byte, i uint64) {
 	copy(f.Key[i+1:], f.Key[i:])
 	f.Key[i] = thekey
 	// Now modify the keyindex
+	
+	fmt.Println(f.Keyindex)
+	
 	l := len(thekey)
 	if l+2>len(f.Keyindex) { // first key of this length
 		newar := make([]uint64,l+2)
@@ -591,11 +595,16 @@ func (f *Key_bytes) AddKeyAt(thekey []byte, i uint64) {
 		newar[l] = i
 		newar[l+1] = i
 		f.Keyindex = newar
+		fmt.Println(`a`)
 	} else { // already have keys of this length
 		for r:=l; r<l+2; r++ {
 			f.Keyindex[r]++
 		}
+		fmt.Println(`b`)
 	}
+	
+	fmt.Println(f.Keyindex)
+	
 	return
 }
 
