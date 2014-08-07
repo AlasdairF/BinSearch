@@ -601,7 +601,7 @@ func (f *Key_bytes) AddKeyAt(thekey []byte, i uint64) {
 				newar[r]=val
 			}
 		}
-		newar[l]++
+		//newar[l]++
 		newar[l+1]++
 		f.Keyindex = newar
 		fmt.Println(`a`)
