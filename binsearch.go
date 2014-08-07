@@ -542,7 +542,7 @@ func (f *Key_bytes) Find(thekey []byte) (uint64, bool) {
 	}
 	for min<=max {
 		at = min+((max-min)/2)
-		if keylen<len(b) {
+		if keylen<len(f.Key[at]) {
 			if at==0 {
 				return 0, false
 			}
@@ -553,14 +553,14 @@ func (f *Key_bytes) Find(thekey []byte) (uint64, bool) {
 			} else {
 				same = true
 				for i:=0; i<keylen; i++ {
-					if a[i]<f.Key[at][i] {
+					if thekey[i]<f.Key[at][i] {
 						if at==0 {
 							return 0, false
 						}
 						max = at-1
 						same=false
 					} else {
-						if a[i]>f.Key[at][i] {
+						if thekey[i]>f.Key[at][i] {
 						min = at+1
 						}
 						same=false
