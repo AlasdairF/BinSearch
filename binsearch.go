@@ -601,7 +601,7 @@ func (f *Key_bytes) Build() []int {
 	sort.Sort(temp)
 	imap := make([]int,l)
 	newkey := make([][]byte,l)
-	keyindex := make([]uint64,100)
+	keyindex := make([]uint64,50)
 	var max uint64
 	for i:=0; i<l; i++ {
 		imap[i]=temp[i].i
