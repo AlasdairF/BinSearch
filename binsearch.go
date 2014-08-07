@@ -2,7 +2,6 @@ package binsearch
 
 import (
 "sort"
-"bytes"
 )
 
 // ---------- Key_uint64 ----------
