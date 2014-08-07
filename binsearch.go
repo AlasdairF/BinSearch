@@ -2,7 +2,6 @@ package binsearch
 
 import (
 "sort"
-"fmt"
 )
 
 // ---------- Key_uint64 ----------
@@ -536,7 +535,6 @@ func (f *Key_bytes) Find(thekey []byte) (uint64, bool) {
 	keylen := len(thekey)
 	min := f.Keyindex[keylen]
 	max := f.Keyindex[keylen+1]
-	fmt.Println(`min`,min,`max`,max)
 	if max>0 {
 		max--
 	} else {
@@ -545,7 +543,6 @@ func (f *Key_bytes) Find(thekey []byte) (uint64, bool) {
 	Outer:
 	for min<=max {
 		at = min+((max-min)/2)
-		fmt.Println(`min`,min,`max`,max,`at`,at)
 		for i:=0; i<keylen; i++ {
 			if thekey[i]<f.Key[at][i] {
 				if at==0 {
