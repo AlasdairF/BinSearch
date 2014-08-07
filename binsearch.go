@@ -596,7 +596,7 @@ func (f *Key_bytes) AddKeyAt(thekey []byte, i uint64) {
 		newar := make([]uint64,newlen)
 		copy(newar,f.Keyindex)
 		if oldlen>0 {
-			val := f.val[oldlen-1]
+			val := newar[oldlen-1]
 			for r:=oldlen; r<newlen; r++ {
 				newar[r]=val
 			}
