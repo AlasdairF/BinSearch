@@ -556,8 +556,8 @@ func (f *Key_bytes) Find(thekey []byte) (uint64, bool) {
 			} else {
 				if thekey[i]>f.Key[at][i] {
 				min = at+1
-				}
 				continue Outer
+				}
 			}
 		}
 		return at, true
