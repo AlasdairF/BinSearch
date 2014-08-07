@@ -533,7 +533,6 @@ func (a sorter_bytes) Less(i, j int) bool {
 // Find returns the index based on the key.
 func (f *Key_bytes) Find(thekey []byte) (uint64, bool) {
 	var at uint64
-	var same bool
 	keylen := len(thekey)
 	min := f.Keyindex[keylen]
 	max := f.Keyindex[keylen+1]
@@ -543,28 +542,24 @@ func (f *Key_bytes) Find(thekey []byte) (uint64, bool) {
 	} else {
 		return 0, false
 	}
+	Outer:
 	for min<=max {
 		at = min+((max-min)/2)
-		same = true
 		for i:=0; i<keylen; i++ {
 			if thekey[i]<f.Key[at][i] {
 				if at==0 {
 					return 0, false
 				}
 				max = at-1
-				same = false
-				break
+				continue Outer
 			} else {
 				if thekey[i]>f.Key[at][i] {
 				min = at+1
 				}
-				same = false
-				break
+				continue Outer
 			}
 		}
-		if same {
-			return at, true
-		}
+		return at, true
 	}
 	return min, false // doesn't exist
 }
