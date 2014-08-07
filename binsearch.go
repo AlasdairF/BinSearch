@@ -553,11 +553,13 @@ func (f *Key_bytes) Find(thekey []byte) (uint64, bool) {
 				}
 				max = at-1
 				same = false
+				break
 			} else {
 				if thekey[i]>f.Key[at][i] {
 				min = at+1
 				}
 				same = false
+				break
 			}
 		}
 		if same {
