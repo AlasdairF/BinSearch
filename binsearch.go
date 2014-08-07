@@ -520,7 +520,9 @@ func comparebytes(a, b []byte) int8 {
 				if a[i]<b[i] {
 					return -1
 				} else {
-					if a[i]>b[i] return 1
+					if a[i]>b[i] {
+					return 1
+					}
 				}
 			}
 			return 0
