@@ -545,6 +545,7 @@ func (f *Key_bytes) Find(thekey []byte) (uint64, bool) {
 	Outer:
 	for min<=max {
 		at = min+((max-min)/2)
+		fmt.Println(`min`,min,`max`,max,`at`,at)
 		for i:=0; i<keylen; i++ {
 			if thekey[i]<f.Key[at][i] {
 				if at==0 {
