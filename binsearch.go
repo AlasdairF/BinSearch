@@ -2,7 +2,6 @@ package binsearch
 
 import (
 "sort"
-"fmt"
 )
 
 // ---------- Key_uint64 ----------
@@ -497,7 +496,7 @@ func (f *Key_string) Build() []int {
 // Add this to any struct to make it binary searchable.
 type Key_bytes struct {
 Key [][]byte
-Keyindex []uint64
+keyindex []uint64
 }
 
 type sort_bytes struct {
@@ -535,16 +534,16 @@ func (f *Key_bytes) Find(thekey []byte) (uint64, bool) {
 	var at uint64
 	keylen := len(thekey)
 	// Check something for this actually exists in the keyindex
-	if len(f.Keyindex)<keylen+2 {
-		l := len(f.Keyindex)
+	if len(f.keyindex)<keylen+2 {
+		l := len(f.keyindex)
 		if l==0 {
 			return 0, false
 		} else {
-			return f.Keyindex[l-1], false
+			return f.keyindex[l-1], false
 		}
 	}
-	min := f.Keyindex[keylen]
-	max := f.Keyindex[keylen+1]
+	min := f.keyindex[keylen]
+	max := f.keyindex[keylen+1]
 	if max>0 {
 		max--
 	} else {
@@ -585,16 +584,12 @@ func (f *Key_bytes) AddKeyAt(thekey []byte, i uint64) {
 	copy(f.Key[i+1:], f.Key[i:])
 	f.Key[i] = thekey
 	// Now modify the keyindex
-	
-	fmt.Println(f.Keyindex)
-	
 	l := len(thekey)
-	fmt.Println(`Add at`,l)
-	if l+2>len(f.Keyindex) { // first key of this length
-		oldlen := len(f.Keyindex)
+	if l+2>len(f.keyindex) { // first key of this length
+		oldlen := len(f.keyindex)
 		newlen := l+2
 		newar := make([]uint64,newlen)
-		copy(newar,f.Keyindex)
+		copy(newar,f.keyindex)
 		if oldlen>0 {
 			val := newar[oldlen-1]
 			for r:=oldlen; r<newlen; r++ {
@@ -602,17 +597,12 @@ func (f *Key_bytes) AddKeyAt(thekey []byte, i uint64) {
 			}
 		}
 		newar[l+1]++
-		f.Keyindex = newar
-		fmt.Println(`a`)
+		f.keyindex = newar
 	} else { // already have keys of this length
-		for r:=l+1; r<len(f.Keyindex); r++ {
-			f.Keyindex[r]++
+		for r:=l+1; r<len(f.keyindex); r++ {
+			f.keyindex[r]++
 		}
-		fmt.Println(`b`)
 	}
-	
-	fmt.Println(f.Keyindex)
-	
 	return
 }
 
@@ -651,6 +641,6 @@ func (f *Key_bytes) Build() []int {
 		newar[i]=at
 		at+=keyindex[i]
 	}
-	f.Keyindex = newar
+	f.keyindex = newar
 	return imap
 }
