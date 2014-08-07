@@ -496,7 +496,7 @@ func (f *Key_string) Build() []int {
 // Add this to any struct to make it binary searchable.
 type Key_bytes struct {
 Key [][]byte
-Keyindex []uint64
+keyindex []uint64
 }
 
 type sort_bytes struct {
@@ -533,8 +533,8 @@ func (a sorter_bytes) Less(i, j int) bool {
 func (f *Key_bytes) Find(thekey []byte) (uint64, bool) {
 	var at uint64
 	keylen := len(thekey)
-	min := f.Keyindex[keylen]
-	max := f.Keyindex[keylen+1]
+	min := f.keyindex[keylen]
+	max := f.keyindex[keylen+1]
 	if max>0 {
 		max--
 	} else {
@@ -576,14 +576,14 @@ func (f *Key_bytes) AddKeyAt(thekey []byte, i uint64) {
 	f.Key[i] = thekey
 	// Now modify the keyindex
 	l := len(thekey)
-	if l+1<len(f.Keyindex) { // first key of this length
+	if l+1<len(f.keyindex) { // first key of this length
 		newar := make([]uint64,l+2)
-		copy(newar,f.Keyindex)
+		copy(newar,f.keyindex)
 		newar[l] = i
 		newar[l+1] = uint64(len(f.Key))
 	} else { // already have keys of this length
 		for r:=l+1; r<l+2; r++ {
-			f.Keyindex[r]++
+			f.keyindex[r]++
 		}
 	}
 	return
@@ -624,6 +624,6 @@ func (f *Key_bytes) Build() []int {
 		newar[i]=at
 		at+=keyindex[i]
 	}
-	f.Keyindex = newar
+	f.keyindex = newar
 	return imap
 }
