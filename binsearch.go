@@ -499,6 +499,10 @@ Key [][]byte
 keyindex []uint64
 }
 
+func NewKey_bytes() *Key_bytes {
+    return &Key_bytes{keyindex: make([]uint64,2)}
+}
+
 type sort_bytes struct {
 i int
 k []byte
