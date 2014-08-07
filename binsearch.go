@@ -506,6 +506,8 @@ type sorter_bytes []sort_bytes
 func (a sorter_bytes) Len() int           { return len(a) }
 func (a sorter_bytes) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a sorter_bytes) Less(i, j int) bool {
+	aa:=a[i].k
+	bb:=a[j].k
 	if len(aa)<len(bb) {
 		return true
 	} else {
