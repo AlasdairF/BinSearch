@@ -436,7 +436,7 @@ func (f *Key_string) Build() []int {
 // Add this to any struct to make it binary searchable.
 type Key_bytes struct {
 Key [][]byte
-keyindex []uint64
+keyindex []int
 }
 
 type sort_bytes struct {
