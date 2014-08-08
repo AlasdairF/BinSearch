@@ -21,21 +21,13 @@ func (a sorter_uint64) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a sorter_uint64) Less(i, j int) bool { return a[i].k < a[j].k }
 
 // Find returns the index based on the key.
-func (f *Key_uint64) Find(thekey uint64) (uint64, bool) {
-	var min,at uint64
+func (f *Key_uint64) Find(thekey uint64) (int, bool) {
+	var min,at int
 	var current uint64
-	max := uint64(len(f.Key))
-	if max>0 {
-		max--
-	} else {
-		return 0, false
-	}
+	max := len(f.Key)-1
 	for min<=max {
 		at = min+((max-min)/2)
 		if current=f.Key[at]; thekey<current {
-			if at==0 {
-				return 0, false
-			}
 			max = at-1
 		} else {
 		if thekey>current {
@@ -49,15 +41,10 @@ func (f *Key_uint64) Find(thekey uint64) (uint64, bool) {
 }
 
 // Find returns the index based on the key, using Interpolation.
-func (f *Key_uint64) FindInterpolation(thekey uint64) (uint64, bool) {
-	var l uint64
-	r := uint64(len(f.Key))
-	if r>0 {
-		r--
-	} else {
-		return 0, false
-	}
-	var mid uint64 = uint64(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r))+0.5) // +0.5 makes it round instead of floor
+func (f *Key_uint64) FindInterpolation(thekey uint64) (int, bool) {
+	var l int
+	r := len(f.Key)-1
+	mid := int(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r))+0.5) // +0.5 makes it round instead of floor
 	for l<=r && mid>=l && mid<=r {
 		if (thekey < f.Key[mid]) {
 			r = mid - 1;
@@ -66,7 +53,7 @@ func (f *Key_uint64) FindInterpolation(thekey uint64) (uint64, bool) {
 		} else {
 			return mid, true
 		}
-	mid = l + uint64(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r - l))+0.5)
+	mid = l + int(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r - l))+0.5)
 	}
 	return 0, false
 }
@@ -78,7 +65,7 @@ func (f *Key_uint64) AddKeyUnsorted(thekey uint64) {
 }
 
 // AddKeyAt adds this key to the index in this exact position, so it does not require later rebuilding.
-func (f *Key_uint64) AddKeyAt(thekey uint64, i uint64) {
+func (f *Key_uint64) AddKeyAt(thekey uint64, i int) {
 	f.Key = append(f.Key, 0)
 	copy(f.Key[i+1:], f.Key[i:])
 	f.Key[i] = thekey
@@ -124,21 +111,13 @@ func (a sorter_uint32) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a sorter_uint32) Less(i, j int) bool { return a[i].k < a[j].k }
 
 // Find returns the index based on the key.
-func (f *Key_uint32) Find(thekey uint32) (uint64, bool) {
-	var min,at uint64
+func (f *Key_uint32) Find(thekey uint32) (int, bool) {
+	var min,at int
 	var current uint32
-	max := uint64(len(f.Key))
-	if max>0 {
-		max--
-	} else {
-		return 0, false
-	}
+	max := len(f.Key)-1
 	for min<=max {
 		at = (max+min)/2
 		if current=f.Key[at]; thekey<current {
-			if at==0 {
-				return 0, false
-			}
 			max = at-1
 		} else {
 		if thekey>current {
@@ -152,15 +131,10 @@ func (f *Key_uint32) Find(thekey uint32) (uint64, bool) {
 }
 
 // Find returns the index based on the key, using Interpolation.
-func (f *Key_uint32) FindInterpolation(thekey uint32) (uint64, bool) {
-	var l uint64
-	r := uint64(len(f.Key))
-	if r>0 {
-		r--
-	} else {
-		return 0, false
-	}
-	var mid uint64 = uint64(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r))+0.5) // +0.5 makes it round instead of floor
+func (f *Key_uint32) FindInterpolation(thekey uint32) (int, bool) {
+	var l int
+	r := len(f.Key)-1
+	mid := int(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r))+0.5) // +0.5 makes it round instead of floor
 	for l<=r && mid>=l && mid<=r {
 		if (thekey < f.Key[mid]) {
 			r = mid - 1;
@@ -169,7 +143,7 @@ func (f *Key_uint32) FindInterpolation(thekey uint32) (uint64, bool) {
 		} else {
 			return mid, true
 		}
-	mid = l + uint64(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r - l))+0.5)
+	mid = l + int(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r - l))+0.5)
 	}
 	return 0, false
 }
@@ -181,7 +155,7 @@ func (f *Key_uint32) AddKeyUnsorted(thekey uint32) {
 }
 
 // AddKeyAt adds this key to the index in this exact position, so it does not require later rebuilding.
-func (f *Key_uint32) AddKeyAt(thekey uint32, i uint64) {
+func (f *Key_uint32) AddKeyAt(thekey uint32, i int) {
 	f.Key = append(f.Key, 0)
 	copy(f.Key[i+1:], f.Key[i:])
 	f.Key[i] = thekey
@@ -226,21 +200,13 @@ func (a sorter_uint16) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a sorter_uint16) Less(i, j int) bool { return a[i].k < a[j].k }
 
 // Find returns the index based on the key.
-func (f *Key_uint16) Find(thekey uint16) (uint64, bool) {
-	var min,at uint64
+func (f *Key_uint16) Find(thekey uint16) (int, bool) {
+	var min,at int
 	var current uint16
-	max := uint64(len(f.Key))
-	if max>0 {
-		max--
-	} else {
-		return 0, false
-	}
+	max := len(f.Key)-1
 	for min<=max {
 		at = (max+min)/2
 		if current=f.Key[at]; thekey<current {
-			if at==0 {
-				return 0, false
-			}
 			max = at-1
 		} else {
 		if thekey>current {
@@ -254,15 +220,10 @@ func (f *Key_uint16) Find(thekey uint16) (uint64, bool) {
 }
 
 // Find returns the index based on the key, using Interpolation.
-func (f *Key_uint16) FindInterpolation(thekey uint16) (uint64, bool) {
-	var l uint64
-	r := uint64(len(f.Key))
-	if r>0 {
-		r--
-	} else {
-		return 0, false
-	}
-	var mid uint64 = uint64(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r))+0.5) // +0.5 makes it round instead of floor
+func (f *Key_uint16) FindInterpolation(thekey uint16) (int, bool) {
+	var l int
+	r := len(f.Key)-1
+	mid := int(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r))+0.5) // +0.5 makes it round instead of floor
 	for l<=r && mid>=l && mid<=r {
 		if (thekey < f.Key[mid]) {
 			r = mid - 1;
@@ -271,7 +232,7 @@ func (f *Key_uint16) FindInterpolation(thekey uint16) (uint64, bool) {
 		} else {
 			return mid, true
 		}
-	mid = l + uint64(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r - l))+0.5)
+	mid = l + int(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r - l))+0.5)
 	}
 	return 0, false
 }
@@ -283,7 +244,7 @@ func (f *Key_uint16) AddKeyUnsorted(thekey uint16) {
 }
 
 // AddKeyAt adds this key to the index in this exact position, so it does not require later rebuilding.
-func (f *Key_uint16) AddKeyAt(thekey uint16, i uint64) {
+func (f *Key_uint16) AddKeyAt(thekey uint16, i int) {
 	f.Key = append(f.Key, 0)
 	copy(f.Key[i+1:], f.Key[i:])
 	f.Key[i] = thekey
@@ -328,21 +289,13 @@ func (a sorter_uint8) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a sorter_uint8) Less(i, j int) bool { return a[i].k < a[j].k }
 
 // Find returns the index based on the key.
-func (f *Key_uint8) Find(thekey uint8) (uint64, bool) {
-	var min,at uint64
+func (f *Key_uint8) Find(thekey uint8) (int, bool) {
+	var min,at int
 	var current uint8
-	max := uint64(len(f.Key))
-	if max>0 {
-		max--
-	} else {
-		return 0, false
-	}
+	max := len(f.Key)-1
 	for min<=max {
 		at = (max+min)/2
 		if current=f.Key[at]; thekey<current {
-			if at==0 {
-				return 0, false
-			}
 			max = at-1
 		} else {
 		if thekey>current {
@@ -356,15 +309,10 @@ func (f *Key_uint8) Find(thekey uint8) (uint64, bool) {
 }
 
 // Find returns the index based on the key, using Interpolation.
-func (f *Key_uint8) FindInterpolation(thekey uint8) (uint64, bool) {
-	var l uint64
-	r := uint64(len(f.Key))
-	if r>0 {
-		r--
-	} else {
-		return 0, false
-	}
-	var mid uint64 = uint64(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r))+0.5) // +0.5 makes it round instead of floor
+func (f *Key_uint8) FindInterpolation(thekey uint8) (int, bool) {
+	var l int
+	r := len(f.Key)-1
+	mid := int(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r))+0.5) // +0.5 makes it round instead of floor
 	for l<=r && mid>=l && mid<=r {
 		if (thekey < f.Key[mid]) {
 			r = mid - 1;
@@ -373,7 +321,7 @@ func (f *Key_uint8) FindInterpolation(thekey uint8) (uint64, bool) {
 		} else {
 			return mid, true
 		}
-	mid = l + uint64(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r - l))+0.5)
+	mid = l + int(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r - l))+0.5)
 	}
 	return 0, false
 }
@@ -385,7 +333,7 @@ func (f *Key_uint8) AddKeyUnsorted(thekey uint8) {
 }
 
 // AddKeyAt adds this key to the index in this exact position, so it does not require later rebuilding.
-func (f *Key_uint8) AddKeyAt(thekey uint8, i uint64) {
+func (f *Key_uint8) AddKeyAt(thekey uint8, i int) {
 	f.Key = append(f.Key, 0)
 	copy(f.Key[i+1:], f.Key[i:])
 	f.Key[i] = thekey
@@ -430,20 +378,12 @@ func (a sorter_string) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a sorter_string) Less(i, j int) bool { return a[i].k < a[j].k }
 
 // Find returns the index based on the key.
-func (f *Key_string) Find(thekey string) (uint64, bool) {
-	var min,at uint64
-	max := uint64(len(f.Key))
-	if max>0 {
-		max--
-	} else {
-		return 0, false
-	}
+func (f *Key_string) Find(thekey string) (int, bool) {
+	var min,at int
+	max := len(f.Key)-1
 	for min<=max {
 		at = min+((max-min)/2)
 		if thekey<f.Key[at] {
-			if at==0 {
-				return 0, false
-			}
 			max = at-1
 		} else {
 		if thekey>f.Key[at] {
@@ -463,7 +403,7 @@ func (f *Key_string) AddKeyUnsorted(thekey string) {
 }
 
 // AddKeyAt adds this key to the index in this exact position, so it does not require later rebuilding.
-func (f *Key_string) AddKeyAt(thekey string, i uint64) {
+func (f *Key_string) AddKeyAt(thekey string, i int) {
 	f.Key = append(f.Key, ``)
 	copy(f.Key[i+1:], f.Key[i:])
 	f.Key[i] = thekey
@@ -530,39 +470,90 @@ func (a sorter_bytes) Less(i, j int) bool {
 }
 
 // Find returns the index based on the key.
-func (f *Key_bytes) Find(thekey []byte) (uint64, bool) {
-	var at uint64
+func (f *Key_bytes) Find(thekey []byte) (int, bool) {
+	var at int
 	keylen := len(thekey)
 	// Check something for this actually exists in the keyindex
 	if len(f.keyindex)<keylen+2 {
-		l := len(f.keyindex)
-		if l==0 {
+		if len(f.keyindex)==0 {
 			return 0, false
 		} else {
-			return f.keyindex[l-1], false
+			return len(f.Key), false
 		}
 	}
 	min := f.keyindex[keylen]
-	max := f.keyindex[keylen+1]
-	if max>0 {
-		max--
-	} else {
-		return 0, false
-	}
+	max := f.keyindex[keylen+1]-1
 	Outer:
 	for min<=max {
 		at = min+((max-min)/2)
 		for i:=0; i<keylen; i++ {
 			if thekey[i]<f.Key[at][i] {
-				if at==0 {
-					return 0, false
-				}
 				max = at-1
 				continue Outer
 			} else {
 				if thekey[i]>f.Key[at][i] {
-				min = at+1
+					min = at+1
+					continue Outer
+				}
+			}
+		}
+		return at, true
+	}
+	return min, false // doesn't exist
+}
+
+// Find returns the index based on the key.
+func (f *Key_bytes) Find2(thekey []byte) (int, bool) {
+	var at int
+	keylen := len(thekey)
+	// Check something for this actually exists in the keyindex
+	if len(f.keyindex)<keylen+2 {
+		if len(f.keyindex)==0 {
+			return 0, false
+		} else {
+			return len(f.Key), false
+		}
+	}
+	min := f.keyindex[keylen]
+	max := f.keyindex[keylen+1]-1
+	var lastmove,lastchar,onchar uint8
+	Outer:
+	for min<=max {
+		at = min+((max-min)/2)
+		// Possibly move ahead to the next character
+		if thekey[onchar]<f.Key[at][onchar] {
+				max = at-1
+				if lastmove==2 && thekey[onchar]==lastchar {
+					onchar++
+					lastmove = 0
+				} else {
+					lastmove = 1
+					lastchar = thekey[onchar]
+				}
 				continue Outer
+			} else {
+				if thekey[onchar]>f.Key[at][onchar] {
+					min = at+1
+					if lastmove==1 && thekey[onchar]==lastchar {
+						onchar++
+						lastmove = 0
+					} else {
+						lastmove = 2
+						lastchar = thekey[onchar]
+					}
+					continue Outer
+				}
+			}
+		// First character didn't match so try the others
+		lastmove = 0
+		for i:=onchar+1; i<keylen; i++ {
+			if thekey[i]<f.Key[at][i] {
+				max = at-1
+				continue Outer
+			} else {
+				if thekey[i]>f.Key[at][i] {
+					min = at+1
+					continue Outer
 				}
 			}
 		}
@@ -578,7 +569,7 @@ func (f *Key_bytes) AddKeyUnsorted(thekey []byte) {
 }
 
 // AddKeyAt adds this key to the index in this exact position, so it does not require later rebuilding.
-func (f *Key_bytes) AddKeyAt(thekey []byte, i uint64) {
+func (f *Key_bytes) AddKeyAt(thekey []byte, i int) {
 	temp := make([]byte,0)
 	f.Key = append(f.Key, temp)
 	copy(f.Key[i+1:], f.Key[i:])
@@ -588,7 +579,7 @@ func (f *Key_bytes) AddKeyAt(thekey []byte, i uint64) {
 	if l+2>len(f.keyindex) { // first key of this length
 		oldlen := len(f.keyindex)
 		newlen := l+2
-		newar := make([]uint64,newlen)
+		newar := make([]int,newlen)
 		copy(newar,f.keyindex)
 		if oldlen>0 {
 			val := newar[oldlen-1]
@@ -618,16 +609,16 @@ func (f *Key_bytes) Build() []int {
 	sort.Sort(temp)
 	imap := make([]int,l)
 	newkey := make([][]byte,l)
-	keyindex := make([]uint64,50)
-	var max uint64
+	keyindex := make([]int,50)
+	var max int
 	for i:=0; i<l; i++ {
 		imap[i]=temp[i].i
 		newkey[i]=temp[i].k
-		l2 := uint64(len(temp[i].k))
+		l2 := len(temp[i].k)
 		if l2>max {
 			max = l2
-			if l2>uint64(len(keyindex)-2) {
-				temp := make([]uint64,l*2)
+			if l2>len(keyindex)-2 {
+				temp := make([]int,l*2)
 				copy(temp,keyindex)
 				keyindex = temp
 			}
@@ -635,9 +626,9 @@ func (f *Key_bytes) Build() []int {
 		keyindex[l2]++
 	}
 	f.Key = newkey
-	var at uint64
-	newar := make([]uint64,max+2)
-	for i:=uint64(0); i<max+2; i++ {
+	var at int
+	newar := make([]int,max+2)
+	for i:=int(0); i<max+2; i++ {
 		newar[i]=at
 		at+=keyindex[i]
 	}
