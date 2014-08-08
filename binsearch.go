@@ -502,54 +502,6 @@ func (f *Key_bytes) Find(thekey []byte) (int, bool) {
 	return min, false // doesn't exist
 }
 
-// Find returns the index based on the key.
-func (f *Key_bytes) Find2(thekey []byte) (int, bool) {
-	keylen := len(thekey)
-	// Check something for this actually exists in the keyindex
-	if len(f.keyindex)<keylen+2 {
-		if len(f.keyindex)==0 {
-			return 0, false
-		} else {
-			return len(f.Key), false
-		}
-	}
-	min := f.keyindex[keylen]
-	max := f.keyindex[keylen+1]-1
-	var at,onchar,skipchar,previous int
-	Outer:
-	for min<=max {
-		at = min+((max-min)/2)
-		for i:=skipchar; i<keylen; i++ {
-			if thekey[i]<f.Key[at][i] {
-				max = at-1
-				if onchar>previous {
-					skipchar=previous
-				} else {
-					skipchar=onchar
-				}
-				previous = onchar
-				onchar = 0
-				continue Outer
-			} else {
-				if thekey[i]>f.Key[at][i] {
-					min = at+1
-					if onchar>previous {
-						skipchar=previous
-					} else {
-						skipchar=onchar
-					}
-					previous = onchar
-					onchar = 0
-					continue Outer
-				}
-			}
-		onchar++
-		}
-		return at, true
-	}
-	return min, false // doesn't exist
-}
-
 // AddKeyUnsorted adds this key to the end of the index for later building with Build.
 func (f *Key_bytes) AddKeyUnsorted(thekey []byte) {
 	f.Key = append(f.Key, thekey)
