@@ -521,7 +521,7 @@ func (f *Key_bytes) Find2(thekey []byte) (int, bool) {
 	Outer:
 	for min<=max {
 		at = min+((max-min)/2)
-		for i:=onchar+1; i<keylen8; i++ {
+		for i:=onchar; i<keylen8; i++ {
 			if thekey[i]<f.Key[at][i] {
 				max = at-1
 				if lastmove==2 && lastchar>=i {
