@@ -521,42 +521,31 @@ func (f *Key_bytes) Find2(thekey []byte) (int, bool) {
 	Outer:
 	for min<=max {
 		at = min+((max-min)/2)
-		// Possibly move ahead to the next character
-		if thekey[onchar]<f.Key[at][onchar] {
-				max = at-1
-				if lastmove==2 && thekey[onchar]==lastchar {
-					onchar++
-					lastmove = 0
-				} else {
-					lastmove = 1
-					lastchar = thekey[onchar]
-				}
-				continue Outer
-			} else {
-				if thekey[onchar]>f.Key[at][onchar] {
-					min = at+1
-					if lastmove==1 && thekey[onchar]==lastchar {
-						onchar++
-						lastmove = 0
-					} else {
-						lastmove = 2
-						lastchar = thekey[onchar]
-					}
-					continue Outer
-				}
-			}
-		// First character didn't match so try the others
-		lastmove = 0
 		for i:=onchar+1; i<keylen8; i++ {
 			if thekey[i]<f.Key[at][i] {
 				max = at-1
+				if lastmove==2 && lastchar>=i {
+					lastmove=0
+					onchar = i
+				} else {
+					lastmove=1
+					lastchar=i
+				}
 				continue Outer
 			} else {
 				if thekey[i]>f.Key[at][i] {
 					min = at+1
+					if lastmove==1 && lastchar>=i {
+						lastmove=0
+						onchar = i
+					} else {
+						lastmove=2
+						lastchar=i
+					}
 					continue Outer
 				}
 			}
+		lastmove = 0
 		}
 		return at, true
 	}
