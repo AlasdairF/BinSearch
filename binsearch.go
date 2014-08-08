@@ -504,7 +504,6 @@ func (f *Key_bytes) Find(thekey []byte) (int, bool) {
 
 // Find returns the index based on the key.
 func (f *Key_bytes) Find2(thekey []byte) (int, bool) {
-	var at int
 	keylen := len(thekey)
 	// Check something for this actually exists in the keyindex
 	if len(f.keyindex)<keylen+2 {
@@ -516,36 +515,35 @@ func (f *Key_bytes) Find2(thekey []byte) (int, bool) {
 	}
 	min := f.keyindex[keylen]
 	max := f.keyindex[keylen+1]-1
-	var lastmove,lastchar,onchar uint8
-	keylen8 := uint8(keylen)
+	var at,onchar,skipchar,previous int
 	Outer:
 	for min<=max {
 		at = min+((max-min)/2)
-		for i:=onchar; i<keylen8; i++ {
+		for i:=skipchar; i<keylen; i++ {
 			if thekey[i]<f.Key[at][i] {
 				max = at-1
-				if lastmove==2 && lastchar>=i {
-					lastmove=0
-					onchar = i
+				if onchar>previous {
+					skipchar=previous
 				} else {
-					lastmove=1
-					lastchar=i
+					skipchar=onchar
 				}
+				previous = onchar
+				onchar = 0
 				continue Outer
 			} else {
 				if thekey[i]>f.Key[at][i] {
 					min = at+1
-					if lastmove==1 && lastchar>=i {
-						lastmove=0
-						onchar = i
+					if onchar>previous {
+						skipchar=previous
 					} else {
-						lastmove=2
-						lastchar=i
+						skipchar=onchar
 					}
+					previous = onchar
+					onchar = 0
 					continue Outer
 				}
 			}
-		lastmove = 0
+		onchar++
 		}
 		return at, true
 	}
