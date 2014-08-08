@@ -517,6 +517,7 @@ func (f *Key_bytes) Find2(thekey []byte) (int, bool) {
 	min := f.keyindex[keylen]
 	max := f.keyindex[keylen+1]-1
 	var lastmove,lastchar,onchar uint8
+	keylen8 := uint8(keylen)
 	Outer:
 	for min<=max {
 		at = min+((max-min)/2)
@@ -546,7 +547,7 @@ func (f *Key_bytes) Find2(thekey []byte) (int, bool) {
 			}
 		// First character didn't match so try the others
 		lastmove = 0
-		for i:=onchar+1; i<keylen; i++ {
+		for i:=onchar+1; i<keylen8; i++ {
 			if thekey[i]<f.Key[at][i] {
 				max = at-1
 				continue Outer
