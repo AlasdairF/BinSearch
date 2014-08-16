@@ -2,7 +2,6 @@ package binsearch
 
 import (
 "sort"
-"fmt"
 )
 
 // ---------- Key_uint64 ----------
@@ -517,7 +516,6 @@ func (f *Key_bytes) AddKeyAt(thekey []byte, i int) {
 	f.Key[i] = thekey
 	// Now modify the KeyIndex
 	l := len(thekey)
-	fmt.Println(l,len(f.KeyIndex)) //debug
 	if l+2>len(f.KeyIndex) { // first key of this length
 		oldlen := len(f.KeyIndex)
 		newlen := l+2
