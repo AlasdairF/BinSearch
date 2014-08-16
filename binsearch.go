@@ -98,6 +98,7 @@ func (f *Key_uint64) Build() []int {
 // Add this to any struct to make it binary searchable.
 type Key_uint32 struct {
 Key []uint32
+keydistribution []uint32
 }
 
 type sort_uint32 struct {
