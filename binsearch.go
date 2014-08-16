@@ -2,6 +2,7 @@ package binsearch
 
 import (
 "sort"
+"fmt"
 )
 
 // ---------- Key_uint64 ----------
@@ -516,6 +517,7 @@ func (f *Key_bytes) AddKeyAt(thekey []byte, i int) {
 	f.Key[i] = thekey
 	// Now modify the KeyIndex
 	l := len(thekey)
+	fmt.Println(l,len(f.KeyIndex)) //debug
 	if l+2>len(f.KeyIndex) { // first key of this length
 		oldlen := len(f.KeyIndex)
 		newlen := l+2
@@ -549,7 +551,7 @@ func (f *Key_bytes) Build() []int {
 	sort.Sort(temp)
 	imap := make([]int,l)
 	newkey := make([][]byte,l)
-	KeyIndex := make([]int,50)
+	keyindex := make([]int,50)
 	var max int
 	for i:=0; i<l; i++ {
 		imap[i]=temp[i].i
@@ -557,20 +559,20 @@ func (f *Key_bytes) Build() []int {
 		l2 := len(temp[i].k)
 		if l2>max {
 			max = l2
-			if l2>len(KeyIndex)-2 {
+			if l2>len(keyindex)-2 {
 				temp := make([]int,l*2)
-				copy(temp,KeyIndex)
-				KeyIndex = temp
+				copy(temp,keyindex)
+				keyindex = temp
 			}
 		}
-		KeyIndex[l2]++
+		keyindex[l2]++
 	}
 	f.Key = newkey
 	var at int
 	newar := make([]int,max+2)
 	for i:=int(0); i<max+2; i++ {
 		newar[i]=at
-		at+=KeyIndex[i]
+		at+=keyindex[i]
 	}
 	f.KeyIndex = newar
 	return imap
