@@ -567,7 +567,7 @@ func (f *Key_bytes) Build() []int {
 	f.Key = newkey
 	var at int
 	newar := make([]int,max+2)
-	for i:=int(0); i<max+2; i++ {
+	for i:=0; i<max+2; i++ {
 		newar[i]=at
 		at+=keyindex[i]
 	}
