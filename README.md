@@ -14,7 +14,7 @@ First choose your key type, the options are:
 
 `Key_uint64`, `Key_uint32`, `Key_uint16`, `Key_uint8`, `Key_string` & `Key_bytes`
 
-Numeric keys are much faster than `string` or `[]byte`. `Key_bytes` is the most highly optimized and is twice as fast as `Key_string` so the only reason to ever use `Key_string` over `Key_bytes` is if you intend to select a range of values between two records where the strings contain non-English UTF8 characters. If you are only searching for individual records, as in most cases, or are only working in English, then always use `Key_bytes`.
+Numeric keys are much faster than `string` or `[]byte`. `Key_bytes` is the most highly optimized and is twice as fast as `Key_string` so the only reason to ever use `Key_string` over `Key_bytes` is if you intend to select a range of values between two keys where the strings contain non-English UTF8 characters. If you are only searching for individual records, as in most cases, or are only working in English, then always use `Key_bytes`.
 
 Just add your chosen key into your struct along with any values you want for it, as slices. You can have multiple values for the same key, or even no values (if you just want to check for the existence of the key.)
 
