@@ -2,7 +2,7 @@
 
 BinSearch is a binary search package for Go. It is extremely efficient on memory, and so is excessively useful for key/value lookups where millions or billion of records need to be stored in memory and retrieved quickly. I wrote this package for the Forgotten Books search engine.
 
-Compared to a map BinSearch uses an order of magnitude less memory. For []byte lookups BinSearch is around 5x slower than map[string]value, but it would be misleading to think that this means BinSearch will slow down your app, as I have yet to find an example where lookup speed is a bottleneck. On the contrary, the purpose of BinSearch is to allow everything to be realistically stored in-memory, and thereby speeding up the app, and the entire server, due to reduced IO. In the case of Forgotten Books this package allows an inverted index corresponding to 100,000,000,000 (one hundred billion) words to be kept in memory at all times, and retrieved in virtually no time at all.
+Compared to a map, BinSearch uses an order of magnitude less memory. For `[]byte` lookups BinSearch is around 5x slower than `map[string]value`, but it would be misleading to think that this means BinSearch will slow down your app, as I have yet to find an example where lookup speed is a bottleneck. On the contrary, the purpose of BinSearch is to allow everything to be realistically stored in-memory, and thereby speeding up the app, and the entire server, due to reduced IO. In the case of Forgotten Books this package allows an inverted index corresponding to 100,000,000,000 (one hundred billion) words to be kept in memory at all times, and retrieved in virtually no time at all.
 
 ##Installation
 
@@ -11,6 +11,7 @@ Compared to a map BinSearch uses an order of magnitude less memory. For []byte l
 ##Usage
 
 First choose your key type, the options are:
+
 `Key_uint64`, `Key_uint32`, `Key_uint16`, `Key_uint8`, `Key_string` & `Key_bytes`
 
 Numeric keys are much faster than string or []byte. `Key_bytes` is the most highly optimized and is twice as fast as `Key_string` so the only reason to ever use `Key_string` over `Key_bytes` is if you intend to select a range of values between two records where the strings contain non-English UTF8 characters. If you are only searching for individual records, as in most cases, or are only working in English, then always use `Key_bytes`.
