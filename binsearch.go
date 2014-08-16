@@ -436,7 +436,7 @@ func (f *Key_string) Build() []int {
 // Add this to any struct to make it binary searchable.
 type Key_bytes struct {
 Key [][]byte
-keyindex []int
+KeyIndex []int
 }
 
 type sort_bytes struct {
@@ -473,16 +473,16 @@ func (a sorter_bytes) Less(i, j int) bool {
 func (f *Key_bytes) Find(thekey []byte) (int, bool) {
 	var at int
 	keylen := len(thekey)
-	// Check something for this actually exists in the keyindex
-	if len(f.keyindex)<keylen+2 {
-		if len(f.keyindex)==0 {
+	// Check something for this actually exists in the KeyIndex
+	if len(f.KeyIndex)<keylen+2 {
+		if len(f.KeyIndex)==0 {
 			return 0, false
 		} else {
 			return len(f.Key), false
 		}
 	}
-	min := f.keyindex[keylen]
-	max := f.keyindex[keylen+1]-1
+	min := f.KeyIndex[keylen]
+	max := f.KeyIndex[keylen+1]-1
 	Outer:
 	for min<=max {
 		at = min+((max-min)/2)
@@ -514,13 +514,13 @@ func (f *Key_bytes) AddKeyAt(thekey []byte, i int) {
 	f.Key = append(f.Key, temp)
 	copy(f.Key[i+1:], f.Key[i:])
 	f.Key[i] = thekey
-	// Now modify the keyindex
+	// Now modify the KeyIndex
 	l := len(thekey)
-	if l+2>len(f.keyindex) { // first key of this length
-		oldlen := len(f.keyindex)
+	if l+2>len(f.KeyIndex) { // first key of this length
+		oldlen := len(f.KeyIndex)
 		newlen := l+2
 		newar := make([]int,newlen)
-		copy(newar,f.keyindex)
+		copy(newar,f.KeyIndex)
 		if oldlen>0 {
 			val := newar[oldlen-1]
 			for r:=oldlen; r<newlen; r++ {
@@ -528,10 +528,10 @@ func (f *Key_bytes) AddKeyAt(thekey []byte, i int) {
 			}
 		}
 		newar[l+1]++
-		f.keyindex = newar
+		f.KeyIndex = newar
 	} else { // already have keys of this length
-		for r:=l+1; r<len(f.keyindex); r++ {
-			f.keyindex[r]++
+		for r:=l+1; r<len(f.KeyIndex); r++ {
+			f.KeyIndex[r]++
 		}
 	}
 	return
@@ -549,7 +549,7 @@ func (f *Key_bytes) Build() []int {
 	sort.Sort(temp)
 	imap := make([]int,l)
 	newkey := make([][]byte,l)
-	keyindex := make([]int,50)
+	KeyIndex := make([]int,50)
 	var max int
 	for i:=0; i<l; i++ {
 		imap[i]=temp[i].i
@@ -557,21 +557,21 @@ func (f *Key_bytes) Build() []int {
 		l2 := len(temp[i].k)
 		if l2>max {
 			max = l2
-			if l2>len(keyindex)-2 {
+			if l2>len(KeyIndex)-2 {
 				temp := make([]int,l*2)
-				copy(temp,keyindex)
-				keyindex = temp
+				copy(temp,KeyIndex)
+				KeyIndex = temp
 			}
 		}
-		keyindex[l2]++
+		KeyIndex[l2]++
 	}
 	f.Key = newkey
 	var at int
 	newar := make([]int,max+2)
 	for i:=int(0); i<max+2; i++ {
 		newar[i]=at
-		at+=keyindex[i]
+		at+=KeyIndex[i]
 	}
-	f.keyindex = newar
+	f.KeyIndex = newar
 	return imap
 }
