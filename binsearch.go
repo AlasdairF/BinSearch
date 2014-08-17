@@ -55,7 +55,7 @@ func (f *Key_uint64) FindInterpolation(thekey uint64) (int, bool) {
 		}
 	mid = l + int(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r - l))+0.5)
 	}
-	return 0, false
+	return l, false
 }
 
 // AddKeyUnsorted adds this key to the end of the index for later building with Build.
@@ -144,7 +144,7 @@ func (f *Key_uint32) FindInterpolation(thekey uint32) (int, bool) {
 		}
 	mid = l + int(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r - l))+0.5)
 	}
-	return 0, false
+	return l, false
 }
 
 // AddKeyUnsorted adds this key to the end of the index for later building with Build.
@@ -233,7 +233,7 @@ func (f *Key_uint16) FindInterpolation(thekey uint16) (int, bool) {
 		}
 	mid = l + int(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r - l))+0.5)
 	}
-	return 0, false
+	return l, false
 }
 
 // AddKeyUnsorted adds this key to the end of the index for later building with Build.
@@ -322,7 +322,7 @@ func (f *Key_uint8) FindInterpolation(thekey uint8) (int, bool) {
 		}
 	mid = l + int(((float32(thekey - f.Key[l])/float32(f.Key[r] - f.Key[l]))*float32(r - l))+0.5)
 	}
-	return 0, false
+	return l, false
 }
 
 // AddKeyUnsorted adds this key to the end of the index for later building with Build.
