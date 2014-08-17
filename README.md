@@ -79,4 +79,4 @@ For numeric keys only you can also use interpolation search:
 
 	indx, exists := MyStruct.FindInterpolation(key)
 	
-However, I strongly recommend not to use interpolation search unless you are certain that your keys are evenly distributed. Interpolation search is only faster when keys are evenly distributed, but can be much, much slower if they are not. If you're unsure just use `Find()`. If you are using `Key_string` or `Key_bytes` then you can only use `Find()` anyway.
+However, I strongly recommend not to use interpolation search unless you are certain that your keys are evenly distributed. Interpolation search is only faster when keys are evenly distributed, but can be much, much slower if they are not. If you're unsure just use `Find()`. If you are using `Key_string` or `Key_bytes` then you can only use `Find()` anyway. I also never tested `FindInterpolation()` with `AddKeyAt()`, so it's probably safer to only use `Find()` to retrieve the indexes for `AddKeyAt()`.
