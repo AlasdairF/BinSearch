@@ -46,7 +46,7 @@ There are two ways to add a key:
 	
 If you used `AddKeyUnsorted` then before you use `Find()` you must run `MyStruct.Build()`, which will sort the keys so they can be searched. You must then sort the values. `MyStruct.Build()` returns a slice telling how each of the old indexes maps to the new (sorted) index. This is all unnecesary if you used `AddKeyAt` since that inserts the key into the correct sorted position as you go, `Build()` is used only if you used `AddKeyUnsorted`. Here is the code for how to use `Build()` for both keys and values:
 
-	temp := make(int,len(MyStruct.value))
+	temp := make([]int,len(MyStruct.value))
 	newindexes := MyStruct.Build()
 	for indx_new,indx_old := range newindexes {
 		temp[indx_new] = MyStruct.value[indx_old]
@@ -55,8 +55,8 @@ If you used `AddKeyUnsorted` then before you use `Find()` you must run `MyStruct
 	
 If you have two values for each key, then you can do both at the same time:
 
-	temp := make(int,len(MyStruct.value))
-	temp2 := make(int,len(MyStruct.secondvalue))
+	temp := make([]int,len(MyStruct.value))
+	temp2 := make([]int,len(MyStruct.secondvalue))
 	newindexes := MyStruct.Build()
 	for indx_new,indx_old := range newindexes {
 		temp[indx_new] = MyStruct.value[indx_old]
