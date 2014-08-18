@@ -42,7 +42,7 @@ There are two ways to add a key:
 		MyStruct.AddKeyAt(key,indx)
 		// Add the value also in the same place using this code:
 		MyStruct.value = append(MyStruct.value, 0) // Enlarge by 1
-		copy(MyStruct.value[indx+1:], MyStruct,value[indx:]) // Make space at indx
+		copy(MyStruct.value[indx+1:], MyStruct.value[indx:]) // Make space at indx
 		MyStruct.value[indx] = 123 // Add your value into the correct position
 	}
 	
