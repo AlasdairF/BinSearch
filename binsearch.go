@@ -167,7 +167,7 @@ func (f *Key_uint32) Build() []int {
 	temp := make(sorter_uint32,l)
 	var i int
 	var k uint32
-	for i, k := range f.Key {
+	for i, k = range f.Key {
 		temp[i] = sort_uint32{i, k}
 	}
 	sort.Sort(temp)
