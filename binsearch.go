@@ -587,8 +587,9 @@ func (f *Key_bytes) Index() {
 	l := len(f.Key)
 	keyindex := make([]int, 50)
 	var max, i, l2 int
+	fkey := f.Key
 	for i=0; i<l; i++ {
-		l2 = len(temp[i].k)
+		l2 = len(fkey[i])
 		if l2 > max {
 			max = l2
 			if l2 > len(keyindex)-2 {
