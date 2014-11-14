@@ -572,7 +572,7 @@ func (f *Key_bytes) Build() []int {
 	}
 	f.Key = newkey
 	var at int
-	var max2 := max + 2
+	max2 := max + 2
 	newar := make([]int, max2)
 	for i=0; i<max2; i++ {
 		newar[i] = at
@@ -600,7 +600,7 @@ func (f *Key_bytes) Index() {
 		keyindex[l2]++
 	}
 	var at int
-	var max2 := max + 2
+	max2 := max + 2
 	newar := make([]int, max2)
 	for i=0; i<max2; i++ {
 		newar[i] = at
