@@ -581,3 +581,31 @@ func (f *Key_bytes) Build() []int {
 	f.KeyIndex = newar
 	return imap
 }
+
+// Index rebuilds the index required for Key_bytes assuming the Key itself is already correctly sorted. This is useful only if you are loading in a previously sorted and saved Key_bytes slice.
+func (f *Key_bytes) Index() {
+	l := len(f.Key)
+	keyindex := make([]int, 50)
+	var max, i, l2 int
+	for i=0; i<l; i++ {
+		l2 = len(temp[i].k)
+		if l2 > max {
+			max = l2
+			if l2 > len(keyindex)-2 {
+				temp := make([]int, l * 2)
+				copy(temp, keyindex)
+				keyindex = temp
+			}
+		}
+		keyindex[l2]++
+	}
+	var at int
+	var max2 := max + 2
+	newar := make([]int, max2)
+	for i=0; i<max2; i++ {
+		newar[i] = at
+		at += keyindex[i]
+	}
+	f.KeyIndex = newar
+}
+
