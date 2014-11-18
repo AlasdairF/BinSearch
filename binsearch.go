@@ -581,6 +581,44 @@ func (f *Key_bytes) Build() []int {
 	f.KeyIndex = newar
 	return imap
 }
+// Build sorts the keys and returns an array telling you how to sort the values, you must do this yourself.
+func (f *Key_bytes) BuildOld() []int {
+	l := len(f.Key)
+	temp := make(sorter_bytes,l)
+	var current uint
+	for i,k := range f.Key {
+		temp[current]=sort_bytes{i,k}
+		current++
+	}
+	sort.Sort(temp)
+	imap := make([]int,l)
+	newkey := make([][]byte,l)
+	keyindex := make([]int,50)
+	var max int
+	for i:=0; i<l; i++ {
+		imap[i]=temp[i].i
+		newkey[i]=temp[i].k
+		l2 := len(temp[i].k)
+		if l2>max {
+			max = l2
+			if l2>len(keyindex)-2 {
+				temp := make([]int,l*2)
+				copy(temp,keyindex)
+				keyindex = temp
+			}
+		}
+		keyindex[l2]++
+	}
+	f.Key = newkey
+	var at int
+	newar := make([]int,max+2)
+	for i:=0; i<max+2; i++ {
+		newar[i]=at
+		at+=keyindex[i]
+	}
+	f.KeyIndex = newar
+	return imap
+}
 
 // Index rebuilds the index required for Key_bytes assuming the Key itself is already correctly sorted. This is useful only if you are loading in a previously sorted and saved Key_bytes slice.
 func (f *Key_bytes) Index() {
