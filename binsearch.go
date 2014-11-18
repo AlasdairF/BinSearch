@@ -445,33 +445,6 @@ k []byte
 type sorter_bytes []sort_bytes
 func (a sorter_bytes) Len() int           { return len(a) }
 func (a sorter_bytes) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-/*
-func (a sorter_bytes) Less(i, j int) bool {
-	ilen := len(a[i].k)
-	jlen := len(a[j].k)
-	if ilen < jlen {
-		return true
-	} else {
-		if ilen > jlen {
-			return false
-		} else {
-			compare := a[j].k
-			var i int
-			var b byte
-			for i, b = range a[i].k {
-				if b < compare[i] {
-					return true
-				} else {
-					if b > compare[i] {
-					return false
-					}
-				}
-			}
-			return false
-		}
-	}
-}
-*/
 func (a sorter_bytes) Less(i, j int) bool {
 	aa:=a[i].k
 	bb:=a[j].k
