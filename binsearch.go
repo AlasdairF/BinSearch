@@ -445,6 +445,7 @@ k []byte
 type sorter_bytes []sort_bytes
 func (a sorter_bytes) Len() int           { return len(a) }
 func (a sorter_bytes) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+/*
 func (a sorter_bytes) Less(i, j int) bool {
 	ilen := len(a[i].k)
 	jlen := len(a[j].k)
@@ -462,6 +463,29 @@ func (a sorter_bytes) Less(i, j int) bool {
 					return true
 				} else {
 					if b > compare[i] {
+					return false
+					}
+				}
+			}
+			return false
+		}
+	}
+}
+*/
+func (a sorter_bytes) Less(i, j int) bool {
+	aa:=a[i].k
+	bb:=a[j].k
+	if len(aa)<len(bb) {
+		return true
+	} else {
+		if len(aa)>len(bb) {
+			return false
+		} else {
+			for i:=0; i<len(aa); i++ {
+				if aa[i]<bb[i] {
+					return true
+				} else {
+					if aa[i]>bb[i] {
 					return false
 					}
 				}
@@ -577,44 +601,6 @@ func (f *Key_bytes) Build() []int {
 	for i=0; i<max2; i++ {
 		newar[i] = at
 		at += keyindex[i]
-	}
-	f.KeyIndex = newar
-	return imap
-}
-// Build sorts the keys and returns an array telling you how to sort the values, you must do this yourself.
-func (f *Key_bytes) BuildOld() []int {
-	l := len(f.Key)
-	temp := make(sorter_bytes,l)
-	var current uint
-	for i,k := range f.Key {
-		temp[current]=sort_bytes{i,k}
-		current++
-	}
-	sort.Sort(temp)
-	imap := make([]int,l)
-	newkey := make([][]byte,l)
-	keyindex := make([]int,50)
-	var max int
-	for i:=0; i<l; i++ {
-		imap[i]=temp[i].i
-		newkey[i]=temp[i].k
-		l2 := len(temp[i].k)
-		if l2>max {
-			max = l2
-			if l2>len(keyindex)-2 {
-				temp := make([]int,l*2)
-				copy(temp,keyindex)
-				keyindex = temp
-			}
-		}
-		keyindex[l2]++
-	}
-	f.Key = newkey
-	var at int
-	newar := make([]int,max+2)
-	for i:=0; i<max+2; i++ {
-		newar[i]=at
-		at+=keyindex[i]
 	}
 	f.KeyIndex = newar
 	return imap
