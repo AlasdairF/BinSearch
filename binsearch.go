@@ -430,7 +430,7 @@ func (f *Key_string) Build() []int {
 }
 
 
-// ---------- Key_byte ----------
+// ---------- Key_bytes ----------
 
 // Add this to any struct to make it binary searchable.
 type Key_bytes struct {
@@ -581,6 +581,183 @@ func (f *Key_bytes) Build() []int {
 
 // Index rebuilds the index required for Key_bytes assuming the Key itself is already correctly sorted. This is useful only if you are loading in a previously sorted and saved Key_bytes slice.
 func (f *Key_bytes) Index() {
+	l := len(f.Key)
+	keyindex := make([]int, 50)
+	var max, i, l2 int
+	fkey := f.Key
+	for i=0; i<l; i++ {
+		l2 = len(fkey[i])
+		if l2 > max {
+			max = l2
+			if l2 > len(keyindex)-2 {
+				temp := make([]int, l * 2)
+				copy(temp, keyindex)
+				keyindex = temp
+			}
+		}
+		keyindex[l2]++
+	}
+	var at int
+	max2 := max + 2
+	newar := make([]int, max2)
+	for i=0; i<max2; i++ {
+		newar[i] = at
+		at += keyindex[i]
+	}
+	f.KeyIndex = newar
+}
+
+// ---------- Key_runes ----------
+
+// Add this to any struct to make it binary searchable.
+type Key_runes struct {
+Key [][]rune
+KeyIndex []int
+}
+
+type sort_runes struct {
+i int
+k []rune
+}
+type sorter_runes []sort_runes
+func (a sorter_runes) Len() int           { return len(a) }
+func (a sorter_runes) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a sorter_runes) Less(i, j int) bool {
+	aa:=a[i].k
+	bb:=a[j].k
+	if len(aa)<len(bb) {
+		return true
+	} else {
+		if len(aa)>len(bb) {
+			return false
+		} else {
+			for i:=0; i<len(aa); i++ {
+				if aa[i]<bb[i] {
+					return true
+				} else {
+					if aa[i]>bb[i] {
+					return false
+					}
+				}
+			}
+			return false
+		}
+	}
+}
+
+// Find returns the index based on the key.
+func (f *Key_runes) Find(thekey []rune) (int, bool) {
+	keylen := len(thekey)
+	// Check something for this actually exists in the KeyIndex
+	if len(f.KeyIndex) < keylen + 2 {
+		if len(f.KeyIndex) == 0 {
+			return 0, false
+		} else {
+			return len(f.Key), false
+		}
+	}
+	var at, i int
+	var b rune
+	var compare []rune
+	min := f.KeyIndex[keylen]
+	max := f.KeyIndex[keylen+1] - 1
+	Outer:
+	for min <= max {
+		at = min + ((max - min) / 2)
+		compare = f.Key[at]
+		for i, b = range thekey {
+			if b < compare[i] {
+				max = at - 1
+				continue Outer
+			} else {
+				if b > compare[i] {
+					min = at + 1
+					continue Outer
+				}
+			}
+		}
+		return at, true
+	}
+	return min, false // doesn't exist
+}
+
+// AddKeyUnsorted adds this key to the end of the index for later building with Build.
+func (f *Key_runes) AddKeyUnsorted(thekey []rune) {
+	f.Key = append(f.Key, thekey)
+	return
+}
+
+// AddKeyAt adds this key to the index in this exact position, so it does not require later rebuilding.
+func (f *Key_runes) AddKeyAt(thekey []rune, i int) {
+	temp := make([]rune,0)
+	f.Key = append(f.Key, temp)
+	copy(f.Key[i+1:], f.Key[i:])
+	f.Key[i] = thekey
+	// Now modify the KeyIndex
+	l := len(thekey)
+	if l+2 > len(f.KeyIndex) { // first key of this length
+		oldlen := len(f.KeyIndex)
+		newlen := l+2
+		newar := make([]int,newlen)
+		copy(newar,f.KeyIndex)
+		if oldlen > 0 {
+			val := newar[oldlen-1]
+			for r:=oldlen; r<newlen; r++ {
+				newar[r]=val
+			}
+		}
+		newar[l+1]++
+		f.KeyIndex = newar
+	} else { // already have keys of this length
+		for r:=l+1; r<len(f.KeyIndex); r++ {
+			f.KeyIndex[r]++
+		}
+	}
+	return
+}
+
+// Build sorts the keys and returns an array telling you how to sort the values, you must do this yourself.
+func (f *Key_runes) Build() []int {
+	l := len(f.Key)
+	temp := make(sorter_runes, l)
+	var i int
+	var k []rune
+	for i, k = range f.Key {
+		temp[i] = sort_runes{i, k}
+	}
+	sort.Sort(temp)
+	imap := make([]int, l)
+	newkey := make([][]rune, l)
+	keyindex := make([]int, 50)
+	var max, l2 int
+	for i=0; i<l; i++ {
+		imap[i] = temp[i].i
+		newkey[i] = temp[i].k
+		l2 = len(temp[i].k)
+		if l2 > max {
+			max = l2
+			if l2 > len(keyindex)-2 {
+				temp := make([]int, l * 2)
+				copy(temp, keyindex)
+				keyindex = temp
+			}
+		}
+		keyindex[l2]++
+	}
+	f.Key = newkey
+	var at int
+	max2 := max + 2
+	newar := make([]int, max2)
+	for i=0; i<max2; i++ {
+		newar[i] = at
+		at += keyindex[i]
+	}
+	f.KeyIndex = newar
+	return imap
+}
+
+// Index rebuilds the index required for Key_runes assuming the Key itself is already correctly sorted. This is useful only if you are loading in a previously sorted and saved Key_runes slice.
+func (f *Key_runes) Index() {
 	l := len(f.Key)
 	keyindex := make([]int, 50)
 	var max, i, l2 int
