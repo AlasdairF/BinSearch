@@ -2135,7 +2135,8 @@ func (t *KeyBytes) Reset() {
 }
 
 func (t *KeyBytes) forward(l int) bool {
-	if t.oncursor++; t.oncursor >= l {
+	t.oncursor++
+	for t.oncursor >= l {
 		t.oncursor = 0
 		if t.on8++; t.on8 == 8 {
 			t.on8 = 0
@@ -2153,9 +2154,6 @@ func (t *KeyBytes) forward(l int) bool {
 			case 5: l = len(t.limit48[t.on8])
 			case 6: l = len(t.limit56[t.on8])
 			case 7: l = len(t.limit64[t.on8])
-		}
-		if t.oncursor >= l {
-			return t.forward(l)
 		}
 	}
 	return false
@@ -4356,7 +4354,8 @@ func (t *KeyValBytes) Reset() {
 }
 
 func (t *KeyValBytes) forward(l int) bool {
-	if t.oncursor++; t.oncursor >= l {
+	t.oncursor++
+	for t.oncursor >= l {
 		t.oncursor = 0
 		if t.on8++; t.on8 == 8 {
 			t.on8 = 0
@@ -4374,9 +4373,6 @@ func (t *KeyValBytes) forward(l int) bool {
 			case 5: l = len(t.limit48[t.on8])
 			case 6: l = len(t.limit56[t.on8])
 			case 7: l = len(t.limit64[t.on8])
-		}
-		if t.oncursor >= l {
-			return t.forward(l)
 		}
 	}
 	return false
@@ -5902,7 +5898,8 @@ func (t *CounterBytes) Reset() {
 }
 
 func (t *CounterBytes) forward(l int) bool {
-	if t.oncursor++; t.oncursor >= l {
+	t.oncursor++
+	for t.oncursor >= l {
 		t.oncursor = 0
 		if t.on8++; t.on8 == 8 {
 			t.on8 = 0
@@ -5920,9 +5917,6 @@ func (t *CounterBytes) forward(l int) bool {
 			case 5: l = len(t.limit48[t.on8])
 			case 6: l = len(t.limit56[t.on8])
 			case 7: l = len(t.limit64[t.on8])
-		}
-		if t.oncursor >= l {
-			return t.forward(l)
 		}
 	}
 	return false
