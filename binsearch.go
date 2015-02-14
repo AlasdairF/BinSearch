@@ -1,4 +1,4 @@
-package binsearch2
+package binsearch
 
 import (
  "github.com/AlasdairF/Custom"
