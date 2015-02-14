@@ -2132,6 +2132,9 @@ func (t *KeyBytes) Reset() {
 	t.onlimit = 0
 	t.on8 = 0
 	t.oncursor = 0
+	if len(t.limit8[0]) == 0 {
+		t.forward(0)
+	}
 }
 
 func (t *KeyBytes) forward(l int) bool {
@@ -2141,7 +2144,7 @@ func (t *KeyBytes) forward(l int) bool {
 		if t.on8++; t.on8 == 8 {
 			t.on8 = 0
 			if t.onlimit++; t.onlimit == 8 {
-				t.onlimit = 0
+				t.Reset()
 				return true
 			}
 		}
@@ -4351,6 +4354,9 @@ func (t *KeyValBytes) Reset() {
 	t.onlimit = 0
 	t.on8 = 0
 	t.oncursor = 0
+	if len(t.limit8[0]) == 0 {
+		t.forward(0)
+	}
 }
 
 func (t *KeyValBytes) forward(l int) bool {
@@ -4360,7 +4366,7 @@ func (t *KeyValBytes) forward(l int) bool {
 		if t.on8++; t.on8 == 8 {
 			t.on8 = 0
 			if t.onlimit++; t.onlimit == 8 {
-				t.onlimit = 0
+				t.Reset()
 				return true
 			}
 		}
@@ -5895,6 +5901,9 @@ func (t *CounterBytes) Reset() {
 	t.onlimit = 0
 	t.on8 = 0
 	t.oncursor = 0
+	if len(t.limit8[0]) == 0 {
+		t.forward(0)
+	}
 }
 
 func (t *CounterBytes) forward(l int) bool {
@@ -5904,7 +5913,7 @@ func (t *CounterBytes) forward(l int) bool {
 		if t.on8++; t.on8 == 8 {
 			t.on8 = 0
 			if t.onlimit++; t.onlimit == 8 {
-				t.onlimit = 0
+				t.Reset()
 				return true
 			}
 		}
