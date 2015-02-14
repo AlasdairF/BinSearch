@@ -2134,112 +2134,67 @@ func (t *KeyBytes) Reset() {
 	t.oncursor = 0
 }
 
+func (t *KeyBytes) forward(l int) bool {
+	if t.oncursor++; t.oncursor >= l {
+		t.oncursor = 0
+		if t.on8++; t.on8 == 8 {
+			t.on8 = 0
+			if t.onlimit++; t.onlimit == 8 {
+				t.onlimit = 0
+				return true
+			}
+		}
+		switch t.onlimit {
+			case 0: l = len(t.limit8[t.on8])
+			case 1: l = len(t.limit16[t.on8])
+			case 2: l = len(t.limit24[t.on8])
+			case 3: l = len(t.limit32[t.on8])
+			case 4: l = len(t.limit40[t.on8])
+			case 5: l = len(t.limit48[t.on8])
+			case 6: l = len(t.limit56[t.on8])
+			case 7: l = len(t.limit60[t.on8])
+		}
+		if t.oncursor >= l {
+			return t.forward(l)
+		}
+	}
+	return false
+}
+
 func (t *KeyBytes) Next() ([]byte, bool) {
 	switch t.onlimit {
 		case 0:
 			v := t.limit8[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit8[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse8(v), true
-					}
-				}
-			}
-			return reverse8(v), false
+			eof := t.forward(len(t.limit8[t.on8]))
+			return reverse8(v), int(v[1]), eof
 		case 1:
 			v := t.limit16[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit16[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse16(v), true
-					}
-				}
-			}
-			return reverse16(v), false
+			eof := t.forward(len(t.limit16[t.on8]))
+			return reverse16(v), int(v[2]), eof
 		case 2:
 			v := t.limit24[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit24[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse24(v), true
-					}
-				}
-			}
-			return reverse24(v), false
+			eof := t.forward(len(t.limit24[t.on8]))
+			return reverse24(v), int(v[3]), eof
 		case 3:
 			v := t.limit32[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit32[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse32(v), true
-					}
-				}
-			}
-			return reverse32(v), false
+			eof := t.forward(len(t.limit32[t.on8]))
+			return reverse32(v), int(v[4]), eof
 		case 4:
 			v := t.limit40[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit40[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse40(v), true
-					}
-				}
-			}
-			return reverse40(v), false
+			eof := t.forward(len(t.limit40[t.on8]))
+			return reverse40(v), int(v[5]), eof
 		case 5:
 			v := t.limit48[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit48[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse48(v), true
-					}
-				}
-			}
-			return reverse48(v), false
+			eof := t.forward(len(t.limit48[t.on8]))
+			return reverse48(v), int(v[6]), eof
 		case 6:
 			v := t.limit56[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit56[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse56(v), true
-					}
-				}
-			}
-			return reverse56(v), false
+			eof := t.forward(len(t.limit56[t.on8]))
+			return reverse56(v), int(v[7]), eof
 		default:
 			v := t.limit64[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit64[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse64(v), true
-					}
-				}
-			}
-			return reverse64(v), false
+			eof := t.forward(len(t.limit64[t.on8]))
+			return reverse64(v), int(v[8]), eof
 	}
 }
 
@@ -4400,112 +4355,67 @@ func (t *KeyValBytes) Reset() {
 	t.oncursor = 0
 }
 
+func (t *KeyValBytes) forward(l int) bool {
+	if t.oncursor++; t.oncursor >= l {
+		t.oncursor = 0
+		if t.on8++; t.on8 == 8 {
+			t.on8 = 0
+			if t.onlimit++; t.onlimit == 8 {
+				t.onlimit = 0
+				return true
+			}
+		}
+		switch t.onlimit {
+			case 0: l = len(t.limit8[t.on8])
+			case 1: l = len(t.limit16[t.on8])
+			case 2: l = len(t.limit24[t.on8])
+			case 3: l = len(t.limit32[t.on8])
+			case 4: l = len(t.limit40[t.on8])
+			case 5: l = len(t.limit48[t.on8])
+			case 6: l = len(t.limit56[t.on8])
+			case 7: l = len(t.limit60[t.on8])
+		}
+		if t.oncursor >= l {
+			return t.forward(l)
+		}
+	}
+	return false
+}
+
 func (t *KeyValBytes) Next() ([]byte, int, bool) {
 	switch t.onlimit {
 		case 0:
 			v := t.limit8[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit8[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse8b(v), int(v[1]), true
-					}
-				}
-			}
-			return reverse8b(v), int(v[1]), false
+			eof := t.forward(len(t.limit8[t.on8]))
+			return reverse8b(v), int(v[1]), eof
 		case 1:
 			v := t.limit16[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit16[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse16b(v), int(v[2]), true
-					}
-				}
-			}
-			return reverse16b(v), int(v[2]), false
+			eof := t.forward(len(t.limit16[t.on8]))
+			return reverse16b(v), int(v[2]), eof
 		case 2:
 			v := t.limit24[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit24[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse24b(v), int(v[3]), true
-					}
-				}
-			}
-			return reverse24b(v), int(v[3]), false
+			eof := t.forward(len(t.limit24[t.on8]))
+			return reverse24b(v), int(v[3]), eof
 		case 3:
 			v := t.limit32[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit32[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse32b(v), int(v[4]), true
-					}
-				}
-			}
-			return reverse32b(v), int(v[4]), false
+			eof := t.forward(len(t.limit32[t.on8]))
+			return reverse32b(v), int(v[4]), eof
 		case 4:
 			v := t.limit40[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit40[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse40b(v), int(v[5]), true
-					}
-				}
-			}
-			return reverse40b(v), int(v[5]), false
+			eof := t.forward(len(t.limit40[t.on8]))
+			return reverse40b(v), int(v[5]), eof
 		case 5:
 			v := t.limit48[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit48[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse48b(v), int(v[6]), true
-					}
-				}
-			}
-			return reverse48b(v), int(v[6]), false
+			eof := t.forward(len(t.limit48[t.on8]))
+			return reverse48b(v), int(v[6]), eof
 		case 6:
 			v := t.limit56[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit56[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse56b(v), int(v[7]), true
-					}
-				}
-			}
-			return reverse56b(v), int(v[7]), false
+			eof := t.forward(len(t.limit56[t.on8]))
+			return reverse56b(v), int(v[7]), eof
 		default:
 			v := t.limit64[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit64[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse64b(v), int(v[8]), true
-					}
-				}
-			}
-			return reverse64b(v), int(v[8]), false
+			eof := t.forward(len(t.limit64[t.on8]))
+			return reverse64b(v), int(v[8]), eof
 	}
 }
 
@@ -5991,112 +5901,67 @@ func (t *CounterBytes) Reset() {
 	t.oncursor = 0
 }
 
+func (t *CounterBytes) forward(l int) bool {
+	if t.oncursor++; t.oncursor >= l {
+		t.oncursor = 0
+		if t.on8++; t.on8 == 8 {
+			t.on8 = 0
+			if t.onlimit++; t.onlimit == 8 {
+				t.onlimit = 0
+				return true
+			}
+		}
+		switch t.onlimit {
+			case 0: l = len(t.limit8[t.on8])
+			case 1: l = len(t.limit16[t.on8])
+			case 2: l = len(t.limit24[t.on8])
+			case 3: l = len(t.limit32[t.on8])
+			case 4: l = len(t.limit40[t.on8])
+			case 5: l = len(t.limit48[t.on8])
+			case 6: l = len(t.limit56[t.on8])
+			case 7: l = len(t.limit60[t.on8])
+		}
+		if t.oncursor >= l {
+			return t.forward(l)
+		}
+	}
+	return false
+}
+
 func (t *CounterBytes) Next() ([]byte, int, bool) {
 	switch t.onlimit {
 		case 0:
 			v := t.limit8[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit8[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse8b(v), int(v[1]), true
-					}
-				}
-			}
-			return reverse8b(v), int(v[1]), false
+			eof := t.forward(len(t.limit8[t.on8]))
+			return reverse8b(v), int(v[1]), eof
 		case 1:
 			v := t.limit16[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit16[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse16b(v), int(v[2]), true
-					}
-				}
-			}
-			return reverse16b(v), int(v[2]), false
+			eof := t.forward(len(t.limit16[t.on8]))
+			return reverse16b(v), int(v[2]), eof
 		case 2:
 			v := t.limit24[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit24[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse24b(v), int(v[3]), true
-					}
-				}
-			}
-			return reverse24b(v), int(v[3]), false
+			eof := t.forward(len(t.limit24[t.on8]))
+			return reverse24b(v), int(v[3]), eof
 		case 3:
 			v := t.limit32[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit32[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse32b(v), int(v[4]), true
-					}
-				}
-			}
-			return reverse32b(v), int(v[4]), false
+			eof := t.forward(len(t.limit32[t.on8]))
+			return reverse32b(v), int(v[4]), eof
 		case 4:
 			v := t.limit40[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit40[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse40b(v), int(v[5]), true
-					}
-				}
-			}
-			return reverse40b(v), int(v[5]), false
+			eof := t.forward(len(t.limit40[t.on8]))
+			return reverse40b(v), int(v[5]), eof
 		case 5:
 			v := t.limit48[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit48[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse48b(v), int(v[6]), true
-					}
-				}
-			}
-			return reverse48b(v), int(v[6]), false
+			eof := t.forward(len(t.limit48[t.on8]))
+			return reverse48b(v), int(v[6]), eof
 		case 6:
 			v := t.limit56[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit56[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse56b(v), int(v[7]), true
-					}
-				}
-			}
-			return reverse56b(v), int(v[7]), false
+			eof := t.forward(len(t.limit56[t.on8]))
+			return reverse56b(v), int(v[7]), eof
 		default:
 			v := t.limit64[t.on8][t.oncursor]
-			if t.oncursor++; t.oncursor == len(t.limit64[t.on8]) {
-				t.oncursor = 0
-				if t.on8++; t.on8 == 8 {
-					t.on8 = 0
-					if t.onlimit++; t.onlimit == 8 {
-						t.onlimit = 0
-						return reverse64b(v), int(v[8]), true
-					}
-				}
-			}
-			return reverse64b(v), int(v[8]), false
+			eof := t.forward(len(t.limit64[t.on8]))
+			return reverse64b(v), int(v[8]), eof
 	}
 }
 
