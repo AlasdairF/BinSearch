@@ -11,9 +11,7 @@ import (
 	TYPES
 	
 	'Key' type (KeyBytes, KeyUint64 etc.) is a key-only store where the index of each key can be used to store any number of associated values.
-	
 	'KeyVal' type (KeyValBytes, KeyValUint64, etc.) is a key-value store where the vals are ints. For custom value types use 'Key' (above).
-	
 	'Counter' type (CounterBytes, CounterUint64, etc.) counts the number of occurances (equivalent to map[key]++) and allows very fast lookups.
 
 	INDEX
@@ -36,8 +34,8 @@ import (
 	KeyValBytes, KeyValRunes
 		func (t *KeyValBytes) Len() int
 		func (t *KeyValBytes) Find(thekey []byte) (int, bool)				Returns: value, exists
-		func (t *KeyValBytes) Update(thekey []byte, fn func(int) int) bool		Returns boolean value for whether the key exists or not, if it exists the value is modified according to the fn function
-		func (t *KeyValBytes) UpdateAll(fn func(int) int)						Modifies all values by the fn function
+		func (t *KeyValBytes) Update(thekey []byte, fn func(int) int) bool	Returns boolean value for whether the key exists or not, if it exists the value is modified according to the fn function
+		func (t *KeyValBytes) UpdateAll(fn func(int) int)					Modifies all values by the fn function
 		func (t *KeyValBytes) Add(thekey []byte, theval int) bool			Returns whether it exists. Replaces old value with the new value if it exists, otherwise adds it in place.
 		func (t *KeyValBytes) AddUnsorted(thekey []byte, theval int) error	Returns error if thekey > 64 bytes
 		func (t *KeyValBytes) Build()										Only required to be called after AddUnsorted, otherwise it will shrink array capacity to length.
@@ -60,45 +58,45 @@ import (
 		func (t *CounterBytes) Write(w *custom.Writer)
 		func (t *CounterBytes) Read(r *custom.Reader)
 		
-	KeyUint64, KeyUint32, KeyUint16, KeyUint8, KeyInt
-		func (t *KeyUint64) Len() int
-		func (t *KeyUint64) Find(thekey []byte) (int, bool)					Returns: index, exists.
-		func (t *KeyUint64) Add(thekey []byte) (int, bool)					Returns: index, exists.
-		func (t *KeyUint64) AddAt(thekey []byte, i int)
-		func (t *KeyUint64) AddUnsorted(thekey []byte)
-		func (t *KeyUint64) Build() []int									Returns slice mapping old indexes to new indexes. Only required if AddUnsorted was used, otherwise it will shrink array capacity to length.
-		func (t *KeyUint64) Reset()
-		func (t *KeyUint64) Next() (uint64, bool)							Returns: key, EOF (true = EOF)
-		func (t *KeyUint64) Keys() []uint64									Returns slice containing all the keys in order
-		func (t *KeyUint64) Write(w *custom.Writer)
-		func (t *KeyUint64) Read(r *custom.Reader)
+	KeyInt, KeyUint64, KeyUint32, KeyUint16, KeyUint8
+		func (t *KeyInt) Len() int
+		func (t *KeyInt) Find(thekey []byte) (int, bool)					Returns: index, exists.
+		func (t *KeyInt) Add(thekey []byte) (int, bool)						Returns: index, exists.
+		func (t *KeyInt) AddAt(thekey []byte, i int)
+		func (t *KeyInt) AddUnsorted(thekey []byte)
+		func (t *KeyInt) Build() []int										Returns slice mapping old indexes to new indexes. Only required if AddUnsorted was used, otherwise it will shrink array capacity to length.
+		func (t *KeyInt) Reset()
+		func (t *KeyInt) Next() (uint64, bool)								Returns: key, EOF (true = EOF)
+		func (t *KeyInt) Keys() []uint64									Returns slice containing all the keys in order
+		func (t *KeyInt) Write(w *custom.Writer)
+		func (t *KeyInt) Read(r *custom.Reader)
 		
-	KeyValUint64, KeyValUint32, KeyValUint16, KeyValUint8, KeyValInt
-		func (t *KeyValUint64) Len() int
-		func (t *KeyValUint64) Find(thekey uint64) (int, bool)				Returns: value, exists
-		func (t *KeyValUint64) Update(thekey uint64, fn func(int) int) bool		Returns boolean value for whether the key exists or not, if it exists the value is modified according to the fn function
-		func (t *KeyValUint64) UpdateAll(fn func(int) int)						Modifies all values by the fn function
-		func (t *KeyValUint64) Add(thekey uint64, theval int) bool			Returns whether it exists. Replaces old value with the new value if it exists, otherwise adds it in place.
-		func (t *KeyValUint64) AddUnsorted(thekey uint64, theval int)
-		func (t *KeyValUint64) Build()										Only required to be called after AddUnsorted, otherwise it will shrink array capacity to length.
-		func (t *KeyValUint64) Reset()
-		func (t *KeyValUint64) Next() ([]byte, int, bool)					Returns: original slice of bytes, value, EOF (true = EOF)
-		func (t *KeyValUint64) Keys() []uint64								Returns slice containing all the keys in order
-		func (t *KeyValUint64) Write(w *custom.Writer)
-		func (t *KeyValUint64) Read(r *custom.Reader)
+	KeyValInt, KeyValUint64, KeyValUint32, KeyValUint16, KeyValUint8
+		func (t *KeyValInt) Len() int
+		func (t *KeyValInt) Find(thekey uint64) (int, bool)					Returns: value, exists
+		func (t *KeyValInt) Update(thekey uint64, fn func(int) int) bool	Returns boolean value for whether the key exists or not, if it exists the value is modified according to the fn function
+		func (t *KeyValInt) UpdateAll(fn func(int) int)						Modifies all values by the fn function
+		func (t *KeyValInt) Add(thekey uint64, theval int) bool				Returns whether it exists. Replaces old value with the new value if it exists, otherwise adds it in place.
+		func (t *KeyValInt) AddUnsorted(thekey uint64, theval int)
+		func (t *KeyValInt) Build()											Only required to be called after AddUnsorted, otherwise it will shrink array capacity to length.
+		func (t *KeyValInt) Reset()
+		func (t *KeyValInt) Next() ([]byte, int, bool)						Returns: original slice of bytes, value, EOF (true = EOF)
+		func (t *KeyValInt) Keys() []uint64									Returns slice containing all the keys in order
+		func (t *KeyValInt) Write(w *custom.Writer)
+		func (t *KeyValInt) Read(r *custom.Reader)
 		
-	CounterUint64, CounterUint32, CounterUint16, CounterUint8, CounterInt
-		func (t *CounterUint64) Len() int
-		func (t *CounterUint64) Find(thekey uint64) (int, bool)				Returns: frequency, exists. Will return nonsensical results if used before Build() is executed; only use after Build.
-		func (t *CounterUint64) Update(thekey uint64, fn func(int) int) bool	Returns boolean value for whether the key exists or not, if it exists the value is modified according to the fn function
-		func (t *CounterUint64) UpdateAll(fn func(int) int)						Modifies all values by the fn function
-		func (t *CounterUint64) Add(thekey uint64, theval int)
-		func (t *CounterUint64) Build()										Always required before Find.
-		func (t *CounterUint64) Reset()
-		func (t *CounterUint64) Next() ([]byte, int, bool)					Returns: original slice of bytes, value, EOF (true = EOF)
-		func (t *CounterUint64) Keys() []uint64								Returns slice containing all the keys in order
-		func (t *CounterUint64) Write(w *custom.Writer)
-		func (t *CounterUint64) Read(r *custom.Reader)
+	CounterInt, CounterUint64, CounterUint32, CounterUint16, CounterUint8
+		func (t *CounterInt) Len() int
+		func (t *CounterInt) Find(thekey uint64) (int, bool)				Returns: frequency, exists. Will return nonsensical results if used before Build() is executed; only use after Build.
+		func (t *CounterInt) Update(thekey uint64, fn func(int) int) bool	Returns boolean value for whether the key exists or not, if it exists the value is modified according to the fn function
+		func (t *CounterInt) UpdateAll(fn func(int) int)					Modifies all values by the fn function
+		func (t *CounterInt) Add(thekey uint64, theval int)
+		func (t *CounterInt) Build()										Always required before Find.
+		func (t *CounterInt) Reset()
+		func (t *CounterInt) Next() ([]byte, int, bool)						Returns: original slice of bytes, value, EOF (true = EOF)
+		func (t *CounterInt) Keys() []uint64								Returns slice containing all the keys in order
+		func (t *CounterInt) Write(w *custom.Writer)
+		func (t *CounterInt) Read(r *custom.Reader)
 
 */
 
