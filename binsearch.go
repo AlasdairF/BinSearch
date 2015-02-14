@@ -1,6 +1,7 @@
-package binsearch
+package binsearch2
 
 import (
+ "github.com/AlasdairF/Custom"
  "sort"
  "errors"
 )
@@ -29,6 +30,8 @@ import (
 		func (t *KeyBytes) Reset()
 		func (t *KeyBytes) Next() ([]byte, bool)							Returns: original slice of bytes, EOF (true = EOF)
 		func (t *KeyBytes) Keys() [][]byte									Returns slice containing all the keys in order
+		func (t *KeyBytes) Write(w *custom.Writer)
+		func (t *KeyBytes) Read(r *custom.Reader)
 		
 	KeyValBytes, KeyValRunes
 		func (t *KeyValBytes) Len() int
@@ -41,17 +44,21 @@ import (
 		func (t *KeyValBytes) Reset()
 		func (t *KeyValBytes) Next() ([]byte, int, bool)					Returns: original slice of bytes, value, EOF (true = EOF)
 		func (t *KeyValBytes) Keys() [][]byte								Returns slice containing all the keys in order
+		func (t *KeyValBytes) Write(w *custom.Writer)
+		func (t *KeyValBytes) Read(r *custom.Reader)
 		
 	CounterBytes, CounterRunes
 		func (t *CounterBytes) Len() int
 		func (t *CounterBytes) Find(thekey []byte) (int, bool)				Returns: frequency, exists. Will return nonsensical results if used before Build() is executed; only use after Build.
-		func (t *CounterBytes) Update(thekey []byte, fn func(int) int) bool		Returns boolean value for whether the key exists or not, if it exists the value is modified according to the fn function
-		func (t *CounterBytes) UpdateAll(fn func(int) int)						Modifies all values by the fn function
-		func (t *CounterBytes) Add(thekey []byte) error						Returns an error if thekey > 64 bytes
+		func (t *CounterBytes) Update(thekey []byte, fn func(int) int) bool	Returns boolean value for whether the key exists or not, if it exists the value is modified according to the fn function
+		func (t *CounterBytes) UpdateAll(fn func(int) int)					Modifies all values by the fn function
+		func (t *CounterBytes) Add(thekey []byte, theval int) error			Returns an error if thekey > 64 bytes
 		func (t *CounterBytes) Build()										Always required before Find.
 		func (t *CounterBytes) Reset()
 		func (t *CounterBytes) Next() ([]byte, int, bool)					Returns: original slice of bytes, value, EOF (true = EOF)
 		func (t *CounterBytes) Keys() [][]byte								Returns slice containing all the keys in order
+		func (t *CounterBytes) Write(w *custom.Writer)
+		func (t *CounterBytes) Read(r *custom.Reader)
 		
 	KeyUint64, KeyUint32, KeyUint16, KeyUint8, KeyInt
 		func (t *KeyUint64) Len() int
@@ -63,6 +70,8 @@ import (
 		func (t *KeyUint64) Reset()
 		func (t *KeyUint64) Next() (uint64, bool)							Returns: key, EOF (true = EOF)
 		func (t *KeyUint64) Keys() []uint64									Returns slice containing all the keys in order
+		func (t *KeyUint64) Write(w *custom.Writer)
+		func (t *KeyUint64) Read(r *custom.Reader)
 		
 	KeyValUint64, KeyValUint32, KeyValUint16, KeyValUint8, KeyValInt
 		func (t *KeyValUint64) Len() int
@@ -75,17 +84,21 @@ import (
 		func (t *KeyValUint64) Reset()
 		func (t *KeyValUint64) Next() ([]byte, int, bool)					Returns: original slice of bytes, value, EOF (true = EOF)
 		func (t *KeyValUint64) Keys() []uint64								Returns slice containing all the keys in order
+		func (t *KeyValUint64) Write(w *custom.Writer)
+		func (t *KeyValUint64) Read(r *custom.Reader)
 		
 	CounterUint64, CounterUint32, CounterUint16, CounterUint8, CounterInt
 		func (t *CounterUint64) Len() int
 		func (t *CounterUint64) Find(thekey uint64) (int, bool)				Returns: frequency, exists. Will return nonsensical results if used before Build() is executed; only use after Build.
 		func (t *CounterUint64) Update(thekey uint64, fn func(int) int) bool	Returns boolean value for whether the key exists or not, if it exists the value is modified according to the fn function
 		func (t *CounterUint64) UpdateAll(fn func(int) int)						Modifies all values by the fn function
-		func (t *CounterUint64) Add(thekey uint64)
+		func (t *CounterUint64) Add(thekey uint64, theval int)
 		func (t *CounterUint64) Build()										Always required before Find.
 		func (t *CounterUint64) Reset()
 		func (t *CounterUint64) Next() ([]byte, int, bool)					Returns: original slice of bytes, value, EOF (true = EOF)
 		func (t *CounterUint64) Keys() []uint64								Returns slice containing all the keys in order
+		func (t *CounterUint64) Write(w *custom.Writer)
+		func (t *CounterUint64) Read(r *custom.Reader)
 
 */
 
@@ -2289,6 +2302,233 @@ func (t *KeyBytes) Keys() [][]byte {
 	return keys
 }
 
+func (t *KeyBytes) Write(w *custom.Writer) {
+	var i, run int
+
+	// Write total
+	w.Write64Variable(uint64(t.total))
+	
+	// Write count
+	for i=0; i<64; i++ {
+		w.Write64Variable(uint64(t.count[i]))
+	}
+	
+	// Write t.limit8
+	for run=0; run<8; run++ {
+		tmp := t.limit8[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v)
+		}
+	}
+	// Write t.limit16
+	for run=0; run<8; run++ {
+		tmp := t.limit16[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v[0])
+			w.Write64(v[1])
+		}
+	}
+	// Write t.limit24
+	for run=0; run<8; run++ {
+		tmp := t.limit24[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v[0])
+			w.Write64(v[1])
+			w.Write64(v[2])
+		}
+	}
+	// Write t.limit32
+	for run=0; run<8; run++ {
+		tmp := t.limit32[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v[0])
+			w.Write64(v[1])
+			w.Write64(v[2])
+			w.Write64(v[3])
+		}
+	}
+	// Write t.limit40
+	for run=0; run<8; run++ {
+		tmp := t.limit40[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v[0])
+			w.Write64(v[1])
+			w.Write64(v[2])
+			w.Write64(v[3])
+			w.Write64(v[4])
+		}
+	}
+	// Write t.limit48
+	for run=0; run<8; run++ {
+		tmp := t.limit48[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v[0])
+			w.Write64(v[1])
+			w.Write64(v[2])
+			w.Write64(v[3])
+			w.Write64(v[4])
+			w.Write64(v[5])
+		}
+	}
+	// Write t.limit56
+	for run=0; run<8; run++ {
+		tmp := t.limit56[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v[0])
+			w.Write64(v[1])
+			w.Write64(v[2])
+			w.Write64(v[3])
+			w.Write64(v[4])
+			w.Write64(v[5])
+			w.Write64(v[6])
+		}
+	}
+	// Write t.limit64
+	for run=0; run<8; run++ {
+		tmp := t.limit64[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v[0])
+			w.Write64(v[1])
+			w.Write64(v[2])
+			w.Write64(v[3])
+			w.Write64(v[4])
+			w.Write64(v[5])
+			w.Write64(v[6])
+			w.Write64(v[7])
+		}
+	}
+	
+}
+
+func (t *KeyBytes) Read(r *custom.Reader) {
+	var run int
+	var i, l, a, b, c, d, e, f, g, h uint64
+
+	// Write total
+	t.total = int(r.Read64Variable())
+	
+	// Read count
+	for i=0; i<64; i++ {
+		t.count[i] = int(r.Read64Variable())
+	}
+	
+	// Read t.limit8
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([]uint64, l)
+		for i=0; i<l; i++ {
+			tmp[i] = r.Read64()
+		}
+		t.limit8[run] = tmp
+	}
+	// Read t.limit16
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([][2]uint64, l)
+		for i=0; i<l; i++ {
+			a = r.Read64()
+			b = r.Read64()
+			tmp[i] = [2]uint64{a, b}
+		}
+		t.limit16[run] = tmp
+	}
+	// Read t.limit24
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([][3]uint64, l)
+		for i=0; i<l; i++ {
+			a = r.Read64()
+			b = r.Read64()
+			c = r.Read64()
+			tmp[i] = [3]uint64{a, b, c}
+		}
+		t.limit24[run] = tmp
+	}
+	// Read t.limit32
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([][4]uint64, l)
+		for i=0; i<l; i++ {
+			a = r.Read64()
+			b = r.Read64()
+			c = r.Read64()
+			d = r.Read64()
+			tmp[i] = [4]uint64{a, b, c, d}
+		}
+		t.limit32[run] = tmp
+	}
+	// Read t.limit40
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([][5]uint64, l)
+		for i=0; i<l; i++ {
+			a = r.Read64()
+			b = r.Read64()
+			c = r.Read64()
+			d = r.Read64()
+			e = r.Read64()
+			tmp[i] = [5]uint64{a, b, c, d, e}
+		}
+		t.limit40[run] = tmp
+	}
+	// Read t.limit48
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([][6]uint64, l)
+		for i=0; i<l; i++ {
+			a = r.Read64()
+			b = r.Read64()
+			c = r.Read64()
+			d = r.Read64()
+			e = r.Read64()
+			f = r.Read64()
+			tmp[i] = [6]uint64{a, b, c, d, e, f}
+		}
+		t.limit48[run] = tmp
+	}
+	// Read t.limit56
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([][7]uint64, l)
+		for i=0; i<l; i++ {
+			a = r.Read64()
+			b = r.Read64()
+			c = r.Read64()
+			d = r.Read64()
+			e = r.Read64()
+			f = r.Read64()
+			g = r.Read64()
+			tmp[i] = [7]uint64{a, b, c, d, e, f, g}
+		}
+		t.limit56[run] = tmp
+	}
+	// Read t.limit64
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([][8]uint64, l)
+		for i=0; i<l; i++ {
+			a = r.Read64()
+			b = r.Read64()
+			c = r.Read64()
+			d = r.Read64()
+			e = r.Read64()
+			f = r.Read64()
+			g = r.Read64()
+			h = r.Read64()
+			tmp[i] = [8]uint64{a, b, c, d, e, f, g, h}
+		}
+		t.limit64[run] = tmp
+	}
+}
+
 // ---------- KeyValBytes ----------
 // Key bytes has around 2KB of memory overhead for the structures, beyond this it stores all keys as efficiently as possible.
 
@@ -4328,6 +4568,240 @@ func (t *KeyValBytes) Keys() [][]byte {
 	return keys
 }
 
+
+func (t *KeyValBytes) Write(w *custom.Writer) {
+	var run int
+
+	// Write total
+	w.Write64Variable(uint64(t.total))
+	
+	// Write t.limit8
+	for run=0; run<8; run++ {
+		tmp := t.limit8[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v[0])
+			w.Write64(v[1])
+		}
+	}
+	// Write t.limit16
+	for run=0; run<8; run++ {
+		tmp := t.limit16[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v[0])
+			w.Write64(v[1])
+			w.Write64(v[2])
+		}
+	}
+	// Write t.limit24
+	for run=0; run<8; run++ {
+		tmp := t.limit24[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v[0])
+			w.Write64(v[1])
+			w.Write64(v[2])
+			w.Write64(v[3])
+		}
+	}
+	// Write t.limit32
+	for run=0; run<8; run++ {
+		tmp := t.limit32[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v[0])
+			w.Write64(v[1])
+			w.Write64(v[2])
+			w.Write64(v[3])
+			w.Write64(v[4])
+		}
+	}
+	// Write t.limit40
+	for run=0; run<8; run++ {
+		tmp := t.limit40[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v[0])
+			w.Write64(v[1])
+			w.Write64(v[2])
+			w.Write64(v[3])
+			w.Write64(v[4])
+			w.Write64(v[5])
+		}
+	}
+	// Write t.limit48
+	for run=0; run<8; run++ {
+		tmp := t.limit48[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v[0])
+			w.Write64(v[1])
+			w.Write64(v[2])
+			w.Write64(v[3])
+			w.Write64(v[4])
+			w.Write64(v[5])
+			w.Write64(v[6])
+		}
+	}
+	// Write t.limit56
+	for run=0; run<8; run++ {
+		tmp := t.limit56[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v[0])
+			w.Write64(v[1])
+			w.Write64(v[2])
+			w.Write64(v[3])
+			w.Write64(v[4])
+			w.Write64(v[5])
+			w.Write64(v[6])
+			w.Write64(v[7])
+		}
+	}
+	// Write t.limit64
+	for run=0; run<8; run++ {
+		tmp := t.limit64[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v[0])
+			w.Write64(v[1])
+			w.Write64(v[2])
+			w.Write64(v[3])
+			w.Write64(v[4])
+			w.Write64(v[5])
+			w.Write64(v[6])
+			w.Write64(v[7])
+			w.Write64(v[8])
+		}
+	}
+}
+
+func (t *KeyValBytes) Read(r *custom.Reader) {
+	var run int
+	var i, l, a, b, c, d, e, f, g, h, z uint64
+
+	// Write total
+	t.total = int(r.Read64Variable())
+	
+	// Read t.limit8
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([][2]uint64, l)
+		for i=0; i<l; i++ {
+			a = r.Read64()
+			b = r.Read64()
+			tmp[i] = [2]uint64{a, b}
+		}
+		t.limit8[run] = tmp
+	}
+	// Read t.limit16
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([][3]uint64, l)
+		for i=0; i<l; i++ {
+			a = r.Read64()
+			b = r.Read64()
+			c = r.Read64()
+			tmp[i] = [3]uint64{a, b, c}
+		}
+		t.limit16[run] = tmp
+	}
+	// Read t.limit24
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([][4]uint64, l)
+		for i=0; i<l; i++ {
+			a = r.Read64()
+			b = r.Read64()
+			c = r.Read64()
+			d = r.Read64()
+			tmp[i] = [4]uint64{a, b, c, d}
+		}
+		t.limit24[run] = tmp
+	}
+	// Read t.limit32
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([][5]uint64, l)
+		for i=0; i<l; i++ {
+			a = r.Read64()
+			b = r.Read64()
+			c = r.Read64()
+			d = r.Read64()
+			e = r.Read64()
+			tmp[i] = [5]uint64{a, b, c, d, e}
+		}
+		t.limit32[run] = tmp
+	}
+	// Read t.limit40
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([][6]uint64, l)
+		for i=0; i<l; i++ {
+			a = r.Read64()
+			b = r.Read64()
+			c = r.Read64()
+			d = r.Read64()
+			e = r.Read64()
+			f = r.Read64()
+			tmp[i] = [6]uint64{a, b, c, d, e, f}
+		}
+		t.limit40[run] = tmp
+	}
+	// Read t.limit48
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([][7]uint64, l)
+		for i=0; i<l; i++ {
+			a = r.Read64()
+			b = r.Read64()
+			c = r.Read64()
+			d = r.Read64()
+			e = r.Read64()
+			f = r.Read64()
+			g = r.Read64()
+			tmp[i] = [7]uint64{a, b, c, d, e, f, g}
+		}
+		t.limit48[run] = tmp
+	}
+	// Read t.limit56
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([][8]uint64, l)
+		for i=0; i<l; i++ {
+			a = r.Read64()
+			b = r.Read64()
+			c = r.Read64()
+			d = r.Read64()
+			e = r.Read64()
+			f = r.Read64()
+			g = r.Read64()
+			h = r.Read64()
+			tmp[i] = [8]uint64{a, b, c, d, e, f, g, h}
+		}
+		t.limit56[run] = tmp
+	}
+	// Read t.limit64
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([][9]uint64, l)
+		for i=0; i<l; i++ {
+			a = r.Read64()
+			b = r.Read64()
+			c = r.Read64()
+			d = r.Read64()
+			e = r.Read64()
+			f = r.Read64()
+			g = r.Read64()
+			h = r.Read64()
+			z = r.Read64()
+			tmp[i] = [9]uint64{a, b, c, d, e, f, g, h, z}
+		}
+		t.limit64[run] = tmp
+	}
+}
+
 // ---------- CounterBytes ----------
 // CounterBytes bytes has around 2KB of memory overhead for the structures, beyond this it stores all keys as efficiently as possible.
 
@@ -5238,17 +5712,17 @@ func (t *CounterBytes) UpdateAll(fn func(int) int) {
 }
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
-func (t *CounterBytes) Add(thekey []byte) error {
+func (t *CounterBytes) Add(thekey []byte, theval int) error {
 	switch (len(thekey) - 1) / 8 {
 		case 0:
 			a, i := bytes2uint64(thekey)
-			t.limit8[i] = append(t.limit8[i], [2]uint64{a, 0})
+			t.limit8[i] = append(t.limit8[i], [2]uint64{a, uint64(theval)})
 			t.total++
 			return nil
 		case 1:
 			a, _ := bytes2uint64(thekey)
 			b, i := bytes2uint64(thekey[8:])
-			t.limit16[i] = append(t.limit16[i], [3]uint64{a, b, 0})
+			t.limit16[i] = append(t.limit16[i], [3]uint64{a, b, uint64(theval)})
 			t.total++
 			return nil
 		case 2:
@@ -5256,7 +5730,7 @@ func (t *CounterBytes) Add(thekey []byte) error {
 			a, _ := bytes2uint64(thekey)
 			b, _ := bytes2uint64(thekey[8:])
 			c, i := bytes2uint64(thekey[16:])
-			t.limit24[i] = append(t.limit24[i], [4]uint64{a, b, c, 0})
+			t.limit24[i] = append(t.limit24[i], [4]uint64{a, b, c, uint64(theval)})
 			t.total++
 			return nil
 		case 3:
@@ -5264,7 +5738,7 @@ func (t *CounterBytes) Add(thekey []byte) error {
 			b, _ := bytes2uint64(thekey[8:])
 			c, _ := bytes2uint64(thekey[16:])
 			d, i := bytes2uint64(thekey[24:])
-			t.limit32[i] = append(t.limit32[i], [5]uint64{a, b, c, d, 0})
+			t.limit32[i] = append(t.limit32[i], [5]uint64{a, b, c, d, uint64(theval)})
 			t.total++
 			return nil
 		case 4:
@@ -5273,7 +5747,7 @@ func (t *CounterBytes) Add(thekey []byte) error {
 			c, _ := bytes2uint64(thekey[16:])
 			d, _ := bytes2uint64(thekey[24:])
 			e, i := bytes2uint64(thekey[32:])
-			t.limit40[i] = append(t.limit40[i], [6]uint64{a, b, c, d, e, 0})
+			t.limit40[i] = append(t.limit40[i], [6]uint64{a, b, c, d, e, uint64(theval)})
 			t.total++
 			return nil
 		case 5:
@@ -5283,7 +5757,7 @@ func (t *CounterBytes) Add(thekey []byte) error {
 			d, _ := bytes2uint64(thekey[24:])
 			e, _ := bytes2uint64(thekey[32:])
 			f, i := bytes2uint64(thekey[40:])
-			t.limit48[i] = append(t.limit48[i], [7]uint64{a, b, c, d, e, f, 0})
+			t.limit48[i] = append(t.limit48[i], [7]uint64{a, b, c, d, e, f, uint64(theval)})
 			t.total++
 			return nil
 		case 6:
@@ -5294,7 +5768,7 @@ func (t *CounterBytes) Add(thekey []byte) error {
 			e, _ := bytes2uint64(thekey[32:])
 			f, _ := bytes2uint64(thekey[40:])
 			g, i := bytes2uint64(thekey[48:])
-			t.limit56[i] = append(t.limit56[i], [8]uint64{a, b, c, d, e, f, g, 0})
+			t.limit56[i] = append(t.limit56[i], [8]uint64{a, b, c, d, e, f, g, uint64(theval)})
 			t.total++
 			return nil
 		case 7:
@@ -5306,7 +5780,7 @@ func (t *CounterBytes) Add(thekey []byte) error {
 			f, _ := bytes2uint64(thekey[40:])
 			g, _ := bytes2uint64(thekey[48:])
 			h, i := bytes2uint64(thekey[56:])
-			t.limit64[i] = append(t.limit64[i], [9]uint64{a, b, c, d, e, f, g, h, 0})
+			t.limit64[i] = append(t.limit64[i], [9]uint64{a, b, c, d, e, f, g, h, uint64(theval)})
 			t.total++
 			return nil
 		default:
@@ -5317,32 +5791,27 @@ func (t *CounterBytes) Add(thekey []byte) error {
 // Build sorts the keys and returns an array telling you how to sort the values, you must do this yourself.
 func (t *CounterBytes) Build() {
 
-	var l, run int
-	var n uint64
+	var l, run, n int
 	
 	for run=0; run<8; run++ {
 		if l = len(t.limit8[run]); l > 0 {
 			var temp sortersimple_limit8 = t.limit8[run]
 			sort.Sort(temp)
 			res := make([][2]uint64, 0, l/5)
-			var this [2]uint64
-			n = 0
-			for _, k := range temp {
+			this := temp[0]
+			n = int(temp[0][1])
+			for _, k := range temp[1:] {
 				if k[0] == this[0] {
-					n++
+					n += int(k[1])
 				} else {
-					if n > 0 {
-						this[1] = n
-						res = append(res, this)
-					}
+					this[1] = uint64(n)
+					res = append(res, this)
 					this = k
-					n = 1
+					n = int(k[1])
 				}
 			}
-			if n > 0 {
-				this[1] = n
-				res = append(res, this)
-			}
+			this[1] = uint64(n)
+			res = append(res, this)
 			t.limit8[run] = make([][2]uint64, len(res))
 			copy(t.limit8[run], res)
 		}
@@ -5353,24 +5822,20 @@ func (t *CounterBytes) Build() {
 			var temp sortersimple_limit16 = t.limit16[run]
 			sort.Sort(temp)
 			res := make([][3]uint64, 0, l/5)
-			var this [3]uint64
-			n = 0
-			for _, k := range temp {
+			this := temp[0]
+			n = int(temp[0][2])
+			for _, k := range temp[1:] {
 				if k[0] == this[0] && k[1] == this[1] {
-					n++
+					n += int(k[2])
 				} else {
-					if n > 0 {
-						this[2] = n
-						res = append(res, this)
-					}
+					this[2] = uint64(n)
+					res = append(res, this)
 					this = k
-					n = 1
+					n = int(k[2])
 				}
 			}
-			if n > 0 {
-				this[2] = n
-				res = append(res, this)
-			}
+			this[2] = uint64(n)
+			res = append(res, this)
 			t.limit16[run] = make([][3]uint64, len(res))
 			copy(t.limit16[run], res)
 		}
@@ -5381,24 +5846,20 @@ func (t *CounterBytes) Build() {
 			var temp sortersimple_limit24 = t.limit24[run]
 			sort.Sort(temp)
 			res := make([][4]uint64, 0, l/5)
-			var this [4]uint64
-			n = 0
-			for _, k := range temp {
+			this := temp[0]
+			n = int(temp[0][3])
+			for _, k := range temp[1:] {
 				if k[0] == this[0] && k[1] == this[1] && k[2] == this[2] {
-					n++
+					n += int(k[3])
 				} else {
-					if n > 0 {
-						this[3] = n
-						res = append(res, this)
-					}
+					this[3] = uint64(n)
+					res = append(res, this)
 					this = k
-					n = 1
+					n = int(k[3])
 				}
 			}
-			if n > 0 {
-				this[3] = n
-				res = append(res, this)
-			}
+			this[3] = uint64(n)
+			res = append(res, this)
 			t.limit24[run] = make([][4]uint64, len(res))
 			copy(t.limit24[run], res)
 		}
@@ -5409,24 +5870,20 @@ func (t *CounterBytes) Build() {
 			var temp sortersimple_limit32 = t.limit32[run]
 			sort.Sort(temp)
 			res := make([][5]uint64, 0, l/5)
-			var this [5]uint64
-			n = 0
-			for _, k := range temp {
+			this := temp[0]
+			n = int(temp[0][4])
+			for _, k := range temp[1:] {
 				if k[0] == this[0] && k[1] == this[1] && k[2] == this[2] && k[3] == this[3] {
-					n++
+					n += int(k[4])
 				} else {
-					if n > 0 {
-						this[4] = n
-						res = append(res, this)
-					}
+					this[4] = uint64(n)
+					res = append(res, this)
 					this = k
-					n = 1
+					n = int(k[4])
 				}
 			}
-			if n > 0 {
-				this[4] = n
-				res = append(res, this)
-			}
+			this[4] = uint64(n)
+			res = append(res, this)
 			t.limit32[run] = make([][5]uint64, len(res))
 			copy(t.limit32[run], res)
 		}
@@ -5437,24 +5894,20 @@ func (t *CounterBytes) Build() {
 			var temp sortersimple_limit40 = t.limit40[run]
 			sort.Sort(temp)
 			res := make([][6]uint64, 0, l/5)
-			var this [6]uint64
-			n = 0
-			for _, k := range temp {
+			this := temp[0]
+			n = int(temp[0][5])
+			for _, k := range temp[1:] {
 				if k[0] == this[0] && k[1] == this[1] && k[2] == this[2] && k[3] == this[3] && k[4] == this[4] {
-					n++
+					n += int(k[5])
 				} else {
-					if n > 0 {
-						this[5] = n
-						res = append(res, this)
-					}
+					this[5] = uint64(n)
+					res = append(res, this)
 					this = k
-					n = 1
+					n = int(k[5])
 				}
 			}
-			if n > 0 {
-				this[5] = n
-				res = append(res, this)
-			}
+			this[5] = uint64(n)
+			res = append(res, this)
 			t.limit40[run] = make([][6]uint64, len(res))
 			copy(t.limit40[run], res)
 		}
@@ -5465,24 +5918,20 @@ func (t *CounterBytes) Build() {
 			var temp sortersimple_limit48 = t.limit48[run]
 			sort.Sort(temp)
 			res := make([][7]uint64, 0, l/5)
-			var this [7]uint64
-			n = 0
-			for _, k := range temp {
+			this := temp[0]
+			n = int(temp[0][6])
+			for _, k := range temp[1:] {
 				if k[0] == this[0] && k[1] == this[1] && k[2] == this[2] && k[3] == this[3] && k[4] == this[4] && k[5] == this[5] {
-					n++
+					n += int(k[6])
 				} else {
-					if n > 0 {
-						this[6] = n
-						res = append(res, this)
-					}
+					this[6] = uint64(n)
+					res = append(res, this)
 					this = k
-					n = 1
+					n = int(k[6])
 				}
 			}
-			if n > 0 {
-				this[6] = n
-				res = append(res, this)
-			}
+			this[6] = uint64(n)
+			res = append(res, this)
 			t.limit48[run] = make([][7]uint64, len(res))
 			copy(t.limit48[run], res)
 		}
@@ -5493,24 +5942,20 @@ func (t *CounterBytes) Build() {
 			var temp sortersimple_limit56 = t.limit56[run]
 			sort.Sort(temp)
 			res := make([][8]uint64, 0, l/5)
-			var this [8]uint64
-			n = 0
-			for _, k := range temp {
+			this := temp[0]
+			n = int(temp[0][7])
+			for _, k := range temp[1:] {
 				if k[0] == this[0] && k[1] == this[1] && k[2] == this[2] && k[3] == this[3] && k[4] == this[4] && k[5] == this[5] && k[6] == this[6] {
-					n++
+					n += int(k[7])
 				} else {
-					if n > 0 {
-						this[7] = n
-						res = append(res, this)
-					}
+					this[7] = uint64(n)
+					res = append(res, this)
 					this = k
-					n = 1
+					n = int(k[7])
 				}
 			}
-			if n > 0 {
-				this[7] = n
-				res = append(res, this)
-			}
+			this[7] = uint64(n)
+			res = append(res, this)
 			t.limit56[run] = make([][8]uint64, len(res))
 			copy(t.limit56[run], res)
 		}
@@ -5521,24 +5966,20 @@ func (t *CounterBytes) Build() {
 			var temp sortersimple_limit64 = t.limit64[run]
 			sort.Sort(temp)
 			res := make([][9]uint64, 0, l/5)
-			var this [9]uint64
-			n = 0
-			for _, k := range temp {
+			this := temp[0]
+			n = int(temp[0][8])
+			for _, k := range temp[1:] {
 				if k[0] == this[0] && k[1] == this[1] && k[2] == this[2] && k[3] == this[3] && k[4] == this[4] && k[5] == this[5] && k[6] == this[6] && k[7] == this[7] {
-					n++
+					n += int(k[8])
 				} else {
-					if n > 0 {
-						this[8] = n
-						res = append(res, this)
-					}
+					this[8] = uint64(n)
+					res = append(res, this)
 					this = k
-					n = 1
+					n = int(k[8])
 				}
 			}
-			if n > 0 {
-				this[8] = n
-				res = append(res, this)
-			}
+			this[8] = uint64(n)
+			res = append(res, this)
 			t.limit64[run] = make([][9]uint64, len(res))
 			copy(t.limit64[run], res)
 		}
@@ -5718,6 +6159,240 @@ func (t *CounterBytes) Keys() [][]byte {
 	return keys
 }
 
+
+func (t *CounterBytes) Write(w *custom.Writer) {
+	var run int
+
+	// Write total
+	w.Write64Variable(uint64(t.total))
+	
+	// Write t.limit8
+	for run=0; run<8; run++ {
+		tmp := t.limit8[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v[0])
+			w.Write64(v[1])
+		}
+	}
+	// Write t.limit16
+	for run=0; run<8; run++ {
+		tmp := t.limit16[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v[0])
+			w.Write64(v[1])
+			w.Write64(v[2])
+		}
+	}
+	// Write t.limit24
+	for run=0; run<8; run++ {
+		tmp := t.limit24[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v[0])
+			w.Write64(v[1])
+			w.Write64(v[2])
+			w.Write64(v[3])
+		}
+	}
+	// Write t.limit32
+	for run=0; run<8; run++ {
+		tmp := t.limit32[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v[0])
+			w.Write64(v[1])
+			w.Write64(v[2])
+			w.Write64(v[3])
+			w.Write64(v[4])
+		}
+	}
+	// Write t.limit40
+	for run=0; run<8; run++ {
+		tmp := t.limit40[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v[0])
+			w.Write64(v[1])
+			w.Write64(v[2])
+			w.Write64(v[3])
+			w.Write64(v[4])
+			w.Write64(v[5])
+		}
+	}
+	// Write t.limit48
+	for run=0; run<8; run++ {
+		tmp := t.limit48[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v[0])
+			w.Write64(v[1])
+			w.Write64(v[2])
+			w.Write64(v[3])
+			w.Write64(v[4])
+			w.Write64(v[5])
+			w.Write64(v[6])
+		}
+	}
+	// Write t.limit56
+	for run=0; run<8; run++ {
+		tmp := t.limit56[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v[0])
+			w.Write64(v[1])
+			w.Write64(v[2])
+			w.Write64(v[3])
+			w.Write64(v[4])
+			w.Write64(v[5])
+			w.Write64(v[6])
+			w.Write64(v[7])
+		}
+	}
+	// Write t.limit64
+	for run=0; run<8; run++ {
+		tmp := t.limit64[run]
+		w.Write64Variable(uint64(len(tmp)))
+		for _, v := range tmp {
+			w.Write64(v[0])
+			w.Write64(v[1])
+			w.Write64(v[2])
+			w.Write64(v[3])
+			w.Write64(v[4])
+			w.Write64(v[5])
+			w.Write64(v[6])
+			w.Write64(v[7])
+			w.Write64(v[8])
+		}
+	}
+}
+
+func (t *CounterBytes) Read(r *custom.Reader) {
+	var run int
+	var i, l, a, b, c, d, e, f, g, h, z uint64
+
+	// Write total
+	t.total = int(r.Read64Variable())
+	
+	// Read t.limit8
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([][2]uint64, l)
+		for i=0; i<l; i++ {
+			a = r.Read64()
+			b = r.Read64()
+			tmp[i] = [2]uint64{a, b}
+		}
+		t.limit8[run] = tmp
+	}
+	// Read t.limit16
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([][3]uint64, l)
+		for i=0; i<l; i++ {
+			a = r.Read64()
+			b = r.Read64()
+			c = r.Read64()
+			tmp[i] = [3]uint64{a, b, c}
+		}
+		t.limit16[run] = tmp
+	}
+	// Read t.limit24
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([][4]uint64, l)
+		for i=0; i<l; i++ {
+			a = r.Read64()
+			b = r.Read64()
+			c = r.Read64()
+			d = r.Read64()
+			tmp[i] = [4]uint64{a, b, c, d}
+		}
+		t.limit24[run] = tmp
+	}
+	// Read t.limit32
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([][5]uint64, l)
+		for i=0; i<l; i++ {
+			a = r.Read64()
+			b = r.Read64()
+			c = r.Read64()
+			d = r.Read64()
+			e = r.Read64()
+			tmp[i] = [5]uint64{a, b, c, d, e}
+		}
+		t.limit32[run] = tmp
+	}
+	// Read t.limit40
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([][6]uint64, l)
+		for i=0; i<l; i++ {
+			a = r.Read64()
+			b = r.Read64()
+			c = r.Read64()
+			d = r.Read64()
+			e = r.Read64()
+			f = r.Read64()
+			tmp[i] = [6]uint64{a, b, c, d, e, f}
+		}
+		t.limit40[run] = tmp
+	}
+	// Read t.limit48
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([][7]uint64, l)
+		for i=0; i<l; i++ {
+			a = r.Read64()
+			b = r.Read64()
+			c = r.Read64()
+			d = r.Read64()
+			e = r.Read64()
+			f = r.Read64()
+			g = r.Read64()
+			tmp[i] = [7]uint64{a, b, c, d, e, f, g}
+		}
+		t.limit48[run] = tmp
+	}
+	// Read t.limit56
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([][8]uint64, l)
+		for i=0; i<l; i++ {
+			a = r.Read64()
+			b = r.Read64()
+			c = r.Read64()
+			d = r.Read64()
+			e = r.Read64()
+			f = r.Read64()
+			g = r.Read64()
+			h = r.Read64()
+			tmp[i] = [8]uint64{a, b, c, d, e, f, g, h}
+		}
+		t.limit56[run] = tmp
+	}
+	// Read t.limit64
+	for run=0; run<8; run++ {
+		l = r.Read64Variable()
+		tmp := make([][9]uint64, l)
+		for i=0; i<l; i++ {
+			a = r.Read64()
+			b = r.Read64()
+			c = r.Read64()
+			d = r.Read64()
+			e = r.Read64()
+			f = r.Read64()
+			g = r.Read64()
+			h = r.Read64()
+			z = r.Read64()
+			tmp[i] = [9]uint64{a, b, c, d, e, f, g, h, z}
+		}
+		t.limit64[run] = tmp
+	}
+}
+
 // ====================== runes ======================
 // ---------- KeyRunes ----------
 
@@ -5892,8 +6567,8 @@ func (t *CounterRunes) Update(thekey []rune, fn func(int) int) bool {
 }
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
-func (t *CounterRunes) Add(thekey []rune) error {
-	return t.child.Add(runes2bytes(thekey))
+func (t *CounterRunes) Add(thekey []rune, theval int) error {
+	return t.child.Add(runes2bytes(thekey), theval)
 }
 
 func (t *CounterRunes) Next() ([]rune, int, bool) {
@@ -6025,13 +6700,8 @@ func (t *KeyUint64) Keys() []uint64 {
 
 // Add this to any struct to make it binary searchable.
 type KeyValUint64 struct {
- key []keyvaluint64
+ key []sort_uint64
  cursor int
-}
-
-type keyvaluint64 struct {
- k uint64
- v int
 }
 
 func (t *KeyValUint64) Len() int {
@@ -6051,7 +6721,7 @@ func (t *KeyValUint64) Find(thekey uint64) (int, bool) {
 		if thekey > current {
 			min = at + 1
 			} else {
-				return t.key[at].v, true // found
+				return t.key[at].i, true // found
 			}
 		}
 	}
@@ -6071,7 +6741,7 @@ func (t *KeyValUint64) Update(thekey uint64, fn func(int) int) bool {
 		if thekey > current {
 			min = at + 1
 			} else {
-				t.key[at].v = fn(t.key[at].v)
+				t.key[at].i = fn(t.key[at].i)
 				return true // found
 			}
 		}
@@ -6084,7 +6754,7 @@ func (t *KeyValUint64) UpdateAll(fn func(int) int) {
 	tmp := t.key
 	l := len(tmp)
 	for i:=0; i<l; i++ {
-		tmp[i].v = fn(tmp[i].v)
+		tmp[i].i = fn(tmp[i].i)
 	}
 }
 
@@ -6101,8 +6771,8 @@ func (t *KeyValUint64) Add(thekey uint64, theval int) bool {
 		if thekey > current {
 			min = at + 1
 			} else {
-				if t.key[at].v != theval {
-					t.key[at].v = theval
+				if t.key[at].i != theval {
+					t.key[at].i = theval
 				}
 				return true // found
 			}
@@ -6111,7 +6781,7 @@ func (t *KeyValUint64) Add(thekey uint64, theval int) bool {
 	cur := t.key
 	lc := len(cur)
 	if lc == cap(cur) {
-		tmp := make([]keyvaluint64, lc + 1, (lc * 2) + 1)
+		tmp := make([]sort_uint64, lc + 1, (lc * 2) + 1)
 		copy(tmp, cur[0:min])
 		copy(tmp[min+1:], cur[min:])
 		cur = tmp
@@ -6119,30 +6789,23 @@ func (t *KeyValUint64) Add(thekey uint64, theval int) bool {
 		cur = cur[0:lc+1]
 		copy(cur[min+1:], cur[min:])
 	}
-	cur[min] = keyvaluint64{thekey, theval}
+	cur[min] = sort_uint64{theval, thekey}
 	t.key = cur
 	return false
 }
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
 func (t *KeyValUint64) AddUnsorted(thekey uint64, theval int) {
-	t.key = append(t.key, keyvaluint64{thekey, theval})
+	t.key = append(t.key, sort_uint64{theval, thekey})
 	return
 }
 
 // Build sorts the keys and values.
 func (t *KeyValUint64) Build() {
-	cur := t.key
-	l := len(cur)
-	temp := make(sorter_uint64, l)
-	for i, k := range cur {
-		temp[i] = sort_uint64{i, k.k}
-	}
+	var temp sorter_uint64 = t.key
 	sort.Sort(temp)
-	newkey := make([]keyvaluint64, l)
-	for i:=0; i<l; i++ {
-		newkey[i] = cur[temp[i].i]
-	}
+	newkey := make([]sort_uint64, len(temp))
+	copy(newkey, temp)
 	t.key = newkey
 }
 
@@ -6154,9 +6817,9 @@ func (t *KeyValUint64) Next() (uint64, int, bool) {
 	v := t.key[t.cursor]
 	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
-		return v.k, v.v, true
+		return v.k, v.i, true
 	}
-	return v.k, v.v, false
+	return v.k, v.i, false
 }
 
 func (t *KeyValUint64) Keys() []uint64 {
@@ -6171,15 +6834,9 @@ func (t *KeyValUint64) Keys() []uint64 {
 
 // Add this to any struct to make it binary searchable.
 type CounterUint64 struct {
- key []keyvaluint64
- lst []uint64
+ key []sort_uint64
  cursor int
 }
-
-type sortersimple_uint64 []uint64
-func (a sortersimple_uint64) Len() int           { return len(a) }
-func (a sortersimple_uint64) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a sortersimple_uint64) Less(i, j int) bool { return a[i] < a[j] }
 
 func (t *CounterUint64) Len() int {
 	return len(t.key)
@@ -6198,7 +6855,7 @@ func (t *CounterUint64) Find(thekey uint64) (int, bool) {
 		if thekey > current {
 			min = at + 1
 			} else {
-				return t.key[at].v, true // found
+				return t.key[at].i, true // found
 			}
 		}
 	}
@@ -6218,7 +6875,7 @@ func (t *CounterUint64) Update(thekey uint64, fn func(int) int) bool {
 		if thekey > current {
 			min = at + 1
 			} else {
-				t.key[at].v = fn(t.key[at].v)
+				t.key[at].i = fn(t.key[at].i)
 				return true // found
 			}
 		}
@@ -6231,38 +6888,36 @@ func (t *CounterUint64) UpdateAll(fn func(int) int) {
 	tmp := t.key
 	l := len(tmp)
 	for i:=0; i<l; i++ {
-		tmp[i].v = fn(tmp[i].v)
+		tmp[i].i = fn(tmp[i].i)
 	}
 }
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
-func (t *CounterUint64) Add(thekey uint64) {
-	t.lst = append(t.lst, thekey)
+func (t *CounterUint64) Add(thekey uint64, theval int) {
+	t.key = append(t.key, sort_uint64{theval, thekey})
 }
 
 // Build sorts the keys and values.
 func (t *CounterUint64) Build() {
-	var temp sortersimple_uint64 = t.lst
+	if len(t.key) == 0 {
+		return
+	}
+	var temp sorter_uint64 = t.key
 	sort.Sort(temp)
-	res := make([]keyvaluint64, 0, len(temp)/5)
-	var this uint64
-	var n int
-	for _, k := range temp {
-		if k == this {
-			n++
+	res := make([]sort_uint64, 0, (len(temp) / 5) + 1)
+	this := temp[0].k
+	n := temp[0].i
+	for _, k := range temp[1:] {
+		if k.k == this {
+			n += k.i
 		} else {
-			if n > 0 {
-				res = append(res, keyvaluint64{this, n})
-			}
-			this = k
-			n = 1
+			res = append(res, sort_uint64{n, this})
+			this = k.k
+			n = k.i
 		}
 	}
-	if n > 0 {
-		res = append(res, keyvaluint64{this, n})
-	}
-	t.lst = nil
-	t.key = make([]keyvaluint64, len(res))
+	res = append(res, sort_uint64{n, this})
+	t.key = make([]sort_uint64, len(res))
 	copy(t.key, res)
 }
 
@@ -6274,9 +6929,9 @@ func (t *CounterUint64) Next() (uint64, int, bool) {
 	v := t.key[t.cursor]
 	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
-		return v.k, v.v, true
+		return v.k, v.i, true
 	}
-	return v.k, v.v, false
+	return v.k, v.i, false
 }
 
 func (t *CounterUint64) Keys() []uint64 {
@@ -6285,6 +6940,66 @@ func (t *CounterUint64) Keys() []uint64 {
 		keys[i] = v.k
 	}
 	return keys
+}
+
+// ------------- export ---------------
+
+func (t *KeyUint64) Write(w *custom.Writer) {
+	w.Write64Variable(uint64(len(t.key)))
+	for _, v := range t.key {
+		w.Write64Variable(v)
+	}
+}
+
+func (t *KeyUint64) Read(r *custom.Reader) {
+	l := int(r.Read64Variable())
+	tmp := make([]uint64, l)
+	for i:=0; i<l; i++ {
+		tmp[i] = r.Read64Variable()
+	}
+	t.key = tmp
+}
+
+func (t *KeyValUint64) Write(w *custom.Writer) {
+	w.Write64Variable(uint64(len(t.key)))
+	for _, v := range t.key {
+		w.Write64Variable(uint64(v.i))
+		w.Write64Variable(v.k)
+	}
+}
+
+func (t *KeyValUint64) Read(r *custom.Reader) {
+	var v int
+	var k uint64
+	l := int(r.Read64Variable())
+	tmp := make([]sort_uint64, l)
+	for i:=0; i<l; i++ {
+		v = int(r.Read64Variable())
+		k = r.Read64Variable()
+		tmp[i] = sort_uint64{v, k}
+	}
+	t.key = tmp
+}
+
+func (t *CounterUint64) Write(w *custom.Writer) {
+	w.Write64Variable(uint64(len(t.key)))
+	for _, v := range t.key {
+		w.Write64Variable(uint64(v.i))
+		w.Write64Variable(v.k)
+	}
+}
+
+func (t *CounterUint64) Read(r *custom.Reader) {
+	var v int
+	var k uint64
+	l := int(r.Read64Variable())
+	tmp := make([]sort_uint64, l)
+	for i:=0; i<l; i++ {
+		v = int(r.Read64Variable())
+		k = r.Read64Variable()
+		tmp[i] = sort_uint64{v, k}
+	}
+	t.key = tmp
 }
 
 // ====================== uint32 ======================
@@ -6402,13 +7117,8 @@ func (t *KeyUint32) Keys() []uint32 {
 
 // Add this to any struct to make it binary searchable.
 type KeyValUint32 struct {
- key []keyvaluint32
+ key []sort_uint32
  cursor int
-}
-
-type keyvaluint32 struct {
- k uint32
- v int
 }
 
 func (t *KeyValUint32) Len() int {
@@ -6428,7 +7138,7 @@ func (t *KeyValUint32) Find(thekey uint32) (int, bool) {
 		if thekey > current {
 			min = at + 1
 			} else {
-				return t.key[at].v, true // found
+				return t.key[at].i, true // found
 			}
 		}
 	}
@@ -6448,7 +7158,7 @@ func (t *KeyValUint32) Update(thekey uint32, fn func(int) int) bool {
 		if thekey > current {
 			min = at + 1
 			} else {
-				t.key[at].v = fn(t.key[at].v)
+				t.key[at].i = fn(t.key[at].i)
 				return true // found
 			}
 		}
@@ -6461,7 +7171,7 @@ func (t *KeyValUint32) UpdateAll(fn func(int) int) {
 	tmp := t.key
 	l := len(tmp)
 	for i:=0; i<l; i++ {
-		tmp[i].v = fn(tmp[i].v)
+		tmp[i].i = fn(tmp[i].i)
 	}
 }
 
@@ -6478,8 +7188,8 @@ func (t *KeyValUint32) Add(thekey uint32, theval int) bool {
 		if thekey > current {
 			min = at + 1
 			} else {
-				if t.key[at].v != theval {
-					t.key[at].v = theval
+				if t.key[at].i != theval {
+					t.key[at].i = theval
 				}
 				return true // found
 			}
@@ -6488,7 +7198,7 @@ func (t *KeyValUint32) Add(thekey uint32, theval int) bool {
 	cur := t.key
 	lc := len(cur)
 	if lc == cap(cur) {
-		tmp := make([]keyvaluint32, lc + 1, (lc * 2) + 1)
+		tmp := make([]sort_uint32, lc + 1, (lc * 2) + 1)
 		copy(tmp, cur[0:min])
 		copy(tmp[min+1:], cur[min:])
 		cur = tmp
@@ -6496,30 +7206,23 @@ func (t *KeyValUint32) Add(thekey uint32, theval int) bool {
 		cur = cur[0:lc+1]
 		copy(cur[min+1:], cur[min:])
 	}
-	cur[min] = keyvaluint32{thekey, theval}
+	cur[min] = sort_uint32{theval, thekey}
 	t.key = cur
 	return false
 }
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
 func (t *KeyValUint32) AddUnsorted(thekey uint32, theval int) {
-	t.key = append(t.key, keyvaluint32{thekey, theval})
+	t.key = append(t.key, sort_uint32{theval, thekey})
 	return
 }
 
 // Build sorts the keys and values.
 func (t *KeyValUint32) Build() {
-	cur := t.key
-	l := len(cur)
-	temp := make(sorter_uint32, l)
-	for i, k := range cur {
-		temp[i] = sort_uint32{i, k.k}
-	}
+	var temp sorter_uint32 = t.key
 	sort.Sort(temp)
-	newkey := make([]keyvaluint32, l)
-	for i:=0; i<l; i++ {
-		newkey[i] = cur[temp[i].i]
-	}
+	newkey := make([]sort_uint32, len(temp))
+	copy(newkey, temp)
 	t.key = newkey
 }
 
@@ -6531,9 +7234,9 @@ func (t *KeyValUint32) Next() (uint32, int, bool) {
 	v := t.key[t.cursor]
 	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
-		return v.k, v.v, true
+		return v.k, v.i, true
 	}
-	return v.k, v.v, false
+	return v.k, v.i, false
 }
 
 func (t *KeyValUint32) Keys() []uint32 {
@@ -6548,15 +7251,9 @@ func (t *KeyValUint32) Keys() []uint32 {
 
 // Add this to any struct to make it binary searchable.
 type CounterUint32 struct {
- key []keyvaluint32
- lst []uint32
+ key []sort_uint32
  cursor int
 }
-
-type sortersimple_uint32 []uint32
-func (a sortersimple_uint32) Len() int           { return len(a) }
-func (a sortersimple_uint32) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a sortersimple_uint32) Less(i, j int) bool { return a[i] < a[j] }
 
 func (t *CounterUint32) Len() int {
 	return len(t.key)
@@ -6575,7 +7272,7 @@ func (t *CounterUint32) Find(thekey uint32) (int, bool) {
 		if thekey > current {
 			min = at + 1
 			} else {
-				return t.key[at].v, true // found
+				return t.key[at].i, true // found
 			}
 		}
 	}
@@ -6595,7 +7292,7 @@ func (t *CounterUint32) Update(thekey uint32, fn func(int) int) bool {
 		if thekey > current {
 			min = at + 1
 			} else {
-				t.key[at].v = fn(t.key[at].v)
+				t.key[at].i = fn(t.key[at].i)
 				return true // found
 			}
 		}
@@ -6608,38 +7305,36 @@ func (t *CounterUint32) UpdateAll(fn func(int) int) {
 	tmp := t.key
 	l := len(tmp)
 	for i:=0; i<l; i++ {
-		tmp[i].v = fn(tmp[i].v)
+		tmp[i].i = fn(tmp[i].i)
 	}
 }
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
-func (t *CounterUint32) Add(thekey uint32) {
-	t.lst = append(t.lst, thekey)
+func (t *CounterUint32) Add(thekey uint32, theval int) {
+	t.key = append(t.key, sort_uint32{theval, thekey})
 }
 
 // Build sorts the keys and values.
 func (t *CounterUint32) Build() {
-	var temp sortersimple_uint32 = t.lst
+	if len(t.key) == 0 {
+		return
+	}
+	var temp sorter_uint32 = t.key
 	sort.Sort(temp)
-	res := make([]keyvaluint32, 0, len(temp)/5)
-	var this uint32
-	var n int
-	for _, k := range temp {
-		if k == this {
-			n++
+	res := make([]sort_uint32, 0, (len(temp) / 5) + 1)
+	this := temp[0].k
+	n := temp[0].i
+	for _, k := range temp[1:] {
+		if k.k == this {
+			n += k.i
 		} else {
-			if n > 0 {
-				res = append(res, keyvaluint32{this, n})
-			}
-			this = k
-			n = 1
+			res = append(res, sort_uint32{n, this})
+			this = k.k
+			n = k.i
 		}
 	}
-	if n > 0 {
-		res = append(res, keyvaluint32{this, n})
-	}
-	t.lst = nil
-	t.key = make([]keyvaluint32, len(res))
+	res = append(res, sort_uint32{n, this})
+	t.key = make([]sort_uint32, len(res))
 	copy(t.key, res)
 }
 
@@ -6651,9 +7346,9 @@ func (t *CounterUint32) Next() (uint32, int, bool) {
 	v := t.key[t.cursor]
 	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
-		return v.k, v.v, true
+		return v.k, v.i, true
 	}
-	return v.k, v.v, false
+	return v.k, v.i, false
 }
 
 func (t *CounterUint32) Keys() []uint32 {
@@ -6662,6 +7357,66 @@ func (t *CounterUint32) Keys() []uint32 {
 		keys[i] = v.k
 	}
 	return keys
+}
+
+// ------------- export ---------------
+
+func (t *KeyUint32) Write(w *custom.Writer) {
+	w.Write64Variable(uint64(len(t.key)))
+	for _, v := range t.key {
+		w.Write64Variable(uint64(v))
+	}
+}
+
+func (t *KeyUint32) Read(r *custom.Reader) {
+	l := int(r.Read64Variable())
+	tmp := make([]uint32, l)
+	for i:=0; i<l; i++ {
+		tmp[i] = uint32(r.Read64Variable())
+	}
+	t.key = tmp
+}
+
+func (t *KeyValUint32) Write(w *custom.Writer) {
+	w.Write64Variable(uint64(len(t.key)))
+	for _, v := range t.key {
+		w.Write64Variable(uint64(v.i))
+		w.Write64Variable(uint64(v.k))
+	}
+}
+
+func (t *KeyValUint32) Read(r *custom.Reader) {
+	var v int
+	var k uint32
+	l := int(r.Read64Variable())
+	tmp := make([]sort_uint32, l)
+	for i:=0; i<l; i++ {
+		v = int(r.Read64Variable())
+		k = uint32(r.Read64Variable())
+		tmp[i] = sort_uint32{v, k}
+	}
+	t.key = tmp
+}
+
+func (t *CounterUint32) Write(w *custom.Writer) {
+	w.Write64Variable(uint64(len(t.key)))
+	for _, v := range t.key {
+		w.Write64Variable(uint64(v.i))
+		w.Write64Variable(uint64(v.k))
+	}
+}
+
+func (t *CounterUint32) Read(r *custom.Reader) {
+	var v int
+	var k uint32
+	l := int(r.Read64Variable())
+	tmp := make([]sort_uint32, l)
+	for i:=0; i<l; i++ {
+		v = int(r.Read64Variable())
+		k = uint32(r.Read64Variable())
+		tmp[i] = sort_uint32{v, k}
+	}
+	t.key = tmp
 }
 
 // ====================== uint16 ======================
@@ -6779,13 +7534,8 @@ func (t *KeyUint16) Keys() []uint16 {
 
 // Add this to any struct to make it binary searchable.
 type KeyValUint16 struct {
- key []keyvaluint16
+ key []sort_uint16
  cursor int
-}
-
-type keyvaluint16 struct {
- k uint16
- v int
 }
 
 func (t *KeyValUint16) Len() int {
@@ -6805,7 +7555,7 @@ func (t *KeyValUint16) Find(thekey uint16) (int, bool) {
 		if thekey > current {
 			min = at + 1
 			} else {
-				return t.key[at].v, true // found
+				return t.key[at].i, true // found
 			}
 		}
 	}
@@ -6825,7 +7575,7 @@ func (t *KeyValUint16) Update(thekey uint16, fn func(int) int) bool {
 		if thekey > current {
 			min = at + 1
 			} else {
-				t.key[at].v = fn(t.key[at].v)
+				t.key[at].i = fn(t.key[at].i)
 				return true // found
 			}
 		}
@@ -6838,7 +7588,7 @@ func (t *KeyValUint16) UpdateAll(fn func(int) int) {
 	tmp := t.key
 	l := len(tmp)
 	for i:=0; i<l; i++ {
-		tmp[i].v = fn(tmp[i].v)
+		tmp[i].i = fn(tmp[i].i)
 	}
 }
 
@@ -6855,8 +7605,8 @@ func (t *KeyValUint16) Add(thekey uint16, theval int) bool {
 		if thekey > current {
 			min = at + 1
 			} else {
-				if t.key[at].v != theval {
-					t.key[at].v = theval
+				if t.key[at].i != theval {
+					t.key[at].i = theval
 				}
 				return true // found
 			}
@@ -6865,7 +7615,7 @@ func (t *KeyValUint16) Add(thekey uint16, theval int) bool {
 	cur := t.key
 	lc := len(cur)
 	if lc == cap(cur) {
-		tmp := make([]keyvaluint16, lc + 1, (lc * 2) + 1)
+		tmp := make([]sort_uint16, lc + 1, (lc * 2) + 1)
 		copy(tmp, cur[0:min])
 		copy(tmp[min+1:], cur[min:])
 		cur = tmp
@@ -6873,30 +7623,23 @@ func (t *KeyValUint16) Add(thekey uint16, theval int) bool {
 		cur = cur[0:lc+1]
 		copy(cur[min+1:], cur[min:])
 	}
-	cur[min] = keyvaluint16{thekey, theval}
+	cur[min] = sort_uint16{theval, thekey}
 	t.key = cur
 	return false
 }
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
 func (t *KeyValUint16) AddUnsorted(thekey uint16, theval int) {
-	t.key = append(t.key, keyvaluint16{thekey, theval})
+	t.key = append(t.key, sort_uint16{theval, thekey})
 	return
 }
 
 // Build sorts the keys and values.
 func (t *KeyValUint16) Build() {
-	cur := t.key
-	l := len(cur)
-	temp := make(sorter_uint16, l)
-	for i, k := range cur {
-		temp[i] = sort_uint16{i, k.k}
-	}
+	var temp sorter_uint16 = t.key
 	sort.Sort(temp)
-	newkey := make([]keyvaluint16, l)
-	for i:=0; i<l; i++ {
-		newkey[i] = cur[temp[i].i]
-	}
+	newkey := make([]sort_uint16, len(temp))
+	copy(newkey, temp)
 	t.key = newkey
 }
 
@@ -6908,9 +7651,9 @@ func (t *KeyValUint16) Next() (uint16, int, bool) {
 	v := t.key[t.cursor]
 	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
-		return v.k, v.v, true
+		return v.k, v.i, true
 	}
-	return v.k, v.v, false
+	return v.k, v.i, false
 }
 
 func (t *KeyValUint16) Keys() []uint16 {
@@ -6925,15 +7668,9 @@ func (t *KeyValUint16) Keys() []uint16 {
 
 // Add this to any struct to make it binary searchable.
 type CounterUint16 struct {
- key []keyvaluint16
- lst []uint16
+ key []sort_uint16
  cursor int
 }
-
-type sortersimple_uint16 []uint16
-func (a sortersimple_uint16) Len() int           { return len(a) }
-func (a sortersimple_uint16) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a sortersimple_uint16) Less(i, j int) bool { return a[i] < a[j] }
 
 func (t *CounterUint16) Len() int {
 	return len(t.key)
@@ -6952,7 +7689,7 @@ func (t *CounterUint16) Find(thekey uint16) (int, bool) {
 		if thekey > current {
 			min = at + 1
 			} else {
-				return t.key[at].v, true // found
+				return t.key[at].i, true // found
 			}
 		}
 	}
@@ -6972,7 +7709,7 @@ func (t *CounterUint16) Update(thekey uint16, fn func(int) int) bool {
 		if thekey > current {
 			min = at + 1
 			} else {
-				t.key[at].v = fn(t.key[at].v)
+				t.key[at].i = fn(t.key[at].i)
 				return true // found
 			}
 		}
@@ -6985,38 +7722,36 @@ func (t *CounterUint16) UpdateAll(fn func(int) int) {
 	tmp := t.key
 	l := len(tmp)
 	for i:=0; i<l; i++ {
-		tmp[i].v = fn(tmp[i].v)
+		tmp[i].i = fn(tmp[i].i)
 	}
 }
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
-func (t *CounterUint16) Add(thekey uint16) {
-	t.lst = append(t.lst, thekey)
+func (t *CounterUint16) Add(thekey uint16, theval int) {
+	t.key = append(t.key, sort_uint16{theval, thekey})
 }
 
 // Build sorts the keys and values.
 func (t *CounterUint16) Build() {
-	var temp sortersimple_uint16 = t.lst
+	if len(t.key) == 0 {
+		return
+	}
+	var temp sorter_uint16 = t.key
 	sort.Sort(temp)
-	res := make([]keyvaluint16, 0, len(temp)/5)
-	var this uint16
-	var n int
-	for _, k := range temp {
-		if k == this {
-			n++
+	res := make([]sort_uint16, 0, (len(temp) / 5) + 1)
+	this := temp[0].k
+	n := temp[0].i
+	for _, k := range temp[1:] {
+		if k.k == this {
+			n += k.i
 		} else {
-			if n > 0 {
-				res = append(res, keyvaluint16{this, n})
-			}
-			this = k
-			n = 1
+			res = append(res, sort_uint16{n, this})
+			this = k.k
+			n = k.i
 		}
 	}
-	if n > 0 {
-		res = append(res, keyvaluint16{this, n})
-	}
-	t.lst = nil
-	t.key = make([]keyvaluint16, len(res))
+	res = append(res, sort_uint16{n, this})
+	t.key = make([]sort_uint16, len(res))
 	copy(t.key, res)
 }
 
@@ -7028,9 +7763,9 @@ func (t *CounterUint16) Next() (uint16, int, bool) {
 	v := t.key[t.cursor]
 	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
-		return v.k, v.v, true
+		return v.k, v.i, true
 	}
-	return v.k, v.v, false
+	return v.k, v.i, false
 }
 
 func (t *CounterUint16) Keys() []uint16 {
@@ -7039,6 +7774,66 @@ func (t *CounterUint16) Keys() []uint16 {
 		keys[i] = v.k
 	}
 	return keys
+}
+
+// ------------- export ---------------
+
+func (t *KeyUint16) Write(w *custom.Writer) {
+	w.Write64Variable(uint64(len(t.key)))
+	for _, v := range t.key {
+		w.Write16(v)
+	}
+}
+
+func (t *KeyUint16) Read(r *custom.Reader) {
+	l := int(r.Read64Variable())
+	tmp := make([]uint16, l)
+	for i:=0; i<l; i++ {
+		tmp[i] = r.Read16()
+	}
+	t.key = tmp
+}
+
+func (t *KeyValUint16) Write(w *custom.Writer) {
+	w.Write64Variable(uint64(len(t.key)))
+	for _, v := range t.key {
+		w.Write64Variable(uint64(v.i))
+		w.Write16(v.k)
+	}
+}
+
+func (t *KeyValUint16) Read(r *custom.Reader) {
+	var v int
+	var k uint16
+	l := int(r.Read64Variable())
+	tmp := make([]sort_uint16, l)
+	for i:=0; i<l; i++ {
+		v = int(r.Read64Variable())
+		k = r.Read16()
+		tmp[i] = sort_uint16{v, k}
+	}
+	t.key = tmp
+}
+
+func (t *CounterUint16) Write(w *custom.Writer) {
+	w.Write64Variable(uint64(len(t.key)))
+	for _, v := range t.key {
+		w.Write64Variable(uint64(v.i))
+		w.Write16(v.k)
+	}
+}
+
+func (t *CounterUint16) Read(r *custom.Reader) {
+	var v int
+	var k uint16
+	l := int(r.Read64Variable())
+	tmp := make([]sort_uint16, l)
+	for i:=0; i<l; i++ {
+		v = int(r.Read64Variable())
+		k = r.Read16()
+		tmp[i] = sort_uint16{v, k}
+	}
+	t.key = tmp
 }
 
 // ====================== uint8 ======================
@@ -7156,13 +7951,8 @@ func (t *KeyUint8) Keys() []uint8 {
 
 // Add this to any struct to make it binary searchable.
 type KeyValUint8 struct {
- key []keyvaluint8
+ key []sort_uint8
  cursor int
-}
-
-type keyvaluint8 struct {
- k uint8
- v int
 }
 
 func (t *KeyValUint8) Len() int {
@@ -7182,7 +7972,7 @@ func (t *KeyValUint8) Find(thekey uint8) (int, bool) {
 		if thekey > current {
 			min = at + 1
 			} else {
-				return t.key[at].v, true // found
+				return t.key[at].i, true // found
 			}
 		}
 	}
@@ -7202,7 +7992,7 @@ func (t *KeyValUint8) Update(thekey uint8, fn func(int) int) bool {
 		if thekey > current {
 			min = at + 1
 			} else {
-				t.key[at].v = fn(t.key[at].v)
+				t.key[at].i = fn(t.key[at].i)
 				return true // found
 			}
 		}
@@ -7215,7 +8005,7 @@ func (t *KeyValUint8) UpdateAll(fn func(int) int) {
 	tmp := t.key
 	l := len(tmp)
 	for i:=0; i<l; i++ {
-		tmp[i].v = fn(tmp[i].v)
+		tmp[i].i = fn(tmp[i].i)
 	}
 }
 
@@ -7232,8 +8022,8 @@ func (t *KeyValUint8) Add(thekey uint8, theval int) bool {
 		if thekey > current {
 			min = at + 1
 			} else {
-				if t.key[at].v != theval {
-					t.key[at].v = theval
+				if t.key[at].i != theval {
+					t.key[at].i = theval
 				}
 				return true // found
 			}
@@ -7242,7 +8032,7 @@ func (t *KeyValUint8) Add(thekey uint8, theval int) bool {
 	cur := t.key
 	lc := len(cur)
 	if lc == cap(cur) {
-		tmp := make([]keyvaluint8, lc + 1, (lc * 2) + 1)
+		tmp := make([]sort_uint8, lc + 1, (lc * 2) + 1)
 		copy(tmp, cur[0:min])
 		copy(tmp[min+1:], cur[min:])
 		cur = tmp
@@ -7250,30 +8040,23 @@ func (t *KeyValUint8) Add(thekey uint8, theval int) bool {
 		cur = cur[0:lc+1]
 		copy(cur[min+1:], cur[min:])
 	}
-	cur[min] = keyvaluint8{thekey, theval}
+	cur[min] = sort_uint8{theval, thekey}
 	t.key = cur
 	return false
 }
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
 func (t *KeyValUint8) AddUnsorted(thekey uint8, theval int) {
-	t.key = append(t.key, keyvaluint8{thekey, theval})
+	t.key = append(t.key, sort_uint8{theval, thekey})
 	return
 }
 
 // Build sorts the keys and values.
 func (t *KeyValUint8) Build() {
-	cur := t.key
-	l := len(cur)
-	temp := make(sorter_uint8, l)
-	for i, k := range cur {
-		temp[i] = sort_uint8{i, k.k}
-	}
+	var temp sorter_uint8 = t.key
 	sort.Sort(temp)
-	newkey := make([]keyvaluint8, l)
-	for i:=0; i<l; i++ {
-		newkey[i] = cur[temp[i].i]
-	}
+	newkey := make([]sort_uint8, len(temp))
+	copy(newkey, temp)
 	t.key = newkey
 }
 
@@ -7285,9 +8068,9 @@ func (t *KeyValUint8) Next() (uint8, int, bool) {
 	v := t.key[t.cursor]
 	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
-		return v.k, v.v, true
+		return v.k, v.i, true
 	}
-	return v.k, v.v, false
+	return v.k, v.i, false
 }
 
 func (t *KeyValUint8) Keys() []uint8 {
@@ -7302,15 +8085,9 @@ func (t *KeyValUint8) Keys() []uint8 {
 
 // Add this to any struct to make it binary searchable.
 type CounterUint8 struct {
- key []keyvaluint8
- lst []uint8
+ key []sort_uint8
  cursor int
 }
-
-type sortersimple_uint8 []uint8
-func (a sortersimple_uint8) Len() int           { return len(a) }
-func (a sortersimple_uint8) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a sortersimple_uint8) Less(i, j int) bool { return a[i] < a[j] }
 
 func (t *CounterUint8) Len() int {
 	return len(t.key)
@@ -7329,7 +8106,7 @@ func (t *CounterUint8) Find(thekey uint8) (int, bool) {
 		if thekey > current {
 			min = at + 1
 			} else {
-				return t.key[at].v, true // found
+				return t.key[at].i, true // found
 			}
 		}
 	}
@@ -7349,7 +8126,7 @@ func (t *CounterUint8) Update(thekey uint8, fn func(int) int) bool {
 		if thekey > current {
 			min = at + 1
 			} else {
-				t.key[at].v = fn(t.key[at].v)
+				t.key[at].i = fn(t.key[at].i)
 				return true // found
 			}
 		}
@@ -7362,38 +8139,36 @@ func (t *CounterUint8) UpdateAll(fn func(int) int) {
 	tmp := t.key
 	l := len(tmp)
 	for i:=0; i<l; i++ {
-		tmp[i].v = fn(tmp[i].v)
+		tmp[i].i = fn(tmp[i].i)
 	}
 }
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
-func (t *CounterUint8) Add(thekey uint8) {
-	t.lst = append(t.lst, thekey)
+func (t *CounterUint8) Add(thekey uint8, theval int) {
+	t.key = append(t.key, sort_uint8{theval, thekey})
 }
 
 // Build sorts the keys and values.
 func (t *CounterUint8) Build() {
-	var temp sortersimple_uint8 = t.lst
+	if len(t.key) == 0 {
+		return
+	}
+	var temp sorter_uint8 = t.key
 	sort.Sort(temp)
-	res := make([]keyvaluint8, 0, len(temp)/5)
-	var this uint8
-	var n int
-	for _, k := range temp {
-		if k == this {
-			n++
+	res := make([]sort_uint8, 0, (len(temp) / 5) + 1)
+	this := temp[0].k
+	n := temp[0].i
+	for _, k := range temp[1:] {
+		if k.k == this {
+			n += k.i
 		} else {
-			if n > 0 {
-				res = append(res, keyvaluint8{this, n})
-			}
-			this = k
-			n = 1
+			res = append(res, sort_uint8{n, this})
+			this = k.k
+			n = k.i
 		}
 	}
-	if n > 0 {
-		res = append(res, keyvaluint8{this, n})
-	}
-	t.lst = nil
-	t.key = make([]keyvaluint8, len(res))
+	res = append(res, sort_uint8{n, this})
+	t.key = make([]sort_uint8, len(res))
 	copy(t.key, res)
 }
 
@@ -7405,9 +8180,9 @@ func (t *CounterUint8) Next() (uint8, int, bool) {
 	v := t.key[t.cursor]
 	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
-		return v.k, v.v, true
+		return v.k, v.i, true
 	}
-	return v.k, v.v, false
+	return v.k, v.i, false
 }
 
 func (t *CounterUint8) Keys() []uint8 {
@@ -7416,6 +8191,66 @@ func (t *CounterUint8) Keys() []uint8 {
 		keys[i] = v.k
 	}
 	return keys
+}
+
+// ------------- export ---------------
+
+func (t *KeyUint8) Write(w *custom.Writer) {
+	w.Write64Variable(uint64(len(t.key)))
+	for _, v := range t.key {
+		w.Write8(v)
+	}
+}
+
+func (t *KeyUint8) Read(r *custom.Reader) {
+	l := int(r.Read64Variable())
+	tmp := make([]uint8, l)
+	for i:=0; i<l; i++ {
+		tmp[i] = r.Read8()
+	}
+	t.key = tmp
+}
+
+func (t *KeyValUint8) Write(w *custom.Writer) {
+	w.Write64Variable(uint64(len(t.key)))
+	for _, v := range t.key {
+		w.Write64Variable(uint64(v.i))
+		w.Write8(v.k)
+	}
+}
+
+func (t *KeyValUint8) Read(r *custom.Reader) {
+	var v int
+	var k uint8
+	l := int(r.Read64Variable())
+	tmp := make([]sort_uint8, l)
+	for i:=0; i<l; i++ {
+		v = int(r.Read64Variable())
+		k = r.Read8()
+		tmp[i] = sort_uint8{v, k}
+	}
+	t.key = tmp
+}
+
+func (t *CounterUint8) Write(w *custom.Writer) {
+	w.Write64Variable(uint64(len(t.key)))
+	for _, v := range t.key {
+		w.Write64Variable(uint64(v.i))
+		w.Write8(v.k)
+	}
+}
+
+func (t *CounterUint8) Read(r *custom.Reader) {
+	var v int
+	var k uint8
+	l := int(r.Read64Variable())
+	tmp := make([]sort_uint8, l)
+	for i:=0; i<l; i++ {
+		v = int(r.Read64Variable())
+		k = r.Read8()
+		tmp[i] = sort_uint8{v, k}
+	}
+	t.key = tmp
 }
 
 // ====================== int ======================
@@ -7533,13 +8368,8 @@ func (t *KeyInt) Keys() []int {
 
 // Add this to any struct to make it binary searchable.
 type KeyValInt struct {
- key []keyvalint
+ key []sort_int
  cursor int
-}
-
-type keyvalint struct {
- k int
- v int
 }
 
 func (t *KeyValInt) Len() int {
@@ -7559,7 +8389,7 @@ func (t *KeyValInt) Find(thekey int) (int, bool) {
 		if thekey > current {
 			min = at + 1
 			} else {
-				return t.key[at].v, true // found
+				return t.key[at].i, true // found
 			}
 		}
 	}
@@ -7579,7 +8409,7 @@ func (t *KeyValInt) Update(thekey int, fn func(int) int) bool {
 		if thekey > current {
 			min = at + 1
 			} else {
-				t.key[at].v = fn(t.key[at].v)
+				t.key[at].i = fn(t.key[at].i)
 				return true // found
 			}
 		}
@@ -7592,7 +8422,7 @@ func (t *KeyValInt) UpdateAll(fn func(int) int) {
 	tmp := t.key
 	l := len(tmp)
 	for i:=0; i<l; i++ {
-		tmp[i].v = fn(tmp[i].v)
+		tmp[i].i = fn(tmp[i].i)
 	}
 }
 
@@ -7609,8 +8439,8 @@ func (t *KeyValInt) Add(thekey int, theval int) bool {
 		if thekey > current {
 			min = at + 1
 			} else {
-				if t.key[at].v != theval {
-					t.key[at].v = theval
+				if t.key[at].i != theval {
+					t.key[at].i = theval
 				}
 				return true // found
 			}
@@ -7619,7 +8449,7 @@ func (t *KeyValInt) Add(thekey int, theval int) bool {
 	cur := t.key
 	lc := len(cur)
 	if lc == cap(cur) {
-		tmp := make([]keyvalint, lc + 1, (lc * 2) + 1)
+		tmp := make([]sort_int, lc + 1, (lc * 2) + 1)
 		copy(tmp, cur[0:min])
 		copy(tmp[min+1:], cur[min:])
 		cur = tmp
@@ -7627,30 +8457,23 @@ func (t *KeyValInt) Add(thekey int, theval int) bool {
 		cur = cur[0:lc+1]
 		copy(cur[min+1:], cur[min:])
 	}
-	cur[min] = keyvalint{thekey, theval}
+	cur[min] = sort_int{theval, thekey}
 	t.key = cur
 	return false
 }
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
 func (t *KeyValInt) AddUnsorted(thekey int, theval int) {
-	t.key = append(t.key, keyvalint{thekey, theval})
+	t.key = append(t.key, sort_int{theval, thekey})
 	return
 }
 
 // Build sorts the keys and values.
 func (t *KeyValInt) Build() {
-	cur := t.key
-	l := len(cur)
-	temp := make(sorter_int, l)
-	for i, k := range cur {
-		temp[i] = sort_int{i, k.k}
-	}
+	var temp sorter_int = t.key
 	sort.Sort(temp)
-	newkey := make([]keyvalint, l)
-	for i:=0; i<l; i++ {
-		newkey[i] = cur[temp[i].i]
-	}
+	newkey := make([]sort_int, len(temp))
+	copy(newkey, temp)
 	t.key = newkey
 }
 
@@ -7662,9 +8485,9 @@ func (t *KeyValInt) Next() (int, int, bool) {
 	v := t.key[t.cursor]
 	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
-		return v.k, v.v, true
+		return v.k, v.i, true
 	}
-	return v.k, v.v, false
+	return v.k, v.i, false
 }
 
 func (t *KeyValInt) Keys() []int {
@@ -7679,15 +8502,9 @@ func (t *KeyValInt) Keys() []int {
 
 // Add this to any struct to make it binary searchable.
 type CounterInt struct {
- key []keyvalint
- lst []int
+ key []sort_int
  cursor int
 }
-
-type sortersimple_int []int
-func (a sortersimple_int) Len() int           { return len(a) }
-func (a sortersimple_int) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a sortersimple_int) Less(i, j int) bool { return a[i] < a[j] }
 
 func (t *CounterInt) Len() int {
 	return len(t.key)
@@ -7706,7 +8523,7 @@ func (t *CounterInt) Find(thekey int) (int, bool) {
 		if thekey > current {
 			min = at + 1
 			} else {
-				return t.key[at].v, true // found
+				return t.key[at].i, true // found
 			}
 		}
 	}
@@ -7726,7 +8543,7 @@ func (t *CounterInt) Update(thekey int, fn func(int) int) bool {
 		if thekey > current {
 			min = at + 1
 			} else {
-				t.key[at].v = fn(t.key[at].v)
+				t.key[at].i = fn(t.key[at].i)
 				return true // found
 			}
 		}
@@ -7739,38 +8556,36 @@ func (t *CounterInt) UpdateAll(fn func(int) int) {
 	tmp := t.key
 	l := len(tmp)
 	for i:=0; i<l; i++ {
-		tmp[i].v = fn(tmp[i].v)
+		tmp[i].i = fn(tmp[i].i)
 	}
 }
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
-func (t *CounterInt) Add(thekey int) {
-	t.lst = append(t.lst, thekey)
+func (t *CounterInt) Add(thekey int, theval int) {
+	t.key = append(t.key, sort_int{theval, thekey})
 }
 
 // Build sorts the keys and values.
 func (t *CounterInt) Build() {
-	var temp sortersimple_int = t.lst
+	if len(t.key) == 0 {
+		return
+	}
+	var temp sorter_int = t.key
 	sort.Sort(temp)
-	res := make([]keyvalint, 0, len(temp)/5)
-	var this int
-	var n int
-	for _, k := range temp {
-		if k == this {
-			n++
+	res := make([]sort_int, 0, (len(temp) / 5) + 1)
+	this := temp[0].k
+	n := temp[0].i
+	for _, k := range temp[1:] {
+		if k.k == this {
+			n += k.i
 		} else {
-			if n > 0 {
-				res = append(res, keyvalint{this, n})
-			}
-			this = k
-			n = 1
+			res = append(res, sort_int{n, this})
+			this = k.k
+			n = k.i
 		}
 	}
-	if n > 0 {
-		res = append(res, keyvalint{this, n})
-	}
-	t.lst = nil
-	t.key = make([]keyvalint, len(res))
+	res = append(res, sort_int{n, this})
+	t.key = make([]sort_int, len(res))
 	copy(t.key, res)
 }
 
@@ -7782,9 +8597,9 @@ func (t *CounterInt) Next() (int, int, bool) {
 	v := t.key[t.cursor]
 	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
-		return v.k, v.v, true
+		return v.k, v.i, true
 	}
-	return v.k, v.v, false
+	return v.k, v.i, false
 }
 
 func (t *CounterInt) Keys() []int {
@@ -7795,3 +8610,62 @@ func (t *CounterInt) Keys() []int {
 	return keys
 }
 
+// ------------- export ---------------
+
+func (t *KeyInt) Write(w *custom.Writer) {
+	w.Write64Variable(uint64(len(t.key)))
+	for _, v := range t.key {
+		w.Write64Variable(uint64(v))
+	}
+}
+
+func (t *KeyInt) Read(r *custom.Reader) {
+	l := int(r.Read64Variable())
+	tmp := make([]int, l)
+	for i:=0; i<l; i++ {
+		tmp[i] = int(r.Read64Variable())
+	}
+	t.key = tmp
+}
+
+func (t *KeyValInt) Write(w *custom.Writer) {
+	w.Write64Variable(uint64(len(t.key)))
+	for _, v := range t.key {
+		w.Write64Variable(uint64(v.i))
+		w.Write64Variable(uint64(v.k))
+	}
+}
+
+func (t *KeyValInt) Read(r *custom.Reader) {
+	var v int
+	var k int
+	l := int(r.Read64Variable())
+	tmp := make([]sort_int, l)
+	for i:=0; i<l; i++ {
+		v = int(r.Read64Variable())
+		k = int(r.Read64Variable())
+		tmp[i] = sort_int{v, k}
+	}
+	t.key = tmp
+}
+
+func (t *CounterInt) Write(w *custom.Writer) {
+	w.Write64Variable(uint64(len(t.key)))
+	for _, v := range t.key {
+		w.Write64Variable(uint64(v.i))
+		w.Write64Variable(uint64(v.k))
+	}
+}
+
+func (t *CounterInt) Read(r *custom.Reader) {
+	var v int
+	var k int
+	l := int(r.Read64Variable())
+	tmp := make([]sort_int, l)
+	for i:=0; i<l; i++ {
+		v = int(r.Read64Variable())
+		k = int(r.Read64Variable())
+		tmp[i] = sort_int{v, k}
+	}
+	t.key = tmp
+}
