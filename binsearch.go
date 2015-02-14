@@ -2152,7 +2152,7 @@ func (t *KeyBytes) forward(l int) bool {
 			case 4: l = len(t.limit40[t.on8])
 			case 5: l = len(t.limit48[t.on8])
 			case 6: l = len(t.limit56[t.on8])
-			case 7: l = len(t.limit60[t.on8])
+			case 7: l = len(t.limit64[t.on8])
 		}
 		if t.oncursor >= l {
 			return t.forward(l)
@@ -2166,35 +2166,35 @@ func (t *KeyBytes) Next() ([]byte, bool) {
 		case 0:
 			v := t.limit8[t.on8][t.oncursor]
 			eof := t.forward(len(t.limit8[t.on8]))
-			return reverse8(v), int(v[1]), eof
+			return reverse8(v), int(v), eof
 		case 1:
 			v := t.limit16[t.on8][t.oncursor]
 			eof := t.forward(len(t.limit16[t.on8]))
-			return reverse16(v), int(v[2]), eof
+			return reverse16(v), int(v[1]), eof
 		case 2:
 			v := t.limit24[t.on8][t.oncursor]
 			eof := t.forward(len(t.limit24[t.on8]))
-			return reverse24(v), int(v[3]), eof
+			return reverse24(v), int(v[2]), eof
 		case 3:
 			v := t.limit32[t.on8][t.oncursor]
 			eof := t.forward(len(t.limit32[t.on8]))
-			return reverse32(v), int(v[4]), eof
+			return reverse32(v), int(v[3]), eof
 		case 4:
 			v := t.limit40[t.on8][t.oncursor]
 			eof := t.forward(len(t.limit40[t.on8]))
-			return reverse40(v), int(v[5]), eof
+			return reverse40(v), int(v[4]), eof
 		case 5:
 			v := t.limit48[t.on8][t.oncursor]
 			eof := t.forward(len(t.limit48[t.on8]))
-			return reverse48(v), int(v[6]), eof
+			return reverse48(v), int(v[5]), eof
 		case 6:
 			v := t.limit56[t.on8][t.oncursor]
 			eof := t.forward(len(t.limit56[t.on8]))
-			return reverse56(v), int(v[7]), eof
+			return reverse56(v), int(v[6]), eof
 		default:
 			v := t.limit64[t.on8][t.oncursor]
 			eof := t.forward(len(t.limit64[t.on8]))
-			return reverse64(v), int(v[8]), eof
+			return reverse64(v), int(v[7]), eof
 	}
 }
 
@@ -4373,7 +4373,7 @@ func (t *KeyValBytes) forward(l int) bool {
 			case 4: l = len(t.limit40[t.on8])
 			case 5: l = len(t.limit48[t.on8])
 			case 6: l = len(t.limit56[t.on8])
-			case 7: l = len(t.limit60[t.on8])
+			case 7: l = len(t.limit64[t.on8])
 		}
 		if t.oncursor >= l {
 			return t.forward(l)
@@ -5919,7 +5919,7 @@ func (t *CounterBytes) forward(l int) bool {
 			case 4: l = len(t.limit40[t.on8])
 			case 5: l = len(t.limit48[t.on8])
 			case 6: l = len(t.limit56[t.on8])
-			case 7: l = len(t.limit60[t.on8])
+			case 7: l = len(t.limit64[t.on8])
 		}
 		if t.oncursor >= l {
 			return t.forward(l)
