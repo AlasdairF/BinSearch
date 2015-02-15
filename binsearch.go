@@ -4743,7 +4743,7 @@ func (t *CounterBytes) Copy() *KeyBytes {
 	obj.total = t.total
 	var run int
 	for run=0; run<8; run++ {
-		tmp := t.limit8[run])
+		tmp := t.limit8[run]
 		cpy := make([]uint64, len(tmp))
 		for i, v := range tmp {
 			cpy[i] = v[0]
@@ -4751,7 +4751,7 @@ func (t *CounterBytes) Copy() *KeyBytes {
 		obj.limit8[run] = cpy
 	}
 	for run=0; run<8; run++ {
-		tmp := t.limit16[run])
+		tmp := t.limit16[run]
 		cpy := make([][2]uint64, len(tmp))
 		for i, v := range tmp {
 			cpy[i][0] = v[0]
@@ -4760,7 +4760,7 @@ func (t *CounterBytes) Copy() *KeyBytes {
 		obj.limit16[run] = cpy
 	}
 	for run=0; run<8; run++ {
-		tmp := t.limit24[run])
+		tmp := t.limit24[run]
 		cpy := make([][3]uint64, len(tmp))
 		for i, v := range tmp {
 			cpy[i][0] = v[0]
@@ -4770,7 +4770,7 @@ func (t *CounterBytes) Copy() *KeyBytes {
 		obj.limit24[run] = cpy
 	}
 	for run=0; run<8; run++ {
-		tmp := t.limit32[run])
+		tmp := t.limit32[run]
 		cpy := make([][4]uint64, len(tmp))
 		for i, v := range tmp {
 			cpy[i][0] = v[0]
@@ -4781,7 +4781,7 @@ func (t *CounterBytes) Copy() *KeyBytes {
 		obj.limit32[run] = cpy
 	}
 	for run=0; run<8; run++ {
-		tmp := t.limit40[run])
+		tmp := t.limit40[run]
 		cpy := make([][5]uint64, len(tmp))
 		for i, v := range tmp {
 			cpy[i][0] = v[0]
@@ -4793,7 +4793,7 @@ func (t *CounterBytes) Copy() *KeyBytes {
 		obj.limit40[run] = cpy
 	}
 	for run=0; run<8; run++ {
-		tmp := t.limit48[run])
+		tmp := t.limit48[run]
 		cpy := make([][6]uint64, len(tmp))
 		for i, v := range tmp {
 			cpy[i][0] = v[0]
@@ -4806,7 +4806,7 @@ func (t *CounterBytes) Copy() *KeyBytes {
 		obj.limit48[run] = cpy
 	}
 	for run=0; run<8; run++ {
-		tmp := t.limit56[run])
+		tmp := t.limit56[run]
 		cpy := make([][7]uint64, len(tmp))
 		for i, v := range tmp {
 			cpy[i][0] = v[0]
@@ -4820,7 +4820,7 @@ func (t *CounterBytes) Copy() *KeyBytes {
 		obj.limit56[run] = cpy
 	}
 	for run=0; run<8; run++ {
-		tmp := t.limit64[run])
+		tmp := t.limit64[run]
 		cpy := make([][8]uint64, len(tmp))
 		for i, v := range tmp {
 			cpy[i][0] = v[0]
