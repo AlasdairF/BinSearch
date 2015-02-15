@@ -57,6 +57,7 @@ import (
 		func (t *CounterBytes) Keys() [][]byte								Returns slice containing all the keys in order
 		func (t *CounterBytes) Write(w *custom.Writer)
 		func (t *CounterBytes) Read(r *custom.Reader)
+		func (t *CounterBytes) Copy() *KeyBytes								Copies keys to a KeyBytes structure
 		
 	KeyInt, KeyUint64, KeyUint32, KeyUint16, KeyUint8
 		func (t *KeyInt) Len() int
@@ -97,6 +98,7 @@ import (
 		func (t *CounterInt) Keys() []uint64								Returns slice containing all the keys in order
 		func (t *CounterInt) Write(w *custom.Writer)
 		func (t *CounterInt) Read(r *custom.Reader)
+		func (t *CounterInt) Copy() *KeyInt									Copies keys to a KeyInt structure
 
 */
 
@@ -2133,7 +2135,9 @@ func (t *KeyBytes) Reset() {
 	t.on8 = 0
 	t.oncursor = 0
 	if len(t.limit8[0]) == 0 {
-		t.forward(0)
+		if t.total > 0 {
+			t.forward(0)
+		}
 	}
 }
 
@@ -4355,7 +4359,9 @@ func (t *KeyValBytes) Reset() {
 	t.on8 = 0
 	t.oncursor = 0
 	if len(t.limit8[0]) == 0 {
-		t.forward(0)
+		if t.total > 0 {
+			t.forward(0)
+		}
 	}
 }
 
@@ -4730,6 +4736,105 @@ type CounterBytes struct {
  onlimit int
  on8 int
  oncursor int
+}
+
+func (t *CounterBytes) Copy() *KeyBytes {
+	obj := new(KeyBytes)
+	obj.total = t.total
+	var run int
+	for run=0; run<8; run++ {
+		tmp := t.limit8[run])
+		cpy := make([]uint64, len(tmp))
+		for i, v := range tmp {
+			cpy[i] = v[0]
+		}
+		obj.limit8[run] = cpy
+	}
+	for run=0; run<8; run++ {
+		tmp := t.limit16[run])
+		cpy := make([][2]uint64, len(tmp))
+		for i, v := range tmp {
+			cpy[i][0] = v[0]
+			cpy[i][1] = v[1]
+		}
+		obj.limit16[run] = cpy
+	}
+	for run=0; run<8; run++ {
+		tmp := t.limit24[run])
+		cpy := make([][3]uint64, len(tmp))
+		for i, v := range tmp {
+			cpy[i][0] = v[0]
+			cpy[i][1] = v[1]
+			cpy[i][2] = v[2]
+		}
+		obj.limit24[run] = cpy
+	}
+	for run=0; run<8; run++ {
+		tmp := t.limit32[run])
+		cpy := make([][4]uint64, len(tmp))
+		for i, v := range tmp {
+			cpy[i][0] = v[0]
+			cpy[i][1] = v[1]
+			cpy[i][2] = v[2]
+			cpy[i][3] = v[3]
+		}
+		obj.limit32[run] = cpy
+	}
+	for run=0; run<8; run++ {
+		tmp := t.limit40[run])
+		cpy := make([][5]uint64, len(tmp))
+		for i, v := range tmp {
+			cpy[i][0] = v[0]
+			cpy[i][1] = v[1]
+			cpy[i][2] = v[2]
+			cpy[i][3] = v[3]
+			cpy[i][4] = v[4]
+		}
+		obj.limit40[run] = cpy
+	}
+	for run=0; run<8; run++ {
+		tmp := t.limit48[run])
+		cpy := make([][6]uint64, len(tmp))
+		for i, v := range tmp {
+			cpy[i][0] = v[0]
+			cpy[i][1] = v[1]
+			cpy[i][2] = v[2]
+			cpy[i][3] = v[3]
+			cpy[i][4] = v[4]
+			cpy[i][5] = v[5]
+		}
+		obj.limit48[run] = cpy
+	}
+	for run=0; run<8; run++ {
+		tmp := t.limit56[run])
+		cpy := make([][7]uint64, len(tmp))
+		for i, v := range tmp {
+			cpy[i][0] = v[0]
+			cpy[i][1] = v[1]
+			cpy[i][2] = v[2]
+			cpy[i][3] = v[3]
+			cpy[i][4] = v[4]
+			cpy[i][5] = v[5]
+			cpy[i][6] = v[6]
+		}
+		obj.limit56[run] = cpy
+	}
+	for run=0; run<8; run++ {
+		tmp := t.limit64[run])
+		cpy := make([][8]uint64, len(tmp))
+		for i, v := range tmp {
+			cpy[i][0] = v[0]
+			cpy[i][1] = v[1]
+			cpy[i][2] = v[2]
+			cpy[i][3] = v[3]
+			cpy[i][4] = v[4]
+			cpy[i][5] = v[5]
+			cpy[i][6] = v[6]
+			cpy[i][7] = v[7]
+		}
+		obj.limit64[run] = cpy
+	}
+	return obj
 }
 
 func (t *CounterBytes) Len() int {
@@ -5701,7 +5806,7 @@ func (t *CounterBytes) Add(thekey []byte, theval int) error {
 // Build sorts the keys and returns an array telling you how to sort the values, you must do this yourself.
 func (t *CounterBytes) Build() {
 
-	var l, run, n int
+	var l, run, n, total int
 	
 	for run=0; run<8; run++ {
 		if l = len(t.limit8[run]); l > 0 {
@@ -5724,6 +5829,7 @@ func (t *CounterBytes) Build() {
 			res = append(res, this)
 			t.limit8[run] = make([][2]uint64, len(res))
 			copy(t.limit8[run], res)
+			total += len(res)
 		}
 	}
 	
@@ -5748,6 +5854,7 @@ func (t *CounterBytes) Build() {
 			res = append(res, this)
 			t.limit16[run] = make([][3]uint64, len(res))
 			copy(t.limit16[run], res)
+			total += len(res)
 		}
 	}
 	
@@ -5772,6 +5879,7 @@ func (t *CounterBytes) Build() {
 			res = append(res, this)
 			t.limit24[run] = make([][4]uint64, len(res))
 			copy(t.limit24[run], res)
+			total += len(res)
 		}
 	}
 	
@@ -5796,6 +5904,7 @@ func (t *CounterBytes) Build() {
 			res = append(res, this)
 			t.limit32[run] = make([][5]uint64, len(res))
 			copy(t.limit32[run], res)
+			total += len(res)
 		}
 	}
 	
@@ -5820,6 +5929,7 @@ func (t *CounterBytes) Build() {
 			res = append(res, this)
 			t.limit40[run] = make([][6]uint64, len(res))
 			copy(t.limit40[run], res)
+			total += len(res)
 		}
 	}
 	
@@ -5844,6 +5954,7 @@ func (t *CounterBytes) Build() {
 			res = append(res, this)
 			t.limit48[run] = make([][7]uint64, len(res))
 			copy(t.limit48[run], res)
+			total += len(res)
 		}
 	}
 	
@@ -5868,6 +5979,7 @@ func (t *CounterBytes) Build() {
 			res = append(res, this)
 			t.limit56[run] = make([][8]uint64, len(res))
 			copy(t.limit56[run], res)
+			total += len(res)
 		}
 	}
 	
@@ -5892,8 +6004,10 @@ func (t *CounterBytes) Build() {
 			res = append(res, this)
 			t.limit64[run] = make([][9]uint64, len(res))
 			copy(t.limit64[run], res)
+			total += len(res)
 		}
 	}
+	t.total = total
 	
 }
 
@@ -5902,7 +6016,9 @@ func (t *CounterBytes) Reset() {
 	t.on8 = 0
 	t.oncursor = 0
 	if len(t.limit8[0]) == 0 {
-		t.forward(0)
+		if t.total > 0 {
+			t.forward(0)
+		}
 	}
 }
 
@@ -6704,6 +6820,16 @@ type CounterUint64 struct {
  cursor int
 }
 
+func (t *CounterUint64) Copy() *KeyUint64 {
+	obj := new(KeyUint64)
+	key := make([]uint64, len(t.key))
+	for i, v := range t.key {
+		key[i] = v.k
+	}
+	obj.key = key
+	return obj
+}
+
 func (t *CounterUint64) Len() int {
 	return len(t.key)
 }
@@ -7119,6 +7245,16 @@ func (t *KeyValUint32) Keys() []uint32 {
 type CounterUint32 struct {
  key []sort_uint32
  cursor int
+}
+
+func (t *CounterUint32) Copy() *KeyUint32 {
+	obj := new(KeyUint32)
+	key := make([]uint32, len(t.key))
+	for i, v := range t.key {
+		key[i] = v.k
+	}
+	obj.key = key
+	return obj
 }
 
 func (t *CounterUint32) Len() int {
@@ -7538,6 +7674,16 @@ type CounterUint16 struct {
  cursor int
 }
 
+func (t *CounterUint16) Copy() *KeyUint16 {
+	obj := new(KeyUint16)
+	key := make([]uint16, len(t.key))
+	for i, v := range t.key {
+		key[i] = v.k
+	}
+	obj.key = key
+	return obj
+}
+
 func (t *CounterUint16) Len() int {
 	return len(t.key)
 }
@@ -7955,6 +8101,16 @@ type CounterUint8 struct {
  cursor int
 }
 
+func (t *CounterUint8) Copy() *KeyUint8 {
+	obj := new(KeyUint8)
+	key := make([]uint8, len(t.key))
+	for i, v := range t.key {
+		key[i] = v.k
+	}
+	obj.key = key
+	return obj
+}
+
 func (t *CounterUint8) Len() int {
 	return len(t.key)
 }
@@ -8370,6 +8526,16 @@ func (t *KeyValInt) Keys() []int {
 type CounterInt struct {
  key []sort_int
  cursor int
+}
+
+func (t *CounterInt) Copy() *KeyInt {
+	obj := new(KeyInt)
+	key := make([]int, len(t.key))
+	for i, v := range t.key {
+		key[i] = v.k
+	}
+	obj.key = key
+	return obj
 }
 
 func (t *CounterInt) Len() int {
