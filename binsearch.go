@@ -573,7 +573,7 @@ func reverse40(v [5]uint64) []byte {
 	uint642bytes(word, v[0])
 	uint642bytes(word[8:], v[1])
 	uint642bytes(word[16:], v[2])
-	uint642bytes(word[32:], v[3])
+	uint642bytes(word[24:], v[3])
 	i := uint642bytesend(word[32:], v[4])
 	return word[0 : 32 + i]
 }
@@ -583,7 +583,7 @@ func reverse40b(v [6]uint64) []byte {
 	uint642bytes(word, v[0])
 	uint642bytes(word[8:], v[1])
 	uint642bytes(word[16:], v[2])
-	uint642bytes(word[32:], v[3])
+	uint642bytes(word[24:], v[3])
 	i := uint642bytesend(word[32:], v[4])
 	return word[0 : 32 + i]
 }
@@ -593,8 +593,8 @@ func reverse48(v [6]uint64) []byte {
 	uint642bytes(word, v[0])
 	uint642bytes(word[8:], v[1])
 	uint642bytes(word[16:], v[2])
-	uint642bytes(word[32:], v[3])
-	uint642bytes(word[40:], v[4])
+	uint642bytes(word[24:], v[3])
+	uint642bytes(word[32:], v[4])
 	i := uint642bytesend(word[40:], v[5])
 	return word[0 : 40 + i]
 }
@@ -604,8 +604,8 @@ func reverse48b(v [7]uint64) []byte {
 	uint642bytes(word, v[0])
 	uint642bytes(word[8:], v[1])
 	uint642bytes(word[16:], v[2])
-	uint642bytes(word[32:], v[3])
-	uint642bytes(word[40:], v[4])
+	uint642bytes(word[24:], v[3])
+	uint642bytes(word[32:], v[4])
 	i := uint642bytesend(word[40:], v[5])
 	return word[0 : 40 + i]
 }
@@ -615,9 +615,9 @@ func reverse56(v [7]uint64) []byte {
 	uint642bytes(word, v[0])
 	uint642bytes(word[8:], v[1])
 	uint642bytes(word[16:], v[2])
-	uint642bytes(word[32:], v[3])
-	uint642bytes(word[40:], v[4])
-	uint642bytes(word[48:], v[5])
+	uint642bytes(word[24:], v[3])
+	uint642bytes(word[32:], v[4])
+	uint642bytes(word[40:], v[5])
 	i := uint642bytesend(word[48:], v[6])
 	return word[0 : 48 + i]
 }
@@ -627,9 +627,9 @@ func reverse56b(v [8]uint64) []byte {
 	uint642bytes(word, v[0])
 	uint642bytes(word[8:], v[1])
 	uint642bytes(word[16:], v[2])
-	uint642bytes(word[32:], v[3])
-	uint642bytes(word[40:], v[4])
-	uint642bytes(word[48:], v[5])
+	uint642bytes(word[24:], v[3])
+	uint642bytes(word[32:], v[4])
+	uint642bytes(word[40:], v[5])
 	i := uint642bytesend(word[48:], v[6])
 	return word[0 : 48 + i]
 }
@@ -639,10 +639,10 @@ func reverse64(v [8]uint64) []byte {
 	uint642bytes(word, v[0])
 	uint642bytes(word[8:], v[1])
 	uint642bytes(word[16:], v[2])
-	uint642bytes(word[32:], v[3])
-	uint642bytes(word[40:], v[4])
-	uint642bytes(word[48:], v[5])
-	uint642bytes(word[56:], v[6])
+	uint642bytes(word[24:], v[3])
+	uint642bytes(word[32:], v[4])
+	uint642bytes(word[40:], v[5])
+	uint642bytes(word[48:], v[6])
 	i := uint642bytesend(word[56:], v[7])
 	return word[0 : 56 + i]
 }
@@ -652,10 +652,10 @@ func reverse64b(v [9]uint64) []byte {
 	uint642bytes(word, v[0])
 	uint642bytes(word[8:], v[1])
 	uint642bytes(word[16:], v[2])
-	uint642bytes(word[32:], v[3])
-	uint642bytes(word[40:], v[4])
-	uint642bytes(word[48:], v[5])
-	uint642bytes(word[56:], v[6])
+	uint642bytes(word[24:], v[3])
+	uint642bytes(word[32:], v[4])
+	uint642bytes(word[40:], v[5])
+	uint642bytes(word[48:], v[6])
 	i := uint642bytesend(word[56:], v[7])
 	return word[0 : 56 + i]
 }
