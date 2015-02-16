@@ -6496,6 +6496,14 @@ func (t *KeyRunes) AddAt(thekey []rune, i int) error {
 	return t.child.AddAt(runes2bytes(thekey), i)
 }
 
+func (t *KeyRunes) Len() int {
+	return t.child.Len()
+}
+
+func (t *KeyRunes) Reset() {
+	t.child.Reset()
+}
+
 func (t *KeyRunes) Next() ([]rune, bool) {
 	a, b := t.child.Next()
 	return bytes2runes(a), b
@@ -6508,6 +6516,14 @@ func (t *KeyRunes) Keys() [][]rune {
 		newkeys[i] = bytes2runes(v)
 	}
 	return newkeys
+}
+
+func (t *KeyRunes) Write(w *custom.Writer) {
+	t.child.Write(w)
+}
+
+func (t *KeyRunes) Read(r *custom.Reader) {
+	t.child.Read(w)
 }
 
 // Add this to any struct to make it binary searchable.
@@ -6534,6 +6550,14 @@ func (t *KeyValRunes) AddUnsorted(thekey []rune, theval int) error {
 	return t.child.AddUnsorted(runes2bytes(thekey), theval)
 }
 
+func (t *KeyValRunes) Len() int {
+	return t.child.Len()
+}
+
+func (t *KeyValRunes) Reset() {
+	t.child.Reset()
+}
+
 func (t *KeyValRunes) Next() ([]rune, int, bool) {
 	a, b, c := t.child.Next()
 	return bytes2runes(a), b, c
@@ -6546,6 +6570,14 @@ func (t *KeyValRunes) Keys() [][]rune {
 		newkeys[i] = bytes2runes(v)
 	}
 	return newkeys
+}
+
+func (t *KeyValRunes) Write(w *custom.Writer) {
+	t.child.Write(w)
+}
+
+func (t *KeyValRunes) Read(r *custom.Reader) {
+	t.child.Read(w)
 }
 
 // Add this to any struct to make it binary searchable.
@@ -6567,6 +6599,14 @@ func (t *CounterRunes) Add(thekey []rune, theval int) error {
 	return t.child.Add(runes2bytes(thekey), theval)
 }
 
+func (t *CounterRunes) Len() int {
+	return t.child.Len()
+}
+
+func (t *CounterRunes) Reset() {
+	t.child.Reset()
+}
+
 func (t *CounterRunes) Next() ([]rune, int, bool) {
 	a, b, c := t.child.Next()
 	return bytes2runes(a), b, c
@@ -6579,6 +6619,21 @@ func (t *CounterRunes) Keys() [][]rune {
 		newkeys[i] = bytes2runes(v)
 	}
 	return newkeys
+}
+
+func (t *CounterRunes) Write(w *custom.Writer) {
+	t.child.Write(w)
+}
+
+func (t *CounterRunes) Read(r *custom.Reader) {
+	t.child.Read(w)
+}
+
+func (t *CounterRunes) Copy() *KeyRunes {
+	obj := new(KeyRunes)
+	child := t.child.Copy()
+	obj.child = *child
+	return obj
 }
 
 // ====================== uint64 ======================
