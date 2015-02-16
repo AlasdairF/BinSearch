@@ -1703,7 +1703,7 @@ func (t *KeyBytes) AddUnsorted(thekey []byte) error {
 			g, i := bytes2uint64(thekey[48:])
 			t.limit56[i] = append(t.limit56[i], [7]uint64{a, b, c, d, e, f, g})
 			t.order56[i] = append(t.order56[i], t.total)
-			t.count[i + 48]++
+			t.count[i + 49]++
 			t.total++
 			return nil
 		case 7:
@@ -4749,6 +4749,7 @@ func (t *CounterBytes) Copy() *KeyBytes {
 			cpy[i] = v[0]
 		}
 		obj.limit8[run] = cpy
+		obj.count[run + 1] = len(cpy)
 	}
 	for run=0; run<8; run++ {
 		tmp := t.limit16[run]
@@ -4758,6 +4759,7 @@ func (t *CounterBytes) Copy() *KeyBytes {
 			cpy[i][1] = v[1]
 		}
 		obj.limit16[run] = cpy
+		obj.count[run + 9] = len(cpy)
 	}
 	for run=0; run<8; run++ {
 		tmp := t.limit24[run]
@@ -4768,6 +4770,7 @@ func (t *CounterBytes) Copy() *KeyBytes {
 			cpy[i][2] = v[2]
 		}
 		obj.limit24[run] = cpy
+		obj.count[run + 17] = len(cpy)
 	}
 	for run=0; run<8; run++ {
 		tmp := t.limit32[run]
@@ -4779,6 +4782,7 @@ func (t *CounterBytes) Copy() *KeyBytes {
 			cpy[i][3] = v[3]
 		}
 		obj.limit32[run] = cpy
+		obj.count[run + 25] = len(cpy)
 	}
 	for run=0; run<8; run++ {
 		tmp := t.limit40[run]
@@ -4791,6 +4795,7 @@ func (t *CounterBytes) Copy() *KeyBytes {
 			cpy[i][4] = v[4]
 		}
 		obj.limit40[run] = cpy
+		obj.count[run + 33] = len(cpy)
 	}
 	for run=0; run<8; run++ {
 		tmp := t.limit48[run]
@@ -4804,6 +4809,7 @@ func (t *CounterBytes) Copy() *KeyBytes {
 			cpy[i][5] = v[5]
 		}
 		obj.limit48[run] = cpy
+		obj.count[run + 41] = len(cpy)
 	}
 	for run=0; run<8; run++ {
 		tmp := t.limit56[run]
@@ -4818,6 +4824,7 @@ func (t *CounterBytes) Copy() *KeyBytes {
 			cpy[i][6] = v[6]
 		}
 		obj.limit56[run] = cpy
+		obj.count[run + 49] = len(cpy)
 	}
 	for run=0; run<8; run++ {
 		tmp := t.limit64[run]
@@ -4833,6 +4840,11 @@ func (t *CounterBytes) Copy() *KeyBytes {
 			cpy[i][7] = v[7]
 		}
 		obj.limit64[run] = cpy
+		obj.count[run + 57] = len(cpy)
+	}
+	// Correct all the counts
+	for run=2; run<64; run++ {
+		obj.count[run] += obj.count[run-1]
 	}
 	return obj
 }
