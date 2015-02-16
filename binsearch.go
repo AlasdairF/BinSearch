@@ -1717,7 +1717,7 @@ func (t *KeyBytes) AddUnsorted(thekey []byte) error {
 			h, i := bytes2uint64(thekey[56:])
 			t.limit64[i] = append(t.limit64[i], [8]uint64{a, b, c, d, e, f, g, h})
 			t.order64[i] = append(t.order64[i], t.total)
-			if i < 8 {
+			if i < 7 {
 				t.count[i + 57]++
 			}
 			t.total++
