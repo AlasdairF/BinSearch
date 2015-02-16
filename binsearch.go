@@ -4840,7 +4840,7 @@ func (t *CounterBytes) Copy() *KeyBytes {
 			cpy[i][7] = v[7]
 		}
 		obj.limit64[run] = cpy
-		if run < 8 {
+		if run < 7 {
 			obj.count[run + 57] = len(cpy)
 		}
 	}
