@@ -6496,6 +6496,10 @@ func (t *KeyRunes) AddAt(thekey []rune, i int) error {
 	return t.child.AddAt(runes2bytes(thekey), i)
 }
 
+func (t *KeyRunes) Build() ([]int, error) {
+	return t.child.Build()
+}
+
 func (t *KeyRunes) Len() int {
 	return t.child.Len()
 }
@@ -6550,6 +6554,10 @@ func (t *KeyValRunes) AddUnsorted(thekey []rune, theval int) error {
 	return t.child.AddUnsorted(runes2bytes(thekey), theval)
 }
 
+func (t *KeyValRunes) Build() {
+	t.child.Build()
+}
+
 func (t *KeyValRunes) Len() int {
 	return t.child.Len()
 }
@@ -6597,6 +6605,10 @@ func (t *CounterRunes) Update(thekey []rune, fn func(int) int) bool {
 // AddUnsorted adds this key to the end of the index for later building with Build.
 func (t *CounterRunes) Add(thekey []rune, theval int) error {
 	return t.child.Add(runes2bytes(thekey), theval)
+}
+
+func (t *CounterRunes) Build() {
+	t.child.Build()
 }
 
 func (t *CounterRunes) Len() int {
