@@ -6523,7 +6523,7 @@ func (t *KeyRunes) Write(w *custom.Writer) {
 }
 
 func (t *KeyRunes) Read(r *custom.Reader) {
-	t.child.Read(w)
+	t.child.Read(r)
 }
 
 // Add this to any struct to make it binary searchable.
@@ -6577,7 +6577,7 @@ func (t *KeyValRunes) Write(w *custom.Writer) {
 }
 
 func (t *KeyValRunes) Read(r *custom.Reader) {
-	t.child.Read(w)
+	t.child.Read(r)
 }
 
 // Add this to any struct to make it binary searchable.
@@ -6626,7 +6626,7 @@ func (t *CounterRunes) Write(w *custom.Writer) {
 }
 
 func (t *CounterRunes) Read(r *custom.Reader) {
-	t.child.Read(w)
+	t.child.Read(r)
 }
 
 func (t *CounterRunes) Copy() *KeyRunes {
