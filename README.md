@@ -234,15 +234,7 @@ The Counter type adds up all of the values associated with every identical key e
 	obj.Add([]byte("the"), 0)
 	obj.Add([]byte("and"), 0)
 	obj.Build()
-	results := make([][]byte, obj.Len())
-	if obj.Reset() {
-		var val, i int
-		var word []byte
-		for eof := false; !eof; i++ {
-			word, _, eof = obj.Next()
-			results[i] = word
-		}
-	}
+	uniques := obj.Keys()
 	
 ###9. Creating a dictionary from results that may contain duplicates
 	
@@ -261,7 +253,7 @@ The Counter type adds up all of the values associated with every identical key e
 	
 ###10. Creating a custom Key/Value structure from results that may contain duplicates
 
-*Note: the result is equivalent to Example 4, but this way is much faster*
+*Note: the result is equivalent to Example 4, but this is much faster.*
 
 	origdata := [][]byte{[]byte("a"), []byte("b"), byte("c"), byte("c"), byte("d")}
 	origval := [][]byte{[]byte("a"), []byte("b"), byte("c"), byte("c"), byte("d")}
