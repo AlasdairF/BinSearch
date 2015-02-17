@@ -2130,15 +2130,19 @@ func (t *KeyBytes) Build() ([]int, error) {
 	return imap, nil
 }
 
-func (t *KeyBytes) Reset() {
+// Reset() must be called before Next(). Returns whether there are any entries.
+func (t *KeyBytes) Reset() bool {
 	t.onlimit = 0
 	t.on8 = 0
 	t.oncursor = 0
 	if len(t.limit8[0]) == 0 {
-		if t.total > 0 {
+		if t.total == 0 {
+			return false
+		} else {
 			t.forward(0)
 		}
 	}
+	return true
 }
 
 func (t *KeyBytes) forward(l int) bool {
@@ -4354,15 +4358,19 @@ func (t *KeyValBytes) Build() {
 	}
 }
 
-func (t *KeyValBytes) Reset() {
+// Reset() must be called before Next(). Returns whether there are any entries.
+func (t *KeyValBytes) Reset() bool {
 	t.onlimit = 0
 	t.on8 = 0
 	t.oncursor = 0
 	if len(t.limit8[0]) == 0 {
-		if t.total > 0 {
+		if t.total == 0 {
+			return false
+		} else {
 			t.forward(0)
 		}
 	}
+	return true
 }
 
 func (t *KeyValBytes) forward(l int) bool {
@@ -6025,15 +6033,19 @@ func (t *CounterBytes) Build() {
 	
 }
 
-func (t *CounterBytes) Reset() {
+// Reset() must be called before Next(). Returns whether there are any entries.
+func (t *CounterBytes) Reset() bool {
 	t.onlimit = 0
 	t.on8 = 0
 	t.oncursor = 0
 	if len(t.limit8[0]) == 0 {
-		if t.total > 0 {
+		if t.total == 0 {
+			return false
+		} else {
 			t.forward(0)
 		}
 	}
+	return true
 }
 
 func (t *CounterBytes) forward(l int) bool {
@@ -6504,8 +6516,8 @@ func (t *KeyRunes) Len() int {
 	return t.child.Len()
 }
 
-func (t *KeyRunes) Reset() {
-	t.child.Reset()
+func (t *KeyRunes) Reset() bool {
+	return t.child.Reset()
 }
 
 func (t *KeyRunes) Next() ([]rune, bool) {
@@ -6562,8 +6574,8 @@ func (t *KeyValRunes) Len() int {
 	return t.child.Len()
 }
 
-func (t *KeyValRunes) Reset() {
-	t.child.Reset()
+func (t *KeyValRunes) Reset() bool {
+	return t.child.Reset()
 }
 
 func (t *KeyValRunes) Next() ([]rune, int, bool) {
@@ -6615,8 +6627,8 @@ func (t *CounterRunes) Len() int {
 	return t.child.Len()
 }
 
-func (t *CounterRunes) Reset() {
-	t.child.Reset()
+func (t *CounterRunes) Reset() bool {
+	return t.child.Reset()
 }
 
 func (t *CounterRunes) Next() ([]rune, int, bool) {
@@ -6742,8 +6754,12 @@ func (t *KeyUint64) Build() []int {
 	return imap
 }
 
-func (t *KeyUint64) Reset() {
+func (t *KeyUint64) Reset() bool {
 	t.cursor = 0
+	if len(t.key) == 0 {
+		return false
+	}
+	return true
 }
 
 func (t *KeyUint64) Next() (uint64, bool) {
@@ -6872,8 +6888,12 @@ func (t *KeyValUint64) Build() {
 	t.key = newkey
 }
 
-func (t *KeyValUint64) Reset() {
+func (t *KeyValUint64) Reset() bool {
 	t.cursor = 0
+	if len(t.key) == 0 {
+		return false
+	}
+	return true
 }
 
 func (t *KeyValUint64) Next() (uint64, int, bool) {
@@ -6994,8 +7014,12 @@ func (t *CounterUint64) Build() {
 	copy(t.key, res)
 }
 
-func (t *CounterUint64) Reset() {
+func (t *CounterUint64) Reset() bool {
 	t.cursor = 0
+	if len(t.key) == 0 {
+		return false
+	}
+	return true
 }
 
 func (t *CounterUint64) Next() (uint64, int, bool) {
@@ -7169,8 +7193,12 @@ func (t *KeyUint32) Build() []int {
 	return imap
 }
 
-func (t *KeyUint32) Reset() {
+func (t *KeyUint32) Reset() bool {
 	t.cursor = 0
+	if len(t.key) == 0 {
+		return false
+	}
+	return true
 }
 
 func (t *KeyUint32) Next() (uint32, bool) {
@@ -7299,8 +7327,12 @@ func (t *KeyValUint32) Build() {
 	t.key = newkey
 }
 
-func (t *KeyValUint32) Reset() {
+func (t *KeyValUint32) Reset() bool {
 	t.cursor = 0
+	if len(t.key) == 0 {
+		return false
+	}
+	return true
 }
 
 func (t *KeyValUint32) Next() (uint32, int, bool) {
@@ -7421,8 +7453,12 @@ func (t *CounterUint32) Build() {
 	copy(t.key, res)
 }
 
-func (t *CounterUint32) Reset() {
+func (t *CounterUint32) Reset() bool {
 	t.cursor = 0
+	if len(t.key) == 0 {
+		return false
+	}
+	return true
 }
 
 func (t *CounterUint32) Next() (uint32, int, bool) {
@@ -7596,8 +7632,12 @@ func (t *KeyUint16) Build() []int {
 	return imap
 }
 
-func (t *KeyUint16) Reset() {
+func (t *KeyUint16) Reset() bool {
 	t.cursor = 0
+	if len(t.key) == 0 {
+		return false
+	}
+	return true
 }
 
 func (t *KeyUint16) Next() (uint16, bool) {
@@ -7726,8 +7766,12 @@ func (t *KeyValUint16) Build() {
 	t.key = newkey
 }
 
-func (t *KeyValUint16) Reset() {
+func (t *KeyValUint16) Reset() bool {
 	t.cursor = 0
+	if len(t.key) == 0 {
+		return false
+	}
+	return true
 }
 
 func (t *KeyValUint16) Next() (uint16, int, bool) {
@@ -7848,8 +7892,12 @@ func (t *CounterUint16) Build() {
 	copy(t.key, res)
 }
 
-func (t *CounterUint16) Reset() {
+func (t *CounterUint16) Reset() bool {
 	t.cursor = 0
+	if len(t.key) == 0 {
+		return false
+	}
+	return true
 }
 
 func (t *CounterUint16) Next() (uint16, int, bool) {
@@ -8023,8 +8071,12 @@ func (t *KeyUint8) Build() []int {
 	return imap
 }
 
-func (t *KeyUint8) Reset() {
+func (t *KeyUint8) Reset() bool {
 	t.cursor = 0
+	if len(t.key) == 0 {
+		return false
+	}
+	return true
 }
 
 func (t *KeyUint8) Next() (uint8, bool) {
@@ -8153,8 +8205,12 @@ func (t *KeyValUint8) Build() {
 	t.key = newkey
 }
 
-func (t *KeyValUint8) Reset() {
+func (t *KeyValUint8) Reset() bool {
 	t.cursor = 0
+	if len(t.key) == 0 {
+		return false
+	}
+	return true
 }
 
 func (t *KeyValUint8) Next() (uint8, int, bool) {
@@ -8275,8 +8331,12 @@ func (t *CounterUint8) Build() {
 	copy(t.key, res)
 }
 
-func (t *CounterUint8) Reset() {
+func (t *CounterUint8) Reset() bool {
 	t.cursor = 0
+	if len(t.key) == 0 {
+		return false
+	}
+	return true
 }
 
 func (t *CounterUint8) Next() (uint8, int, bool) {
@@ -8450,8 +8510,12 @@ func (t *KeyInt) Build() []int {
 	return imap
 }
 
-func (t *KeyInt) Reset() {
+func (t *KeyInt) Reset() bool {
 	t.cursor = 0
+	if len(t.key) == 0 {
+		return false
+	}
+	return true
 }
 
 func (t *KeyInt) Next() (int, bool) {
@@ -8580,8 +8644,12 @@ func (t *KeyValInt) Build() {
 	t.key = newkey
 }
 
-func (t *KeyValInt) Reset() {
+func (t *KeyValInt) Reset() bool {
 	t.cursor = 0
+	if len(t.key) == 0 {
+		return false
+	}
+	return true
 }
 
 func (t *KeyValInt) Next() (int, int, bool) {
@@ -8702,8 +8770,12 @@ func (t *CounterInt) Build() {
 	copy(t.key, res)
 }
 
-func (t *CounterInt) Reset() {
+func (t *CounterInt) Reset() bool {
 	t.cursor = 0
+	if len(t.key) == 0 {
+		return false
+	}
+	return true
 }
 
 func (t *CounterInt) Next() (int, int, bool) {
