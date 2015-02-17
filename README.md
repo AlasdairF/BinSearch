@@ -256,7 +256,7 @@ The Counter type adds up all of the values associated with every identical key e
 *Note: the result is equivalent to Example 4, but this is much faster.*
 
 	origdata := [][]byte{[]byte("a"), []byte("b"), byte("c"), byte("c"), byte("d")}
-	origval := [][]byte{[]byte("a"), []byte("b"), byte("c"), byte("c"), byte("d")}
+	origval := []mystruct{10, 20, 30, 40}
 	obj := new(binsearch.CounterBytes)
 	for _, word := range origdata {
 		obj.Add(word, 0) // add all of the keys to the counter, ignoring the values
