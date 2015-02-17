@@ -31,15 +31,15 @@ The different structure names are one of `Key`, `KeyVal`, `Counter`, followed by
 
 Most structures require the keys to be added first and then the `Build()` function executed before any `Find(key)` is performed. The exception to this is the `Add(key)` function from `Key` and `KeyVal` types, which does not require the use of `Build()` and which does allow for `Find(key)` to be performed at any time, but the insertion of the keys is considerably slower. In most cases this is not necessary and there is usually a way to avoid using `Add(key)`.
 
-#Key
+###Key Type
 
 The Key store records only the keys and its `Find(key)` function will return an index number, which is the position of the key. You can store any value in a separate slice under this index. The Key store is also useful if you don't need any values, for example you want to see only if a word exists in a dictionary.
 
-#KeyVal
+###KeyVal Type
 
 The KeyVal store is similar to the Key store but it also features an `int` value associated with each key. This value is always returned by the `Find(key)` function instead of the index. If you do not want an `int` value then use the Key store and implement your own value slice.
 
-#Counter
+###Counter Type
 
 The Counter type adds up all of the values associated with every identical key element. It is therefore useful for removing duplicates from a list, for tallying up scores, and for counting the number of occurances of each key. Values are `int` and so may be positive or negative; the value is irrelevant if `Counter` is being used to remove duplicates.	
 	
