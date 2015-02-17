@@ -236,7 +236,7 @@ The Counter type adds up all of the values associated with every identical key e
 	obj.Build()
 	uniques := obj.Keys()
 	
-###9. Creating a dictionary from results that may contain duplicates
+###9. Creating a dictionary from results which may contain duplicates
 	
 	obj := new(binsearch.CounterBytes)
 	obj.Add([]byte("aardvark"), 0)
@@ -251,7 +251,7 @@ The Counter type adds up all of the values associated with every identical key e
 		fmt.Println(`It's not in the dictionary!`)
 	}
 	
-###10. Creating a custom Key/Value structure from results that may contain duplicates
+###10. Creating a custom Key/Value structure from results which may contain duplicates
 
 *Note: the result is equivalent to Example 4, but this is much faster.*
 
