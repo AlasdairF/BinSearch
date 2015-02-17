@@ -12,7 +12,7 @@ BinSearch is a super-efficient, in-memory key/value data structure for Go. In fu
 
 ##Advantages
 * Incredibly memory efficient, max 5KB of memory overhead.
-* []byte and []rune keys are compacted and therefore use *less* memory than the original slice, while remaining lossless and retrievable.
+* `[]byte` and `[]rune` keys are compacted and therefore use *less* memory than the original slice, while remaining lossless and retrievable.
 * Very, very fast. Much faster than the native `map` for almost all applications.
 
 ##Disadvantages
