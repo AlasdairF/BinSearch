@@ -285,7 +285,7 @@ The Counter type adds up all of the values associated with every identical key e
 ###12. Saving to file
 	
 	import "github.com/AlasdairF/Custom"
-	func save(obj *binsearch.KeyValBytes) {
+	func save(obj *binsearch.KeyValBytes) error {
 		fi, err := os.Create(`filename.ext`)
 		if err != nil {
 			return err
