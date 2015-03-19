@@ -285,8 +285,8 @@ The Counter type adds up all of the values associated with every identical key e
 ###12. Saving to file
 	
 	import "github.com/AlasdairF/Custom"
-	func save(obj *binsearch.KeyValBytes) error {
-		fi, err := os.Create(`filename.ext`)
+	func save(filename string, obj *binsearch.KeyValBytes) error {
+		fi, err := os.Create(filename)
 		if err != nil {
 			return err
 		}
@@ -300,7 +300,7 @@ The Counter type adds up all of the values associated with every identical key e
 ###12. Reading from file
 	
 	import "github.com/AlasdairF/Custom"
-	func load() (*binsearch.KeyValBytes, error) {
+	func load(filename string) (*binsearch.KeyValBytes, error) {
 		// Open file for reading
 		fi, err := os.Open(filename)
 		if err != nil {
@@ -317,8 +317,7 @@ The Counter type adds up all of the values associated with every identical key e
 		obj := new(binsearch.KeyValBytes)
 		obj.Read(r) // do the reading
 		// Make sure we're at the end and the checksum is OK
-		err = r.EOF()
-		if err != nil {
+		if r.EOF() != nil {
 			return nil, errors.New(`Not a valid binsearch structure.`)
 		}
 		return obj, nil
