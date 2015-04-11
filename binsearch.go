@@ -8,6 +8,10 @@ import (
 
 /*
 
+	INFORMATION
+	
+	Maximum key size is 64 bytes.
+
 	TYPES
 	
 	'Key' type (KeyBytes, KeyUint64 etc.) is a key-only store where the index of each key can be used to store any number of associated values.
@@ -16,8 +20,6 @@ import (
 
 	INDEX
 	
-	Maximum key size is 64 bytes.
-	
 	KeyBytes, KeyRunes
 		func (t *KeyBytes) Len() int
 		func (t *KeyBytes) Find(thekey []byte) (int, bool)					Returns: index, exists.
@@ -25,11 +27,11 @@ import (
 		func (t *KeyBytes) AddAt(thekey []byte, i int) error				Returns error if thekey > 64 bytes
 		func (t *KeyBytes) AddUnsorted(thekey []byte) error					Returns error if thekey > 64 bytes
 		func (t *KeyBytes) Build() ([]int, error)							Returns slice mapping old indexes to new indexes. Can only be used after AddUnsorted, otherwise returns an error.
-		func (t *KeyBytes) Reset()
+		func (t *KeyBytes) Reset() bool										Returns false if the structure is empty (Len() == 0)
 		func (t *KeyBytes) Next() ([]byte, bool)							Returns: original slice of bytes, EOF (true = EOF)
 		func (t *KeyBytes) Keys() [][]byte									Returns slice containing all the keys in order
-		func (t *KeyBytes) Write(w *custom.Writer)
-		func (t *KeyBytes) Read(r *custom.Reader)
+		func (t *KeyBytes) Write(w *custom.Writer)							Writes built structure out to custom.Writer (requires github.com/AlasdairF/Custom)
+		func (t *KeyBytes) Read(r *custom.Reader)							Reads structure in from custom.Reader (requires github.com/AlasdairF/Custom)
 		
 	KeyValBytes, KeyValRunes
 		func (t *KeyValBytes) Len() int
@@ -39,24 +41,24 @@ import (
 		func (t *KeyValBytes) Add(thekey []byte, theval int) bool			Returns whether it exists. Replaces old value with the new value if it exists, otherwise adds it in place.
 		func (t *KeyValBytes) AddUnsorted(thekey []byte, theval int) error	Returns error if thekey > 64 bytes
 		func (t *KeyValBytes) Build()										Only required to be called after AddUnsorted, otherwise it will shrink array capacity to length.
-		func (t *KeyValBytes) Reset()
+		func (t *KeyValBytes) Reset() bool									Returns false if the structure is empty (Len() == 0)
 		func (t *KeyValBytes) Next() ([]byte, int, bool)					Returns: original slice of bytes, value, EOF (true = EOF)
 		func (t *KeyValBytes) Keys() [][]byte								Returns slice containing all the keys in order
-		func (t *KeyValBytes) Write(w *custom.Writer)
-		func (t *KeyValBytes) Read(r *custom.Reader)
+		func (t *KeyValBytes) Write(w *custom.Writer)						Writes built structure out to custom.Writer (requires github.com/AlasdairF/Custom)
+		func (t *KeyValBytes) Read(r *custom.Reader)						Reads structure in from custom.Reader (requires github.com/AlasdairF/Custom)
 		
 	CounterBytes, CounterRunes
-		func (t *CounterBytes) Len() int
+		func (t *CounterBytes) Len() int									Len() is only accurate after Build()
 		func (t *CounterBytes) Find(thekey []byte) (int, bool)				Returns: frequency, exists. Will return nonsensical results if used before Build() is executed; only use after Build.
 		func (t *CounterBytes) Update(thekey []byte, fn func(int) int) bool	Returns boolean value for whether the key exists or not, if it exists the value is modified according to the fn function
 		func (t *CounterBytes) UpdateAll(fn func(int) int)					Modifies all values by the fn function
 		func (t *CounterBytes) Add(thekey []byte, theval int) error			Returns an error if thekey > 64 bytes
 		func (t *CounterBytes) Build()										Always required before Find.
-		func (t *CounterBytes) Reset()
+		func (t *CounterBytes) Reset() bool									Returns false if the structure is empty (Len() == 0)
 		func (t *CounterBytes) Next() ([]byte, int, bool)					Returns: original slice of bytes, value, EOF (true = EOF)
 		func (t *CounterBytes) Keys() [][]byte								Returns slice containing all the keys in order
-		func (t *CounterBytes) Write(w *custom.Writer)
-		func (t *CounterBytes) Read(r *custom.Reader)
+		func (t *CounterBytes) Write(w *custom.Writer)						Writes built structure out to custom.Writer (requires github.com/AlasdairF/Custom)
+		func (t *CounterBytes) Read(r *custom.Reader)						Reads structure in from custom.Reader (requires github.com/AlasdairF/Custom)
 		func (t *CounterBytes) Copy() *KeyBytes								Copies keys to a KeyBytes structure
 		
 	KeyInt, KeyUint64, KeyUint32, KeyUint16, KeyUint8
@@ -66,11 +68,11 @@ import (
 		func (t *KeyInt) AddAt(thekey []byte, i int)
 		func (t *KeyInt) AddUnsorted(thekey []byte)
 		func (t *KeyInt) Build() []int										Returns slice mapping old indexes to new indexes. Only required if AddUnsorted was used, otherwise it will shrink array capacity to length.
-		func (t *KeyInt) Reset()
+		func (t *KeyInt) Reset() bool										Returns false if the structure is empty (Len() == 0)
 		func (t *KeyInt) Next() (uint64, bool)								Returns: key, EOF (true = EOF)
 		func (t *KeyInt) Keys() []uint64									Returns slice containing all the keys in order
-		func (t *KeyInt) Write(w *custom.Writer)
-		func (t *KeyInt) Read(r *custom.Reader)
+		func (t *KeyInt) Write(w *custom.Writer)							Writes built structure out to custom.Writer (requires github.com/AlasdairF/Custom)
+		func (t *KeyInt) Read(r *custom.Reader)								Reads structure in from custom.Reader (requires github.com/AlasdairF/Custom)
 		
 	KeyValInt, KeyValUint64, KeyValUint32, KeyValUint16, KeyValUint8
 		func (t *KeyValInt) Len() int
@@ -80,24 +82,24 @@ import (
 		func (t *KeyValInt) Add(thekey uint64, theval int) bool				Returns whether it exists. Replaces old value with the new value if it exists, otherwise adds it in place.
 		func (t *KeyValInt) AddUnsorted(thekey uint64, theval int)
 		func (t *KeyValInt) Build()											Only required to be called after AddUnsorted, otherwise it will shrink array capacity to length.
-		func (t *KeyValInt) Reset()
+		func (t *KeyValInt) Reset() bool									Returns false if the structure is empty (Len() == 0)
 		func (t *KeyValInt) Next() ([]byte, int, bool)						Returns: original slice of bytes, value, EOF (true = EOF)
 		func (t *KeyValInt) Keys() []uint64									Returns slice containing all the keys in order
-		func (t *KeyValInt) Write(w *custom.Writer)
-		func (t *KeyValInt) Read(r *custom.Reader)
+		func (t *KeyValInt) Write(w *custom.Writer)							Writes built structure out to custom.Writer (requires github.com/AlasdairF/Custom)
+		func (t *KeyValInt) Read(r *custom.Reader)							Reads structure in from custom.Reader (requires github.com/AlasdairF/Custom))
 		
 	CounterInt, CounterUint64, CounterUint32, CounterUint16, CounterUint8
-		func (t *CounterInt) Len() int
+		func (t *CounterInt) Len() int										Len() is only accurate after Build()
 		func (t *CounterInt) Find(thekey uint64) (int, bool)				Returns: frequency, exists. Will return nonsensical results if used before Build() is executed; only use after Build.
 		func (t *CounterInt) Update(thekey uint64, fn func(int) int) bool	Returns boolean value for whether the key exists or not, if it exists the value is modified according to the fn function
 		func (t *CounterInt) UpdateAll(fn func(int) int)					Modifies all values by the fn function
 		func (t *CounterInt) Add(thekey uint64, theval int)
 		func (t *CounterInt) Build()										Always required before Find.
-		func (t *CounterInt) Reset()
+		func (t *CounterInt) Reset() bool									Returns false if the structure is empty (Len() == 0)
 		func (t *CounterInt) Next() ([]byte, int, bool)						Returns: original slice of bytes, value, EOF (true = EOF)
 		func (t *CounterInt) Keys() []uint64								Returns slice containing all the keys in order
-		func (t *CounterInt) Write(w *custom.Writer)
-		func (t *CounterInt) Read(r *custom.Reader)
+		func (t *CounterInt) Write(w *custom.Writer)						Writes built structure out to custom.Writer (requires github.com/AlasdairF/Custom)
+		func (t *CounterInt) Read(r *custom.Reader)							Reads structure in from custom.Reader (requires github.com/AlasdairF/Custom)
 		func (t *CounterInt) Copy() *KeyInt									Copies keys to a KeyInt structure
 
 */
