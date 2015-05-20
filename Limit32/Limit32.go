@@ -8,8 +8,8 @@ package sortLimit32
 
 type Slice []KeyVal
 type KeyVal struct {
-	k int
-	v [4]uint64
+	K int
+	V [4]uint64
 }
 
 func (a Slice) less(i, j int) bool {
