@@ -6705,9 +6705,9 @@ func (t *KeyValUint64) Next() (uint64, int, bool) {
 	v := t.key[t.cursor]
 	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
-		return v.K, v.i, true
+		return v.V, v.K, true
 	}
-	return v.K, v.i, false
+	return v.V, v.K, false
 }
 
 func (t *KeyValUint64) Keys() []uint64 {
@@ -6732,7 +6732,7 @@ func (t *CounterUint64) KeyUint64() *KeyUint64 {
 	for i, v := range t.key {
 		key[i] = v.V
 	}
-	obj.Key = key
+	obj.key = key
 	return obj
 }
 
@@ -6740,7 +6740,7 @@ func (t *CounterUint64) KeyValUint64() *KeyValUint64 {
 	obj := new(KeyValUint64)
 	key := make([]sortIntUint64.KeyVal, len(t.key))
 	copy(key, t.key)
-	obj.Key = key
+	obj.key = key
 	return obj
 }
 
@@ -7152,9 +7152,9 @@ func (t *KeyValUint32) Next() (uint32, int, bool) {
 	v := t.key[t.cursor]
 	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
-		return v.K, v.i, true
+		return v.V, v.K, true
 	}
-	return v.K, v.i, false
+	return v.V, v.K, false
 }
 
 func (t *KeyValUint32) Keys() []uint32 {
@@ -7179,7 +7179,7 @@ func (t *CounterUint32) KeyUint32() *KeyUint32 {
 	for i, v := range t.key {
 		key[i] = v.V
 	}
-	obj.Key = key
+	obj.key = key
 	return obj
 }
 
@@ -7187,7 +7187,7 @@ func (t *CounterUint32) KeyValUint32() *KeyValUint32 {
 	obj := new(KeyValUint32)
 	key := make([]sortIntUint32.KeyVal, len(t.key))
 	copy(key, t.key)
-	obj.Key = key
+	obj.key = key
 	return obj
 }
 
@@ -7599,9 +7599,9 @@ func (t *KeyValUint16) Next() (uint16, int, bool) {
 	v := t.key[t.cursor]
 	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
-		return v.K, v.i, true
+		return v.V, v.K, true
 	}
-	return v.K, v.i, false
+	return v.V, v.K, false
 }
 
 func (t *KeyValUint16) Keys() []uint16 {
@@ -7626,7 +7626,7 @@ func (t *CounterUint16) KeyUint16() *KeyUint16 {
 	for i, v := range t.key {
 		key[i] = v.V
 	}
-	obj.Key = key
+	obj.key = key
 	return obj
 }
 
@@ -7634,7 +7634,7 @@ func (t *CounterUint16) KeyValUint16() *KeyValUint16 {
 	obj := new(KeyValUint16)
 	key := make([]sortIntUint16.KeyVal, len(t.key))
 	copy(key, t.key)
-	obj.Key = key
+	obj.key = key
 	return obj
 }
 
@@ -8046,9 +8046,9 @@ func (t *KeyValUint8) Next() (uint8, int, bool) {
 	v := t.key[t.cursor]
 	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
-		return v.K, v.i, true
+		return v.V, v.K, true
 	}
-	return v.K, v.i, false
+	return v.V, v.K, false
 }
 
 func (t *KeyValUint8) Keys() []uint8 {
@@ -8073,7 +8073,7 @@ func (t *CounterUint8) KeyUint8() *KeyUint8 {
 	for i, v := range t.key {
 		key[i] = v.V
 	}
-	obj.Key = key
+	obj.key = key
 	return obj
 }
 
@@ -8081,7 +8081,7 @@ func (t *CounterUint8) KeyValUint8() *KeyValUint8 {
 	obj := new(KeyValUint8)
 	key := make([]sortIntUint8.KeyVal, len(t.key))
 	copy(key, t.key)
-	obj.Key = key
+	obj.key = key
 	return obj
 }
 
@@ -8493,9 +8493,9 @@ func (t *KeyValInt) Next() (int, int, bool) {
 	v := t.key[t.cursor]
 	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
-		return v.K, v.i, true
+		return v.V, v.K, true
 	}
-	return v.K, v.i, false
+	return v.V, v.K, false
 }
 
 func (t *KeyValInt) Keys() []int {
@@ -8520,7 +8520,7 @@ func (t *CounterInt) KeyInt() *KeyInt {
 	for i, v := range t.key {
 		key[i] = v.V
 	}
-	obj.Key = key
+	obj.key = key
 	return obj
 }
 
@@ -8528,7 +8528,7 @@ func (t *CounterInt) KeyValInt() *KeyValInt {
 	obj := new(KeyValInt)
 	key := make([]sortIntInt.KeyVal, len(t.key))
 	copy(key, t.key)
-	obj.Key = key
+	obj.key = key
 	return obj
 }
 
