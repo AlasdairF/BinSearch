@@ -6457,9 +6457,16 @@ func (t *CounterRunes) Read(r *custom.Reader) {
 	t.child.Read(r)
 }
 
-func (t *CounterRunes) Copy() *KeyRunes {
+func (t *CounterRunes) KeyRunes() *KeyRunes {
 	obj := new(KeyRunes)
-	child := t.child.Copy()
+	child := t.child.KeyBytes()
+	obj.child = *child
+	return obj
+}
+
+func (t *CounterRunes) KeyValRunes() *KeyValRunes {
+	obj := new(KeyValRunes)
+	child := t.child.KeyValBytes()
 	obj.child = *child
 	return obj
 }
@@ -6477,10 +6484,10 @@ type KeyUint64 struct {
 func (t *KeyUint64) Find(thekey uint64) (int, bool) {
 	var min, at int
 	var current uint64
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at]; thekey < current {
+		if current=t.key[at]; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
@@ -6504,13 +6511,13 @@ func (t *KeyUint64) Add(thekey uint64) (int, bool) {
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
 func (t *KeyUint64) AddUnsorted(thekey uint64) {
-	t.Key = append(t.Key, thekey)
+	t.key = append(t.key, thekey)
 	return
 }
 
 // AddAt adds this key to the index in this exact position, so it does not require later rebuilding.
 func (t *KeyUint64) AddAt(thekey uint64, i int) {
-	cur := t.Key
+	cur := t.key
 	lc := len(cur)
 	if lc == cap(cur) {
 		tmp := make([]uint64, lc + 1, (lc * 2) + 1)
@@ -6522,21 +6529,21 @@ func (t *KeyUint64) AddAt(thekey uint64, i int) {
 		copy(cur[i+1:], cur[i:])
 	}
 	cur[i] = thekey
-	t.Key = cur
+	t.key = cur
 }
 
 // Build sorts the keys and returns an array telling you how to sort the values, you must do this yourself.
 func (t *KeyUint64) Build() []int {
-	l := len(t.Key)
+	l := len(t.key)
 	temp := make([]sortIntUint64.KeyVal, l)
 	var i int
 	var k uint64
-	for i, k = range t.Key {
+	for i, k = range t.key {
 		temp[i] = sortIntUint64.KeyVal{i, k}
 	}
 	sortIntUint64.Asc(temp)
 	imap := make([]int, l)
-	newkey := t.Key
+	newkey := t.key
 	for i, obj := range temp {
 		imap[i] = obj.K
 		newkey[i] = obj.V
@@ -6545,22 +6552,22 @@ func (t *KeyUint64) Build() []int {
 }
 
 func (t *KeyUint64) Optimize() {
-	temp := make([]uint64, len(t.Key))
-	copy(temp, t.Key)
-	t.Key = temp
+	temp := make([]uint64, len(t.key))
+	copy(temp, t.key)
+	t.key = temp
 }
 
 func (t *KeyUint64) Reset() bool {
 	t.cursor = 0
-	if len(t.Key) == 0 {
+	if len(t.key) == 0 {
 		return false
 	}
 	return true
 }
 
 func (t *KeyUint64) Next() (uint64, bool) {
-	v := t.Key[t.cursor]
-	if t.cursor++; t.cursor == len(t.Key) {
+	v := t.key[t.cursor]
+	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
 		return v, true
 	}
@@ -6568,7 +6575,7 @@ func (t *KeyUint64) Next() (uint64, bool) {
 }
 
 func (t *KeyUint64) Keys() []uint64 {
-	return t.Key
+	return t.key
 }
 
 // ---------- KeyValUint64 ----------
@@ -6580,23 +6587,23 @@ type KeyValUint64 struct {
 }
 
 func (t *KeyValUint64) Len() int {
-	return len(t.Key)
+	return len(t.key)
 }
 
 // Find returns the index based on the key.
 func (t *KeyValUint64) Find(thekey uint64) (int, bool) {
 	var min, at int
 	var current uint64
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				return t.Key[at].K, true // found
+				return t.key[at].K, true // found
 			}
 		}
 	}
@@ -6607,16 +6614,16 @@ func (t *KeyValUint64) Find(thekey uint64) (int, bool) {
 func (t *KeyValUint64) Update(thekey uint64, fn func(int) int) bool {
 	var min, at int
 	var current uint64
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				t.Key[at].K = fn(t.Key[at].K)
+				t.key[at].K = fn(t.key[at].K)
 				return true // found
 			}
 		}
@@ -6626,7 +6633,7 @@ func (t *KeyValUint64) Update(thekey uint64, fn func(int) int) bool {
 
 // Modifies all values by running each through the provided function
 func (t *KeyValUint64) UpdateAll(fn func(int) int) {
-	tmp := t.Key
+	tmp := t.key
 	l := len(tmp)
 	for i:=0; i<l; i++ {
 		tmp[i].K = fn(tmp[i].K)
@@ -6637,23 +6644,23 @@ func (t *KeyValUint64) UpdateAll(fn func(int) int) {
 func (t *KeyValUint64) Add(thekey uint64, theval int) bool {
 	var min, at int
 	var current uint64
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				if t.Key[at].K != theval {
-					t.Key[at].K = theval
+				if t.key[at].K != theval {
+					t.key[at].K = theval
 				}
 				return true // found
 			}
 		}
 	}
-	cur := t.Key
+	cur := t.key
 	lc := len(cur)
 	if lc == cap(cur) {
 		tmp := make([]sortIntUint64.KeyVal, lc + 1, (lc * 2) + 1)
@@ -6665,38 +6672,38 @@ func (t *KeyValUint64) Add(thekey uint64, theval int) bool {
 		copy(cur[min+1:], cur[min:])
 	}
 	cur[min] = sortIntUint64.KeyVal{theval, thekey}
-	t.Key = cur
+	t.key = cur
 	return false
 }
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
 func (t *KeyValUint64) AddUnsorted(thekey uint64, theval int) {
-	t.Key = append(t.Key, sortIntUint64.KeyVal{theval, thekey})
+	t.key = append(t.key, sortIntUint64.KeyVal{theval, thekey})
 	return
 }
 
 // Build sorts the keys and values.
 func (t *KeyValUint64) Build() {
-	sortIntUint64.Asc(t.Key)
+	sortIntUint64.Asc(t.key)
 }
 
 func (t *KeyValUint64) Optimize() {
-	temp := make([]sortIntUint64.KeyVal, len(t.Key))
-	copy(temp, t.Key)
-	t.Key = temp
+	temp := make([]sortIntUint64.KeyVal, len(t.key))
+	copy(temp, t.key)
+	t.key = temp
 }
 
 func (t *KeyValUint64) Reset() bool {
 	t.cursor = 0
-	if len(t.Key) == 0 {
+	if len(t.key) == 0 {
 		return false
 	}
 	return true
 }
 
 func (t *KeyValUint64) Next() (uint64, int, bool) {
-	v := t.Key[t.cursor]
-	if t.cursor++; t.cursor == len(t.Key) {
+	v := t.key[t.cursor]
+	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
 		return v.K, v.i, true
 	}
@@ -6704,8 +6711,8 @@ func (t *KeyValUint64) Next() (uint64, int, bool) {
 }
 
 func (t *KeyValUint64) Keys() []uint64 {
-	keys := make([]uint64, len(t.Key))
-	for i, v := range t.Key {
+	keys := make([]uint64, len(t.key))
+	for i, v := range t.key {
 		keys[i] = v.K
 	}
 	return keys
@@ -6721,8 +6728,8 @@ type CounterUint64 struct {
 
 func (t *CounterUint64) KeyUint64() *KeyUint64 {
 	obj := new(KeyUint64)
-	key := make([]uint64, len(t.Key))
-	for i, v := range t.Key {
+	key := make([]uint64, len(t.key))
+	for i, v := range t.key {
 		key[i] = v.V
 	}
 	obj.Key = key
@@ -6731,30 +6738,30 @@ func (t *CounterUint64) KeyUint64() *KeyUint64 {
 
 func (t *CounterUint64) KeyValUint64() *KeyValUint64 {
 	obj := new(KeyValUint64)
-	key := make([]sortIntUint64.KeyVal, len(t.Key))
-	copy(key, t.Key)
+	key := make([]sortIntUint64.KeyVal, len(t.key))
+	copy(key, t.key)
 	obj.Key = key
 	return obj
 }
 
 func (t *CounterUint64) Len() int {
-	return len(t.Key)
+	return len(t.key)
 }
 
 // Find returns the index based on the key.
 func (t *CounterUint64) Find(thekey uint64) (int, bool) {
 	var min, at int
 	var current uint64
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				return t.Key[at].K, true // found
+				return t.key[at].K, true // found
 			}
 		}
 	}
@@ -6765,16 +6772,16 @@ func (t *CounterUint64) Find(thekey uint64) (int, bool) {
 func (t *CounterUint64) Update(thekey uint64, fn func(int) int) bool {
 	var min, at int
 	var current uint64
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				t.Key[at].K = fn(t.Key[at].K)
+				t.key[at].K = fn(t.key[at].K)
 				return true // found
 			}
 		}
@@ -6784,7 +6791,7 @@ func (t *CounterUint64) Update(thekey uint64, fn func(int) int) bool {
 
 // Modifies all values by running each through the provided function.
 func (t *CounterUint64) UpdateAll(fn func(int) int) {
-	tmp := t.Key
+	tmp := t.key
 	l := len(tmp)
 	for i:=0; i<l; i++ {
 		tmp[i].K = fn(tmp[i].K)
@@ -6793,20 +6800,20 @@ func (t *CounterUint64) UpdateAll(fn func(int) int) {
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
 func (t *CounterUint64) Add(thekey uint64, theval int) {
-	t.Key = append(t.Key, sortIntUint64.KeyVal{theval, thekey})
+	t.key = append(t.key, sortIntUint64.KeyVal{theval, thekey})
 }
 
 // Build sorts the keys and values.
 func (t *CounterUint64) Build() {
-	var temp = t.Key
+	var temp = t.key
 	if len(temp) == 0 {
 		return
 	}
 	sortIntUint64.Asc(temp)
-	this := t.Key[0].V
-	n := t.Key[0].K
+	this := t.key[0].V
+	n := t.key[0].K
 	var on int
-	for _, k := range t.Key[1:] {
+	for _, k := range t.key[1:] {
 		if k.V == this {
 			n += k.K
 		} else {
@@ -6817,26 +6824,26 @@ func (t *CounterUint64) Build() {
 		}
 	}
 	temp[on] = sortIntUint64.KeyVal{n, this}
-	t.Key = temp[0:on+1]
+	t.key = temp[0:on+1]
 }
 
 func (t *CounterUint64) Optimize() {
-	temp := make([]sortIntUint64.KeyVal, len(t.Key))
-	copy(temp, t.Key)
-	t.Key = temp
+	temp := make([]sortIntUint64.KeyVal, len(t.key))
+	copy(temp, t.key)
+	t.key = temp
 }
 
 func (t *CounterUint64) Reset() bool {
 	t.cursor = 0
-	if len(t.Key) == 0 {
+	if len(t.key) == 0 {
 		return false
 	}
 	return true
 }
 
 func (t *CounterUint64) Next() (uint64, int, bool) {
-	v := t.Key[t.cursor]
-	if t.cursor++; t.cursor == len(t.Key) {
+	v := t.key[t.cursor]
+	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
 		return v.V, v.K, true
 	}
@@ -6844,8 +6851,8 @@ func (t *CounterUint64) Next() (uint64, int, bool) {
 }
 
 func (t *CounterUint64) Keys() []uint64 {
-	keys := make([]uint64, len(t.Key))
-	for i, v := range t.Key {
+	keys := make([]uint64, len(t.key))
+	for i, v := range t.key {
 		keys[i] = v.V
 	}
 	return keys
@@ -6854,8 +6861,8 @@ func (t *CounterUint64) Keys() []uint64 {
 // ------------- export ---------------
 
 func (t *KeyUint64) Write(w *custom.Writer) {
-	w.Write64Variable(uint64(len(t.Key)))
-	for _, v := range t.Key {
+	w.Write64Variable(uint64(len(t.key)))
+	for _, v := range t.key {
 		w.Write64Variable(v)
 	}
 }
@@ -6866,12 +6873,12 @@ func (t *KeyUint64) Read(r *custom.Reader) {
 	for i:=0; i<l; i++ {
 		tmp[i] = r.Read64Variable()
 	}
-	t.Key = tmp
+	t.key = tmp
 }
 
 func (t *KeyValUint64) Write(w *custom.Writer) {
-	w.Write64Variable(uint64(len(t.Key)))
-	for _, v := range t.Key {
+	w.Write64Variable(uint64(len(t.key)))
+	for _, v := range t.key {
 		w.Write64Variable(uint64(v.K))
 		w.Write64Variable(v.V)
 	}
@@ -6887,12 +6894,12 @@ func (t *KeyValUint64) Read(r *custom.Reader) {
 		k = r.Read64Variable()
 		tmp[i] = sortIntUint64.KeyVal{v, k}
 	}
-	t.Key = tmp
+	t.key = tmp
 }
 
 func (t *CounterUint64) Write(w *custom.Writer) {
-	w.Write64Variable(uint64(len(t.Key)))
-	for _, v := range t.Key {
+	w.Write64Variable(uint64(len(t.key)))
+	for _, v := range t.key {
 		w.Write64Variable(uint64(v.K))
 		w.Write64Variable(v.V)
 	}
@@ -6908,7 +6915,7 @@ func (t *CounterUint64) Read(r *custom.Reader) {
 		k = r.Read64Variable()
 		tmp[i] = sortIntUint64.KeyVal{v, k}
 	}
-	t.Key = tmp
+	t.key = tmp
 }
 
 // ====================== uint32 ======================
@@ -6924,10 +6931,10 @@ type KeyUint32 struct {
 func (t *KeyUint32) Find(thekey uint32) (int, bool) {
 	var min, at int
 	var current uint32
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at]; thekey < current {
+		if current=t.key[at]; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
@@ -6951,13 +6958,13 @@ func (t *KeyUint32) Add(thekey uint32) (int, bool) {
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
 func (t *KeyUint32) AddUnsorted(thekey uint32) {
-	t.Key = append(t.Key, thekey)
+	t.key = append(t.key, thekey)
 	return
 }
 
 // AddAt adds this key to the index in this exact position, so it does not require later rebuilding.
 func (t *KeyUint32) AddAt(thekey uint32, i int) {
-	cur := t.Key
+	cur := t.key
 	lc := len(cur)
 	if lc == cap(cur) {
 		tmp := make([]uint32, lc + 1, (lc * 2) + 1)
@@ -6969,21 +6976,21 @@ func (t *KeyUint32) AddAt(thekey uint32, i int) {
 		copy(cur[i+1:], cur[i:])
 	}
 	cur[i] = thekey
-	t.Key = cur
+	t.key = cur
 }
 
 // Build sorts the keys and returns an array telling you how to sort the values, you must do this yourself.
 func (t *KeyUint32) Build() []int {
-	l := len(t.Key)
+	l := len(t.key)
 	temp := make([]sortIntUint32.KeyVal, l)
 	var i int
 	var k uint32
-	for i, k = range t.Key {
+	for i, k = range t.key {
 		temp[i] = sortIntUint32.KeyVal{i, k}
 	}
 	sortIntUint32.Asc(temp)
 	imap := make([]int, l)
-	newkey := t.Key
+	newkey := t.key
 	for i, obj := range temp {
 		imap[i] = obj.K
 		newkey[i] = obj.V
@@ -6992,22 +6999,22 @@ func (t *KeyUint32) Build() []int {
 }
 
 func (t *KeyUint32) Optimize() {
-	temp := make([]uint32, len(t.Key))
-	copy(temp, t.Key)
-	t.Key = temp
+	temp := make([]uint32, len(t.key))
+	copy(temp, t.key)
+	t.key = temp
 }
 
 func (t *KeyUint32) Reset() bool {
 	t.cursor = 0
-	if len(t.Key) == 0 {
+	if len(t.key) == 0 {
 		return false
 	}
 	return true
 }
 
 func (t *KeyUint32) Next() (uint32, bool) {
-	v := t.Key[t.cursor]
-	if t.cursor++; t.cursor == len(t.Key) {
+	v := t.key[t.cursor]
+	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
 		return v, true
 	}
@@ -7015,7 +7022,7 @@ func (t *KeyUint32) Next() (uint32, bool) {
 }
 
 func (t *KeyUint32) Keys() []uint32 {
-	return t.Key
+	return t.key
 }
 
 // ---------- KeyValUint32 ----------
@@ -7027,23 +7034,23 @@ type KeyValUint32 struct {
 }
 
 func (t *KeyValUint32) Len() int {
-	return len(t.Key)
+	return len(t.key)
 }
 
 // Find returns the index based on the key.
 func (t *KeyValUint32) Find(thekey uint32) (int, bool) {
 	var min, at int
 	var current uint32
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				return t.Key[at].K, true // found
+				return t.key[at].K, true // found
 			}
 		}
 	}
@@ -7054,16 +7061,16 @@ func (t *KeyValUint32) Find(thekey uint32) (int, bool) {
 func (t *KeyValUint32) Update(thekey uint32, fn func(int) int) bool {
 	var min, at int
 	var current uint32
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				t.Key[at].K = fn(t.Key[at].K)
+				t.key[at].K = fn(t.key[at].K)
 				return true // found
 			}
 		}
@@ -7073,7 +7080,7 @@ func (t *KeyValUint32) Update(thekey uint32, fn func(int) int) bool {
 
 // Modifies all values by running each through the provided function
 func (t *KeyValUint32) UpdateAll(fn func(int) int) {
-	tmp := t.Key
+	tmp := t.key
 	l := len(tmp)
 	for i:=0; i<l; i++ {
 		tmp[i].K = fn(tmp[i].K)
@@ -7084,23 +7091,23 @@ func (t *KeyValUint32) UpdateAll(fn func(int) int) {
 func (t *KeyValUint32) Add(thekey uint32, theval int) bool {
 	var min, at int
 	var current uint32
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				if t.Key[at].K != theval {
-					t.Key[at].K = theval
+				if t.key[at].K != theval {
+					t.key[at].K = theval
 				}
 				return true // found
 			}
 		}
 	}
-	cur := t.Key
+	cur := t.key
 	lc := len(cur)
 	if lc == cap(cur) {
 		tmp := make([]sortIntUint32.KeyVal, lc + 1, (lc * 2) + 1)
@@ -7112,38 +7119,38 @@ func (t *KeyValUint32) Add(thekey uint32, theval int) bool {
 		copy(cur[min+1:], cur[min:])
 	}
 	cur[min] = sortIntUint32.KeyVal{theval, thekey}
-	t.Key = cur
+	t.key = cur
 	return false
 }
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
 func (t *KeyValUint32) AddUnsorted(thekey uint32, theval int) {
-	t.Key = append(t.Key, sortIntUint32.KeyVal{theval, thekey})
+	t.key = append(t.key, sortIntUint32.KeyVal{theval, thekey})
 	return
 }
 
 // Build sorts the keys and values.
 func (t *KeyValUint32) Build() {
-	sortIntUint32.Asc(t.Key)
+	sortIntUint32.Asc(t.key)
 }
 
 func (t *KeyValUint32) Optimize() {
-	temp := make([]sortIntUint32.KeyVal, len(t.Key))
-	copy(temp, t.Key)
-	t.Key = temp
+	temp := make([]sortIntUint32.KeyVal, len(t.key))
+	copy(temp, t.key)
+	t.key = temp
 }
 
 func (t *KeyValUint32) Reset() bool {
 	t.cursor = 0
-	if len(t.Key) == 0 {
+	if len(t.key) == 0 {
 		return false
 	}
 	return true
 }
 
 func (t *KeyValUint32) Next() (uint32, int, bool) {
-	v := t.Key[t.cursor]
-	if t.cursor++; t.cursor == len(t.Key) {
+	v := t.key[t.cursor]
+	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
 		return v.K, v.i, true
 	}
@@ -7151,8 +7158,8 @@ func (t *KeyValUint32) Next() (uint32, int, bool) {
 }
 
 func (t *KeyValUint32) Keys() []uint32 {
-	keys := make([]uint32, len(t.Key))
-	for i, v := range t.Key {
+	keys := make([]uint32, len(t.key))
+	for i, v := range t.key {
 		keys[i] = v.K
 	}
 	return keys
@@ -7168,8 +7175,8 @@ type CounterUint32 struct {
 
 func (t *CounterUint32) KeyUint32() *KeyUint32 {
 	obj := new(KeyUint32)
-	key := make([]uint32, len(t.Key))
-	for i, v := range t.Key {
+	key := make([]uint32, len(t.key))
+	for i, v := range t.key {
 		key[i] = v.V
 	}
 	obj.Key = key
@@ -7178,30 +7185,30 @@ func (t *CounterUint32) KeyUint32() *KeyUint32 {
 
 func (t *CounterUint32) KeyValUint32() *KeyValUint32 {
 	obj := new(KeyValUint32)
-	key := make([]sortIntUint32.KeyVal, len(t.Key))
-	copy(key, t.Key)
+	key := make([]sortIntUint32.KeyVal, len(t.key))
+	copy(key, t.key)
 	obj.Key = key
 	return obj
 }
 
 func (t *CounterUint32) Len() int {
-	return len(t.Key)
+	return len(t.key)
 }
 
 // Find returns the index based on the key.
 func (t *CounterUint32) Find(thekey uint32) (int, bool) {
 	var min, at int
 	var current uint32
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				return t.Key[at].K, true // found
+				return t.key[at].K, true // found
 			}
 		}
 	}
@@ -7212,16 +7219,16 @@ func (t *CounterUint32) Find(thekey uint32) (int, bool) {
 func (t *CounterUint32) Update(thekey uint32, fn func(int) int) bool {
 	var min, at int
 	var current uint32
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				t.Key[at].K = fn(t.Key[at].K)
+				t.key[at].K = fn(t.key[at].K)
 				return true // found
 			}
 		}
@@ -7231,7 +7238,7 @@ func (t *CounterUint32) Update(thekey uint32, fn func(int) int) bool {
 
 // Modifies all values by running each through the provided function.
 func (t *CounterUint32) UpdateAll(fn func(int) int) {
-	tmp := t.Key
+	tmp := t.key
 	l := len(tmp)
 	for i:=0; i<l; i++ {
 		tmp[i].K = fn(tmp[i].K)
@@ -7240,20 +7247,20 @@ func (t *CounterUint32) UpdateAll(fn func(int) int) {
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
 func (t *CounterUint32) Add(thekey uint32, theval int) {
-	t.Key = append(t.Key, sortIntUint32.KeyVal{theval, thekey})
+	t.key = append(t.key, sortIntUint32.KeyVal{theval, thekey})
 }
 
 // Build sorts the keys and values.
 func (t *CounterUint32) Build() {
-	var temp = t.Key
+	var temp = t.key
 	if len(temp) == 0 {
 		return
 	}
 	sortIntUint32.Asc(temp)
-	this := t.Key[0].V
-	n := t.Key[0].K
+	this := t.key[0].V
+	n := t.key[0].K
 	var on int
-	for _, k := range t.Key[1:] {
+	for _, k := range t.key[1:] {
 		if k.V == this {
 			n += k.K
 		} else {
@@ -7264,26 +7271,26 @@ func (t *CounterUint32) Build() {
 		}
 	}
 	temp[on] = sortIntUint32.KeyVal{n, this}
-	t.Key = temp[0:on+1]
+	t.key = temp[0:on+1]
 }
 
 func (t *CounterUint32) Optimize() {
-	temp := make([]sortIntUint32.KeyVal, len(t.Key))
-	copy(temp, t.Key)
-	t.Key = temp
+	temp := make([]sortIntUint32.KeyVal, len(t.key))
+	copy(temp, t.key)
+	t.key = temp
 }
 
 func (t *CounterUint32) Reset() bool {
 	t.cursor = 0
-	if len(t.Key) == 0 {
+	if len(t.key) == 0 {
 		return false
 	}
 	return true
 }
 
 func (t *CounterUint32) Next() (uint32, int, bool) {
-	v := t.Key[t.cursor]
-	if t.cursor++; t.cursor == len(t.Key) {
+	v := t.key[t.cursor]
+	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
 		return v.V, v.K, true
 	}
@@ -7291,8 +7298,8 @@ func (t *CounterUint32) Next() (uint32, int, bool) {
 }
 
 func (t *CounterUint32) Keys() []uint32 {
-	keys := make([]uint32, len(t.Key))
-	for i, v := range t.Key {
+	keys := make([]uint32, len(t.key))
+	for i, v := range t.key {
 		keys[i] = v.V
 	}
 	return keys
@@ -7301,8 +7308,8 @@ func (t *CounterUint32) Keys() []uint32 {
 // ------------- export ---------------
 
 func (t *KeyUint32) Write(w *custom.Writer) {
-	w.Write64Variable(uint32(len(t.Key)))
-	for _, v := range t.Key {
+	w.Write64Variable(uint32(len(t.key)))
+	for _, v := range t.key {
 		w.Write64Variable(v)
 	}
 }
@@ -7313,12 +7320,12 @@ func (t *KeyUint32) Read(r *custom.Reader) {
 	for i:=0; i<l; i++ {
 		tmp[i] = r.Read64Variable()
 	}
-	t.Key = tmp
+	t.key = tmp
 }
 
 func (t *KeyValUint32) Write(w *custom.Writer) {
-	w.Write64Variable(uint32(len(t.Key)))
-	for _, v := range t.Key {
+	w.Write64Variable(uint32(len(t.key)))
+	for _, v := range t.key {
 		w.Write64Variable(uint32(v.K))
 		w.Write64Variable(v.V)
 	}
@@ -7334,12 +7341,12 @@ func (t *KeyValUint32) Read(r *custom.Reader) {
 		k = r.Read64Variable()
 		tmp[i] = sortIntUint32.KeyVal{v, k}
 	}
-	t.Key = tmp
+	t.key = tmp
 }
 
 func (t *CounterUint32) Write(w *custom.Writer) {
-	w.Write64Variable(uint32(len(t.Key)))
-	for _, v := range t.Key {
+	w.Write64Variable(uint32(len(t.key)))
+	for _, v := range t.key {
 		w.Write64Variable(uint32(v.K))
 		w.Write64Variable(v.V)
 	}
@@ -7355,7 +7362,7 @@ func (t *CounterUint32) Read(r *custom.Reader) {
 		k = r.Read64Variable()
 		tmp[i] = sortIntUint32.KeyVal{v, k}
 	}
-	t.Key = tmp
+	t.key = tmp
 }
 
 // ====================== uint16 ======================
@@ -7371,10 +7378,10 @@ type KeyUint16 struct {
 func (t *KeyUint16) Find(thekey uint16) (int, bool) {
 	var min, at int
 	var current uint16
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at]; thekey < current {
+		if current=t.key[at]; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
@@ -7398,13 +7405,13 @@ func (t *KeyUint16) Add(thekey uint16) (int, bool) {
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
 func (t *KeyUint16) AddUnsorted(thekey uint16) {
-	t.Key = append(t.Key, thekey)
+	t.key = append(t.key, thekey)
 	return
 }
 
 // AddAt adds this key to the index in this exact position, so it does not require later rebuilding.
 func (t *KeyUint16) AddAt(thekey uint16, i int) {
-	cur := t.Key
+	cur := t.key
 	lc := len(cur)
 	if lc == cap(cur) {
 		tmp := make([]uint16, lc + 1, (lc * 2) + 1)
@@ -7416,21 +7423,21 @@ func (t *KeyUint16) AddAt(thekey uint16, i int) {
 		copy(cur[i+1:], cur[i:])
 	}
 	cur[i] = thekey
-	t.Key = cur
+	t.key = cur
 }
 
 // Build sorts the keys and returns an array telling you how to sort the values, you must do this yourself.
 func (t *KeyUint16) Build() []int {
-	l := len(t.Key)
+	l := len(t.key)
 	temp := make([]sortIntUint16.KeyVal, l)
 	var i int
 	var k uint16
-	for i, k = range t.Key {
+	for i, k = range t.key {
 		temp[i] = sortIntUint16.KeyVal{i, k}
 	}
 	sortIntUint16.Asc(temp)
 	imap := make([]int, l)
-	newkey := t.Key
+	newkey := t.key
 	for i, obj := range temp {
 		imap[i] = obj.K
 		newkey[i] = obj.V
@@ -7439,22 +7446,22 @@ func (t *KeyUint16) Build() []int {
 }
 
 func (t *KeyUint16) Optimize() {
-	temp := make([]uint16, len(t.Key))
-	copy(temp, t.Key)
-	t.Key = temp
+	temp := make([]uint16, len(t.key))
+	copy(temp, t.key)
+	t.key = temp
 }
 
 func (t *KeyUint16) Reset() bool {
 	t.cursor = 0
-	if len(t.Key) == 0 {
+	if len(t.key) == 0 {
 		return false
 	}
 	return true
 }
 
 func (t *KeyUint16) Next() (uint16, bool) {
-	v := t.Key[t.cursor]
-	if t.cursor++; t.cursor == len(t.Key) {
+	v := t.key[t.cursor]
+	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
 		return v, true
 	}
@@ -7462,7 +7469,7 @@ func (t *KeyUint16) Next() (uint16, bool) {
 }
 
 func (t *KeyUint16) Keys() []uint16 {
-	return t.Key
+	return t.key
 }
 
 // ---------- KeyValUint16 ----------
@@ -7474,23 +7481,23 @@ type KeyValUint16 struct {
 }
 
 func (t *KeyValUint16) Len() int {
-	return len(t.Key)
+	return len(t.key)
 }
 
 // Find returns the index based on the key.
 func (t *KeyValUint16) Find(thekey uint16) (int, bool) {
 	var min, at int
 	var current uint16
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				return t.Key[at].K, true // found
+				return t.key[at].K, true // found
 			}
 		}
 	}
@@ -7501,16 +7508,16 @@ func (t *KeyValUint16) Find(thekey uint16) (int, bool) {
 func (t *KeyValUint16) Update(thekey uint16, fn func(int) int) bool {
 	var min, at int
 	var current uint16
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				t.Key[at].K = fn(t.Key[at].K)
+				t.key[at].K = fn(t.key[at].K)
 				return true // found
 			}
 		}
@@ -7520,7 +7527,7 @@ func (t *KeyValUint16) Update(thekey uint16, fn func(int) int) bool {
 
 // Modifies all values by running each through the provided function
 func (t *KeyValUint16) UpdateAll(fn func(int) int) {
-	tmp := t.Key
+	tmp := t.key
 	l := len(tmp)
 	for i:=0; i<l; i++ {
 		tmp[i].K = fn(tmp[i].K)
@@ -7531,23 +7538,23 @@ func (t *KeyValUint16) UpdateAll(fn func(int) int) {
 func (t *KeyValUint16) Add(thekey uint16, theval int) bool {
 	var min, at int
 	var current uint16
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				if t.Key[at].K != theval {
-					t.Key[at].K = theval
+				if t.key[at].K != theval {
+					t.key[at].K = theval
 				}
 				return true // found
 			}
 		}
 	}
-	cur := t.Key
+	cur := t.key
 	lc := len(cur)
 	if lc == cap(cur) {
 		tmp := make([]sortIntUint16.KeyVal, lc + 1, (lc * 2) + 1)
@@ -7559,38 +7566,38 @@ func (t *KeyValUint16) Add(thekey uint16, theval int) bool {
 		copy(cur[min+1:], cur[min:])
 	}
 	cur[min] = sortIntUint16.KeyVal{theval, thekey}
-	t.Key = cur
+	t.key = cur
 	return false
 }
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
 func (t *KeyValUint16) AddUnsorted(thekey uint16, theval int) {
-	t.Key = append(t.Key, sortIntUint16.KeyVal{theval, thekey})
+	t.key = append(t.key, sortIntUint16.KeyVal{theval, thekey})
 	return
 }
 
 // Build sorts the keys and values.
 func (t *KeyValUint16) Build() {
-	sortIntUint16.Asc(t.Key)
+	sortIntUint16.Asc(t.key)
 }
 
 func (t *KeyValUint16) Optimize() {
-	temp := make([]sortIntUint16.KeyVal, len(t.Key))
-	copy(temp, t.Key)
-	t.Key = temp
+	temp := make([]sortIntUint16.KeyVal, len(t.key))
+	copy(temp, t.key)
+	t.key = temp
 }
 
 func (t *KeyValUint16) Reset() bool {
 	t.cursor = 0
-	if len(t.Key) == 0 {
+	if len(t.key) == 0 {
 		return false
 	}
 	return true
 }
 
 func (t *KeyValUint16) Next() (uint16, int, bool) {
-	v := t.Key[t.cursor]
-	if t.cursor++; t.cursor == len(t.Key) {
+	v := t.key[t.cursor]
+	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
 		return v.K, v.i, true
 	}
@@ -7598,8 +7605,8 @@ func (t *KeyValUint16) Next() (uint16, int, bool) {
 }
 
 func (t *KeyValUint16) Keys() []uint16 {
-	keys := make([]uint16, len(t.Key))
-	for i, v := range t.Key {
+	keys := make([]uint16, len(t.key))
+	for i, v := range t.key {
 		keys[i] = v.K
 	}
 	return keys
@@ -7615,8 +7622,8 @@ type CounterUint16 struct {
 
 func (t *CounterUint16) KeyUint16() *KeyUint16 {
 	obj := new(KeyUint16)
-	key := make([]uint16, len(t.Key))
-	for i, v := range t.Key {
+	key := make([]uint16, len(t.key))
+	for i, v := range t.key {
 		key[i] = v.V
 	}
 	obj.Key = key
@@ -7625,30 +7632,30 @@ func (t *CounterUint16) KeyUint16() *KeyUint16 {
 
 func (t *CounterUint16) KeyValUint16() *KeyValUint16 {
 	obj := new(KeyValUint16)
-	key := make([]sortIntUint16.KeyVal, len(t.Key))
-	copy(key, t.Key)
+	key := make([]sortIntUint16.KeyVal, len(t.key))
+	copy(key, t.key)
 	obj.Key = key
 	return obj
 }
 
 func (t *CounterUint16) Len() int {
-	return len(t.Key)
+	return len(t.key)
 }
 
 // Find returns the index based on the key.
 func (t *CounterUint16) Find(thekey uint16) (int, bool) {
 	var min, at int
 	var current uint16
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				return t.Key[at].K, true // found
+				return t.key[at].K, true // found
 			}
 		}
 	}
@@ -7659,16 +7666,16 @@ func (t *CounterUint16) Find(thekey uint16) (int, bool) {
 func (t *CounterUint16) Update(thekey uint16, fn func(int) int) bool {
 	var min, at int
 	var current uint16
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				t.Key[at].K = fn(t.Key[at].K)
+				t.key[at].K = fn(t.key[at].K)
 				return true // found
 			}
 		}
@@ -7678,7 +7685,7 @@ func (t *CounterUint16) Update(thekey uint16, fn func(int) int) bool {
 
 // Modifies all values by running each through the provided function.
 func (t *CounterUint16) UpdateAll(fn func(int) int) {
-	tmp := t.Key
+	tmp := t.key
 	l := len(tmp)
 	for i:=0; i<l; i++ {
 		tmp[i].K = fn(tmp[i].K)
@@ -7687,20 +7694,20 @@ func (t *CounterUint16) UpdateAll(fn func(int) int) {
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
 func (t *CounterUint16) Add(thekey uint16, theval int) {
-	t.Key = append(t.Key, sortIntUint16.KeyVal{theval, thekey})
+	t.key = append(t.key, sortIntUint16.KeyVal{theval, thekey})
 }
 
 // Build sorts the keys and values.
 func (t *CounterUint16) Build() {
-	var temp = t.Key
+	var temp = t.key
 	if len(temp) == 0 {
 		return
 	}
 	sortIntUint16.Asc(temp)
-	this := t.Key[0].V
-	n := t.Key[0].K
+	this := t.key[0].V
+	n := t.key[0].K
 	var on int
-	for _, k := range t.Key[1:] {
+	for _, k := range t.key[1:] {
 		if k.V == this {
 			n += k.K
 		} else {
@@ -7711,26 +7718,26 @@ func (t *CounterUint16) Build() {
 		}
 	}
 	temp[on] = sortIntUint16.KeyVal{n, this}
-	t.Key = temp[0:on+1]
+	t.key = temp[0:on+1]
 }
 
 func (t *CounterUint16) Optimize() {
-	temp := make([]sortIntUint16.KeyVal, len(t.Key))
-	copy(temp, t.Key)
-	t.Key = temp
+	temp := make([]sortIntUint16.KeyVal, len(t.key))
+	copy(temp, t.key)
+	t.key = temp
 }
 
 func (t *CounterUint16) Reset() bool {
 	t.cursor = 0
-	if len(t.Key) == 0 {
+	if len(t.key) == 0 {
 		return false
 	}
 	return true
 }
 
 func (t *CounterUint16) Next() (uint16, int, bool) {
-	v := t.Key[t.cursor]
-	if t.cursor++; t.cursor == len(t.Key) {
+	v := t.key[t.cursor]
+	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
 		return v.V, v.K, true
 	}
@@ -7738,8 +7745,8 @@ func (t *CounterUint16) Next() (uint16, int, bool) {
 }
 
 func (t *CounterUint16) Keys() []uint16 {
-	keys := make([]uint16, len(t.Key))
-	for i, v := range t.Key {
+	keys := make([]uint16, len(t.key))
+	for i, v := range t.key {
 		keys[i] = v.V
 	}
 	return keys
@@ -7748,8 +7755,8 @@ func (t *CounterUint16) Keys() []uint16 {
 // ------------- export ---------------
 
 func (t *KeyUint16) Write(w *custom.Writer) {
-	w.Write64Variable(uint16(len(t.Key)))
-	for _, v := range t.Key {
+	w.Write64Variable(uint16(len(t.key)))
+	for _, v := range t.key {
 		w.Write64Variable(v)
 	}
 }
@@ -7760,12 +7767,12 @@ func (t *KeyUint16) Read(r *custom.Reader) {
 	for i:=0; i<l; i++ {
 		tmp[i] = r.Read64Variable()
 	}
-	t.Key = tmp
+	t.key = tmp
 }
 
 func (t *KeyValUint16) Write(w *custom.Writer) {
-	w.Write64Variable(uint16(len(t.Key)))
-	for _, v := range t.Key {
+	w.Write64Variable(uint16(len(t.key)))
+	for _, v := range t.key {
 		w.Write64Variable(uint16(v.K))
 		w.Write64Variable(v.V)
 	}
@@ -7781,12 +7788,12 @@ func (t *KeyValUint16) Read(r *custom.Reader) {
 		k = r.Read64Variable()
 		tmp[i] = sortIntUint16.KeyVal{v, k}
 	}
-	t.Key = tmp
+	t.key = tmp
 }
 
 func (t *CounterUint16) Write(w *custom.Writer) {
-	w.Write64Variable(uint16(len(t.Key)))
-	for _, v := range t.Key {
+	w.Write64Variable(uint16(len(t.key)))
+	for _, v := range t.key {
 		w.Write64Variable(uint16(v.K))
 		w.Write64Variable(v.V)
 	}
@@ -7802,7 +7809,7 @@ func (t *CounterUint16) Read(r *custom.Reader) {
 		k = r.Read64Variable()
 		tmp[i] = sortIntUint16.KeyVal{v, k}
 	}
-	t.Key = tmp
+	t.key = tmp
 }
 
 // ====================== uint8 ======================
@@ -7818,10 +7825,10 @@ type KeyUint8 struct {
 func (t *KeyUint8) Find(thekey uint8) (int, bool) {
 	var min, at int
 	var current uint8
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at]; thekey < current {
+		if current=t.key[at]; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
@@ -7845,13 +7852,13 @@ func (t *KeyUint8) Add(thekey uint8) (int, bool) {
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
 func (t *KeyUint8) AddUnsorted(thekey uint8) {
-	t.Key = append(t.Key, thekey)
+	t.key = append(t.key, thekey)
 	return
 }
 
 // AddAt adds this key to the index in this exact position, so it does not require later rebuilding.
 func (t *KeyUint8) AddAt(thekey uint8, i int) {
-	cur := t.Key
+	cur := t.key
 	lc := len(cur)
 	if lc == cap(cur) {
 		tmp := make([]uint8, lc + 1, (lc * 2) + 1)
@@ -7863,21 +7870,21 @@ func (t *KeyUint8) AddAt(thekey uint8, i int) {
 		copy(cur[i+1:], cur[i:])
 	}
 	cur[i] = thekey
-	t.Key = cur
+	t.key = cur
 }
 
 // Build sorts the keys and returns an array telling you how to sort the values, you must do this yourself.
 func (t *KeyUint8) Build() []int {
-	l := len(t.Key)
+	l := len(t.key)
 	temp := make([]sortIntUint8.KeyVal, l)
 	var i int
 	var k uint8
-	for i, k = range t.Key {
+	for i, k = range t.key {
 		temp[i] = sortIntUint8.KeyVal{i, k}
 	}
 	sortIntUint8.Asc(temp)
 	imap := make([]int, l)
-	newkey := t.Key
+	newkey := t.key
 	for i, obj := range temp {
 		imap[i] = obj.K
 		newkey[i] = obj.V
@@ -7886,22 +7893,22 @@ func (t *KeyUint8) Build() []int {
 }
 
 func (t *KeyUint8) Optimize() {
-	temp := make([]uint8, len(t.Key))
-	copy(temp, t.Key)
-	t.Key = temp
+	temp := make([]uint8, len(t.key))
+	copy(temp, t.key)
+	t.key = temp
 }
 
 func (t *KeyUint8) Reset() bool {
 	t.cursor = 0
-	if len(t.Key) == 0 {
+	if len(t.key) == 0 {
 		return false
 	}
 	return true
 }
 
 func (t *KeyUint8) Next() (uint8, bool) {
-	v := t.Key[t.cursor]
-	if t.cursor++; t.cursor == len(t.Key) {
+	v := t.key[t.cursor]
+	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
 		return v, true
 	}
@@ -7909,7 +7916,7 @@ func (t *KeyUint8) Next() (uint8, bool) {
 }
 
 func (t *KeyUint8) Keys() []uint8 {
-	return t.Key
+	return t.key
 }
 
 // ---------- KeyValUint8 ----------
@@ -7921,23 +7928,23 @@ type KeyValUint8 struct {
 }
 
 func (t *KeyValUint8) Len() int {
-	return len(t.Key)
+	return len(t.key)
 }
 
 // Find returns the index based on the key.
 func (t *KeyValUint8) Find(thekey uint8) (int, bool) {
 	var min, at int
 	var current uint8
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				return t.Key[at].K, true // found
+				return t.key[at].K, true // found
 			}
 		}
 	}
@@ -7948,16 +7955,16 @@ func (t *KeyValUint8) Find(thekey uint8) (int, bool) {
 func (t *KeyValUint8) Update(thekey uint8, fn func(int) int) bool {
 	var min, at int
 	var current uint8
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				t.Key[at].K = fn(t.Key[at].K)
+				t.key[at].K = fn(t.key[at].K)
 				return true // found
 			}
 		}
@@ -7967,7 +7974,7 @@ func (t *KeyValUint8) Update(thekey uint8, fn func(int) int) bool {
 
 // Modifies all values by running each through the provided function
 func (t *KeyValUint8) UpdateAll(fn func(int) int) {
-	tmp := t.Key
+	tmp := t.key
 	l := len(tmp)
 	for i:=0; i<l; i++ {
 		tmp[i].K = fn(tmp[i].K)
@@ -7978,23 +7985,23 @@ func (t *KeyValUint8) UpdateAll(fn func(int) int) {
 func (t *KeyValUint8) Add(thekey uint8, theval int) bool {
 	var min, at int
 	var current uint8
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				if t.Key[at].K != theval {
-					t.Key[at].K = theval
+				if t.key[at].K != theval {
+					t.key[at].K = theval
 				}
 				return true // found
 			}
 		}
 	}
-	cur := t.Key
+	cur := t.key
 	lc := len(cur)
 	if lc == cap(cur) {
 		tmp := make([]sortIntUint8.KeyVal, lc + 1, (lc * 2) + 1)
@@ -8006,38 +8013,38 @@ func (t *KeyValUint8) Add(thekey uint8, theval int) bool {
 		copy(cur[min+1:], cur[min:])
 	}
 	cur[min] = sortIntUint8.KeyVal{theval, thekey}
-	t.Key = cur
+	t.key = cur
 	return false
 }
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
 func (t *KeyValUint8) AddUnsorted(thekey uint8, theval int) {
-	t.Key = append(t.Key, sortIntUint8.KeyVal{theval, thekey})
+	t.key = append(t.key, sortIntUint8.KeyVal{theval, thekey})
 	return
 }
 
 // Build sorts the keys and values.
 func (t *KeyValUint8) Build() {
-	sortIntUint8.Asc(t.Key)
+	sortIntUint8.Asc(t.key)
 }
 
 func (t *KeyValUint8) Optimize() {
-	temp := make([]sortIntUint8.KeyVal, len(t.Key))
-	copy(temp, t.Key)
-	t.Key = temp
+	temp := make([]sortIntUint8.KeyVal, len(t.key))
+	copy(temp, t.key)
+	t.key = temp
 }
 
 func (t *KeyValUint8) Reset() bool {
 	t.cursor = 0
-	if len(t.Key) == 0 {
+	if len(t.key) == 0 {
 		return false
 	}
 	return true
 }
 
 func (t *KeyValUint8) Next() (uint8, int, bool) {
-	v := t.Key[t.cursor]
-	if t.cursor++; t.cursor == len(t.Key) {
+	v := t.key[t.cursor]
+	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
 		return v.K, v.i, true
 	}
@@ -8045,8 +8052,8 @@ func (t *KeyValUint8) Next() (uint8, int, bool) {
 }
 
 func (t *KeyValUint8) Keys() []uint8 {
-	keys := make([]uint8, len(t.Key))
-	for i, v := range t.Key {
+	keys := make([]uint8, len(t.key))
+	for i, v := range t.key {
 		keys[i] = v.K
 	}
 	return keys
@@ -8062,8 +8069,8 @@ type CounterUint8 struct {
 
 func (t *CounterUint8) KeyUint8() *KeyUint8 {
 	obj := new(KeyUint8)
-	key := make([]uint8, len(t.Key))
-	for i, v := range t.Key {
+	key := make([]uint8, len(t.key))
+	for i, v := range t.key {
 		key[i] = v.V
 	}
 	obj.Key = key
@@ -8072,30 +8079,30 @@ func (t *CounterUint8) KeyUint8() *KeyUint8 {
 
 func (t *CounterUint8) KeyValUint8() *KeyValUint8 {
 	obj := new(KeyValUint8)
-	key := make([]sortIntUint8.KeyVal, len(t.Key))
-	copy(key, t.Key)
+	key := make([]sortIntUint8.KeyVal, len(t.key))
+	copy(key, t.key)
 	obj.Key = key
 	return obj
 }
 
 func (t *CounterUint8) Len() int {
-	return len(t.Key)
+	return len(t.key)
 }
 
 // Find returns the index based on the key.
 func (t *CounterUint8) Find(thekey uint8) (int, bool) {
 	var min, at int
 	var current uint8
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				return t.Key[at].K, true // found
+				return t.key[at].K, true // found
 			}
 		}
 	}
@@ -8106,16 +8113,16 @@ func (t *CounterUint8) Find(thekey uint8) (int, bool) {
 func (t *CounterUint8) Update(thekey uint8, fn func(int) int) bool {
 	var min, at int
 	var current uint8
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				t.Key[at].K = fn(t.Key[at].K)
+				t.key[at].K = fn(t.key[at].K)
 				return true // found
 			}
 		}
@@ -8125,7 +8132,7 @@ func (t *CounterUint8) Update(thekey uint8, fn func(int) int) bool {
 
 // Modifies all values by running each through the provided function.
 func (t *CounterUint8) UpdateAll(fn func(int) int) {
-	tmp := t.Key
+	tmp := t.key
 	l := len(tmp)
 	for i:=0; i<l; i++ {
 		tmp[i].K = fn(tmp[i].K)
@@ -8134,20 +8141,20 @@ func (t *CounterUint8) UpdateAll(fn func(int) int) {
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
 func (t *CounterUint8) Add(thekey uint8, theval int) {
-	t.Key = append(t.Key, sortIntUint8.KeyVal{theval, thekey})
+	t.key = append(t.key, sortIntUint8.KeyVal{theval, thekey})
 }
 
 // Build sorts the keys and values.
 func (t *CounterUint8) Build() {
-	var temp = t.Key
+	var temp = t.key
 	if len(temp) == 0 {
 		return
 	}
 	sortIntUint8.Asc(temp)
-	this := t.Key[0].V
-	n := t.Key[0].K
+	this := t.key[0].V
+	n := t.key[0].K
 	var on int
-	for _, k := range t.Key[1:] {
+	for _, k := range t.key[1:] {
 		if k.V == this {
 			n += k.K
 		} else {
@@ -8158,26 +8165,26 @@ func (t *CounterUint8) Build() {
 		}
 	}
 	temp[on] = sortIntUint8.KeyVal{n, this}
-	t.Key = temp[0:on+1]
+	t.key = temp[0:on+1]
 }
 
 func (t *CounterUint8) Optimize() {
-	temp := make([]sortIntUint8.KeyVal, len(t.Key))
-	copy(temp, t.Key)
-	t.Key = temp
+	temp := make([]sortIntUint8.KeyVal, len(t.key))
+	copy(temp, t.key)
+	t.key = temp
 }
 
 func (t *CounterUint8) Reset() bool {
 	t.cursor = 0
-	if len(t.Key) == 0 {
+	if len(t.key) == 0 {
 		return false
 	}
 	return true
 }
 
 func (t *CounterUint8) Next() (uint8, int, bool) {
-	v := t.Key[t.cursor]
-	if t.cursor++; t.cursor == len(t.Key) {
+	v := t.key[t.cursor]
+	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
 		return v.V, v.K, true
 	}
@@ -8185,8 +8192,8 @@ func (t *CounterUint8) Next() (uint8, int, bool) {
 }
 
 func (t *CounterUint8) Keys() []uint8 {
-	keys := make([]uint8, len(t.Key))
-	for i, v := range t.Key {
+	keys := make([]uint8, len(t.key))
+	for i, v := range t.key {
 		keys[i] = v.V
 	}
 	return keys
@@ -8195,8 +8202,8 @@ func (t *CounterUint8) Keys() []uint8 {
 // ------------- export ---------------
 
 func (t *KeyUint8) Write(w *custom.Writer) {
-	w.Write64Variable(uint8(len(t.Key)))
-	for _, v := range t.Key {
+	w.Write64Variable(uint8(len(t.key)))
+	for _, v := range t.key {
 		w.Write64Variable(v)
 	}
 }
@@ -8207,12 +8214,12 @@ func (t *KeyUint8) Read(r *custom.Reader) {
 	for i:=0; i<l; i++ {
 		tmp[i] = r.Read64Variable()
 	}
-	t.Key = tmp
+	t.key = tmp
 }
 
 func (t *KeyValUint8) Write(w *custom.Writer) {
-	w.Write64Variable(uint8(len(t.Key)))
-	for _, v := range t.Key {
+	w.Write64Variable(uint8(len(t.key)))
+	for _, v := range t.key {
 		w.Write64Variable(uint8(v.K))
 		w.Write64Variable(v.V)
 	}
@@ -8228,12 +8235,12 @@ func (t *KeyValUint8) Read(r *custom.Reader) {
 		k = r.Read64Variable()
 		tmp[i] = sortIntUint8.KeyVal{v, k}
 	}
-	t.Key = tmp
+	t.key = tmp
 }
 
 func (t *CounterUint8) Write(w *custom.Writer) {
-	w.Write64Variable(uint8(len(t.Key)))
-	for _, v := range t.Key {
+	w.Write64Variable(uint8(len(t.key)))
+	for _, v := range t.key {
 		w.Write64Variable(uint8(v.K))
 		w.Write64Variable(v.V)
 	}
@@ -8249,7 +8256,7 @@ func (t *CounterUint8) Read(r *custom.Reader) {
 		k = r.Read64Variable()
 		tmp[i] = sortIntUint8.KeyVal{v, k}
 	}
-	t.Key = tmp
+	t.key = tmp
 }
 
 // ====================== int ======================
@@ -8265,10 +8272,10 @@ type KeyInt struct {
 func (t *KeyInt) Find(thekey int) (int, bool) {
 	var min, at int
 	var current int
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at]; thekey < current {
+		if current=t.key[at]; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
@@ -8292,13 +8299,13 @@ func (t *KeyInt) Add(thekey int) (int, bool) {
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
 func (t *KeyInt) AddUnsorted(thekey int) {
-	t.Key = append(t.Key, thekey)
+	t.key = append(t.key, thekey)
 	return
 }
 
 // AddAt adds this key to the index in this exact position, so it does not require later rebuilding.
 func (t *KeyInt) AddAt(thekey int, i int) {
-	cur := t.Key
+	cur := t.key
 	lc := len(cur)
 	if lc == cap(cur) {
 		tmp := make([]int, lc + 1, (lc * 2) + 1)
@@ -8310,21 +8317,21 @@ func (t *KeyInt) AddAt(thekey int, i int) {
 		copy(cur[i+1:], cur[i:])
 	}
 	cur[i] = thekey
-	t.Key = cur
+	t.key = cur
 }
 
 // Build sorts the keys and returns an array telling you how to sort the values, you must do this yourself.
 func (t *KeyInt) Build() []int {
-	l := len(t.Key)
-	temp := make([]sortIntInt.KeyVal, l)
+	l := len(t.key)
+	temp := make([]sortIntInt.keyVal, l)
 	var i int
 	var k int
-	for i, k = range t.Key {
-		temp[i] = sortIntInt.KeyVal{i, k}
+	for i, k = range t.key {
+		temp[i] = sortIntInt.keyVal{i, k}
 	}
 	sortIntInt.Asc(temp)
 	imap := make([]int, l)
-	newkey := t.Key
+	newkey := t.key
 	for i, obj := range temp {
 		imap[i] = obj.K
 		newkey[i] = obj.V
@@ -8333,22 +8340,22 @@ func (t *KeyInt) Build() []int {
 }
 
 func (t *KeyInt) Optimize() {
-	temp := make([]int, len(t.Key))
-	copy(temp, t.Key)
-	t.Key = temp
+	temp := make([]int, len(t.key))
+	copy(temp, t.key)
+	t.key = temp
 }
 
 func (t *KeyInt) Reset() bool {
 	t.cursor = 0
-	if len(t.Key) == 0 {
+	if len(t.key) == 0 {
 		return false
 	}
 	return true
 }
 
 func (t *KeyInt) Next() (int, bool) {
-	v := t.Key[t.cursor]
-	if t.cursor++; t.cursor == len(t.Key) {
+	v := t.key[t.cursor]
+	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
 		return v, true
 	}
@@ -8356,35 +8363,35 @@ func (t *KeyInt) Next() (int, bool) {
 }
 
 func (t *KeyInt) Keys() []int {
-	return t.Key
+	return t.key
 }
 
 // ---------- KeyValInt ----------
 
 // Add this to any struct to make it binary searchable.
 type KeyValInt struct {
- key []sortIntInt.KeyVal
+ key []sortIntInt.keyVal
  cursor int
 }
 
 func (t *KeyValInt) Len() int {
-	return len(t.Key)
+	return len(t.key)
 }
 
 // Find returns the index based on the key.
 func (t *KeyValInt) Find(thekey int) (int, bool) {
 	var min, at int
 	var current int
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				return t.Key[at].K, true // found
+				return t.key[at].K, true // found
 			}
 		}
 	}
@@ -8395,16 +8402,16 @@ func (t *KeyValInt) Find(thekey int) (int, bool) {
 func (t *KeyValInt) Update(thekey int, fn func(int) int) bool {
 	var min, at int
 	var current int
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				t.Key[at].K = fn(t.Key[at].K)
+				t.key[at].K = fn(t.key[at].K)
 				return true // found
 			}
 		}
@@ -8414,7 +8421,7 @@ func (t *KeyValInt) Update(thekey int, fn func(int) int) bool {
 
 // Modifies all values by running each through the provided function
 func (t *KeyValInt) UpdateAll(fn func(int) int) {
-	tmp := t.Key
+	tmp := t.key
 	l := len(tmp)
 	for i:=0; i<l; i++ {
 		tmp[i].K = fn(tmp[i].K)
@@ -8425,26 +8432,26 @@ func (t *KeyValInt) UpdateAll(fn func(int) int) {
 func (t *KeyValInt) Add(thekey int, theval int) bool {
 	var min, at int
 	var current int
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				if t.Key[at].K != theval {
-					t.Key[at].K = theval
+				if t.key[at].K != theval {
+					t.key[at].K = theval
 				}
 				return true // found
 			}
 		}
 	}
-	cur := t.Key
+	cur := t.key
 	lc := len(cur)
 	if lc == cap(cur) {
-		tmp := make([]sortIntInt.KeyVal, lc + 1, (lc * 2) + 1)
+		tmp := make([]sortIntInt.keyVal, lc + 1, (lc * 2) + 1)
 		copy(tmp, cur[0:min])
 		copy(tmp[min+1:], cur[min:])
 		cur = tmp
@@ -8452,39 +8459,39 @@ func (t *KeyValInt) Add(thekey int, theval int) bool {
 		cur = cur[0:lc+1]
 		copy(cur[min+1:], cur[min:])
 	}
-	cur[min] = sortIntInt.KeyVal{theval, thekey}
-	t.Key = cur
+	cur[min] = sortIntInt.keyVal{theval, thekey}
+	t.key = cur
 	return false
 }
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
 func (t *KeyValInt) AddUnsorted(thekey int, theval int) {
-	t.Key = append(t.Key, sortIntInt.KeyVal{theval, thekey})
+	t.key = append(t.key, sortIntInt.keyVal{theval, thekey})
 	return
 }
 
 // Build sorts the keys and values.
 func (t *KeyValInt) Build() {
-	sortIntInt.Asc(t.Key)
+	sortIntInt.Asc(t.key)
 }
 
 func (t *KeyValInt) Optimize() {
-	temp := make([]sortIntInt.KeyVal, len(t.Key))
-	copy(temp, t.Key)
-	t.Key = temp
+	temp := make([]sortIntInt.keyVal, len(t.key))
+	copy(temp, t.key)
+	t.key = temp
 }
 
 func (t *KeyValInt) Reset() bool {
 	t.cursor = 0
-	if len(t.Key) == 0 {
+	if len(t.key) == 0 {
 		return false
 	}
 	return true
 }
 
 func (t *KeyValInt) Next() (int, int, bool) {
-	v := t.Key[t.cursor]
-	if t.cursor++; t.cursor == len(t.Key) {
+	v := t.key[t.cursor]
+	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
 		return v.K, v.i, true
 	}
@@ -8492,8 +8499,8 @@ func (t *KeyValInt) Next() (int, int, bool) {
 }
 
 func (t *KeyValInt) Keys() []int {
-	keys := make([]int, len(t.Key))
-	for i, v := range t.Key {
+	keys := make([]int, len(t.key))
+	for i, v := range t.key {
 		keys[i] = v.K
 	}
 	return keys
@@ -8503,14 +8510,14 @@ func (t *KeyValInt) Keys() []int {
 
 // Add this to any struct to make it binary searchable.
 type CounterInt struct {
- key []sortIntInt.KeyVal
+ key []sortIntInt.keyVal
  cursor int
 }
 
 func (t *CounterInt) KeyInt() *KeyInt {
 	obj := new(KeyInt)
-	key := make([]int, len(t.Key))
-	for i, v := range t.Key {
+	key := make([]int, len(t.key))
+	for i, v := range t.key {
 		key[i] = v.V
 	}
 	obj.Key = key
@@ -8519,30 +8526,30 @@ func (t *CounterInt) KeyInt() *KeyInt {
 
 func (t *CounterInt) KeyValInt() *KeyValInt {
 	obj := new(KeyValInt)
-	key := make([]sortIntInt.KeyVal, len(t.Key))
-	copy(key, t.Key)
+	key := make([]sortIntInt.keyVal, len(t.key))
+	copy(key, t.key)
 	obj.Key = key
 	return obj
 }
 
 func (t *CounterInt) Len() int {
-	return len(t.Key)
+	return len(t.key)
 }
 
 // Find returns the index based on the key.
 func (t *CounterInt) Find(thekey int) (int, bool) {
 	var min, at int
 	var current int
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				return t.Key[at].K, true // found
+				return t.key[at].K, true // found
 			}
 		}
 	}
@@ -8553,16 +8560,16 @@ func (t *CounterInt) Find(thekey int) (int, bool) {
 func (t *CounterInt) Update(thekey int, fn func(int) int) bool {
 	var min, at int
 	var current int
-	max := len(t.Key) - 1
+	max := len(t.key) - 1
 	for min <= max {
 		at = min + ((max - min) / 2)
-		if current=t.Key[at].V; thekey < current {
+		if current=t.key[at].V; thekey < current {
 			max = at - 1
 		} else {
 		if thekey > current {
 			min = at + 1
 			} else {
-				t.Key[at].K = fn(t.Key[at].K)
+				t.key[at].K = fn(t.key[at].K)
 				return true // found
 			}
 		}
@@ -8572,7 +8579,7 @@ func (t *CounterInt) Update(thekey int, fn func(int) int) bool {
 
 // Modifies all values by running each through the provided function.
 func (t *CounterInt) UpdateAll(fn func(int) int) {
-	tmp := t.Key
+	tmp := t.key
 	l := len(tmp)
 	for i:=0; i<l; i++ {
 		tmp[i].K = fn(tmp[i].K)
@@ -8581,50 +8588,50 @@ func (t *CounterInt) UpdateAll(fn func(int) int) {
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
 func (t *CounterInt) Add(thekey int, theval int) {
-	t.Key = append(t.Key, sortIntInt.KeyVal{theval, thekey})
+	t.key = append(t.key, sortIntInt.keyVal{theval, thekey})
 }
 
 // Build sorts the keys and values.
 func (t *CounterInt) Build() {
-	var temp = t.Key
+	var temp = t.key
 	if len(temp) == 0 {
 		return
 	}
 	sortIntInt.Asc(temp)
-	this := t.Key[0].V
-	n := t.Key[0].K
+	this := t.key[0].V
+	n := t.key[0].K
 	var on int
-	for _, k := range t.Key[1:] {
+	for _, k := range t.key[1:] {
 		if k.V == this {
 			n += k.K
 		} else {
-			temp[on] = sortIntInt.KeyVal{n, this}
+			temp[on] = sortIntInt.keyVal{n, this}
 			on++
 			this = k.V
 			n = k.K
 		}
 	}
-	temp[on] = sortIntInt.KeyVal{n, this}
-	t.Key = temp[0:on+1]
+	temp[on] = sortIntInt.keyVal{n, this}
+	t.key = temp[0:on+1]
 }
 
 func (t *CounterInt) Optimize() {
-	temp := make([]sortIntInt.KeyVal, len(t.Key))
-	copy(temp, t.Key)
-	t.Key = temp
+	temp := make([]sortIntInt.keyVal, len(t.key))
+	copy(temp, t.key)
+	t.key = temp
 }
 
 func (t *CounterInt) Reset() bool {
 	t.cursor = 0
-	if len(t.Key) == 0 {
+	if len(t.key) == 0 {
 		return false
 	}
 	return true
 }
 
 func (t *CounterInt) Next() (int, int, bool) {
-	v := t.Key[t.cursor]
-	if t.cursor++; t.cursor == len(t.Key) {
+	v := t.key[t.cursor]
+	if t.cursor++; t.cursor == len(t.key) {
 		t.cursor = 0
 		return v.V, v.K, true
 	}
@@ -8632,8 +8639,8 @@ func (t *CounterInt) Next() (int, int, bool) {
 }
 
 func (t *CounterInt) Keys() []int {
-	keys := make([]int, len(t.Key))
-	for i, v := range t.Key {
+	keys := make([]int, len(t.key))
+	for i, v := range t.key {
 		keys[i] = v.V
 	}
 	return keys
@@ -8642,8 +8649,8 @@ func (t *CounterInt) Keys() []int {
 // ------------- export ---------------
 
 func (t *KeyInt) Write(w *custom.Writer) {
-	w.Write64Variable(int(len(t.Key)))
-	for _, v := range t.Key {
+	w.Write64Variable(int(len(t.key)))
+	for _, v := range t.key {
 		w.Write64Variable(v)
 	}
 }
@@ -8654,12 +8661,12 @@ func (t *KeyInt) Read(r *custom.Reader) {
 	for i:=0; i<l; i++ {
 		tmp[i] = r.Read64Variable()
 	}
-	t.Key = tmp
+	t.key = tmp
 }
 
 func (t *KeyValInt) Write(w *custom.Writer) {
-	w.Write64Variable(int(len(t.Key)))
-	for _, v := range t.Key {
+	w.Write64Variable(int(len(t.key)))
+	for _, v := range t.key {
 		w.Write64Variable(int(v.K))
 		w.Write64Variable(v.V)
 	}
@@ -8669,18 +8676,18 @@ func (t *KeyValInt) Read(r *custom.Reader) {
 	var v int
 	var k int
 	l := int(r.Read64Variable())
-	tmp := make([]sortIntInt.KeyVal, l)
+	tmp := make([]sortIntInt.keyVal, l)
 	for i:=0; i<l; i++ {
 		v = int(r.Read64Variable())
 		k = r.Read64Variable()
-		tmp[i] = sortIntInt.KeyVal{v, k}
+		tmp[i] = sortIntInt.keyVal{v, k}
 	}
-	t.Key = tmp
+	t.key = tmp
 }
 
 func (t *CounterInt) Write(w *custom.Writer) {
-	w.Write64Variable(int(len(t.Key)))
-	for _, v := range t.Key {
+	w.Write64Variable(int(len(t.key)))
+	for _, v := range t.key {
 		w.Write64Variable(int(v.K))
 		w.Write64Variable(v.V)
 	}
@@ -8690,11 +8697,11 @@ func (t *CounterInt) Read(r *custom.Reader) {
 	var v int
 	var k int
 	l := int(r.Read64Variable())
-	tmp := make([]sortIntInt.KeyVal, l)
+	tmp := make([]sortIntInt.keyVal, l)
 	for i:=0; i<l; i++ {
 		v = int(r.Read64Variable())
 		k = r.Read64Variable()
-		tmp[i] = sortIntInt.KeyVal{v, k}
+		tmp[i] = sortIntInt.keyVal{v, k}
 	}
-	t.Key = tmp
+	t.key = tmp
 }
