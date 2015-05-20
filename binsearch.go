@@ -6713,7 +6713,7 @@ func (t *KeyValUint64) Next() (uint64, int, bool) {
 func (t *KeyValUint64) Keys() []uint64 {
 	keys := make([]uint64, len(t.key))
 	for i, v := range t.key {
-		keys[i] = v.K
+		keys[i] = v.V
 	}
 	return keys
 }
@@ -6885,14 +6885,14 @@ func (t *KeyValUint64) Write(w *custom.Writer) {
 }
 
 func (t *KeyValUint64) Read(r *custom.Reader) {
-	var v int
-	var k uint64
+	var k int
+	var v uint64
 	l := int(r.Read64Variable())
 	tmp := make([]sortIntUint64.KeyVal, l)
 	for i:=0; i<l; i++ {
-		v = int(r.Read64Variable())
-		k = r.Read64Variable()
-		tmp[i] = sortIntUint64.KeyVal{v, k}
+		k = int(r.Read64Variable())
+		v = r.Read64Variable()
+		tmp[i] = sortIntUint64.KeyVal{k, v}
 	}
 	t.key = tmp
 }
@@ -6906,14 +6906,14 @@ func (t *CounterUint64) Write(w *custom.Writer) {
 }
 
 func (t *CounterUint64) Read(r *custom.Reader) {
-	var v int
-	var k uint64
+	var k int
+	var v uint64
 	l := int(r.Read64Variable())
 	tmp := make([]sortIntUint64.KeyVal, l)
 	for i:=0; i<l; i++ {
-		v = int(r.Read64Variable())
-		k = r.Read64Variable()
-		tmp[i] = sortIntUint64.KeyVal{v, k}
+		k = int(r.Read64Variable())
+		v = r.Read64Variable()
+		tmp[i] = sortIntUint64.KeyVal{k, v}
 	}
 	t.key = tmp
 }
@@ -7160,7 +7160,7 @@ func (t *KeyValUint32) Next() (uint32, int, bool) {
 func (t *KeyValUint32) Keys() []uint32 {
 	keys := make([]uint32, len(t.key))
 	for i, v := range t.key {
-		keys[i] = v.K
+		keys[i] = v.V
 	}
 	return keys
 }
@@ -7308,9 +7308,9 @@ func (t *CounterUint32) Keys() []uint32 {
 // ------------- export ---------------
 
 func (t *KeyUint32) Write(w *custom.Writer) {
-	w.Write64Variable(uint32(len(t.key)))
+	w.Write64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(v)
+		w.Write64Variable(uint64(v))
 	}
 }
 
@@ -7318,49 +7318,49 @@ func (t *KeyUint32) Read(r *custom.Reader) {
 	l := int(r.Read64Variable())
 	tmp := make([]uint32, l)
 	for i:=0; i<l; i++ {
-		tmp[i] = r.Read64Variable()
+		tmp[i] = uint32(r.Read64Variable())
 	}
 	t.key = tmp
 }
 
 func (t *KeyValUint32) Write(w *custom.Writer) {
-	w.Write64Variable(uint32(len(t.key)))
+	w.Write64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(uint32(v.K))
-		w.Write64Variable(v.V)
+		w.Write64Variable(uint64(v.K))
+		w.Write64Variable(uint64(v.V))
 	}
 }
 
 func (t *KeyValUint32) Read(r *custom.Reader) {
-	var v int
-	var k uint32
+	var k int
+	var v uint32
 	l := int(r.Read64Variable())
 	tmp := make([]sortIntUint32.KeyVal, l)
 	for i:=0; i<l; i++ {
-		v = int(r.Read64Variable())
-		k = r.Read64Variable()
-		tmp[i] = sortIntUint32.KeyVal{v, k}
+		k = int(r.Read64Variable())
+		v = uint32(r.Read64Variable())
+		tmp[i] = sortIntUint32.KeyVal{k, v}
 	}
 	t.key = tmp
 }
 
 func (t *CounterUint32) Write(w *custom.Writer) {
-	w.Write64Variable(uint32(len(t.key)))
+	w.Write64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(uint32(v.K))
-		w.Write64Variable(v.V)
+		w.Write64Variable(uint64(v.K))
+		w.Write64Variable(uint64(v.V))
 	}
 }
 
 func (t *CounterUint32) Read(r *custom.Reader) {
-	var v int
-	var k uint32
+	var k int
+	var v uint32
 	l := int(r.Read64Variable())
 	tmp := make([]sortIntUint32.KeyVal, l)
 	for i:=0; i<l; i++ {
-		v = int(r.Read64Variable())
-		k = r.Read64Variable()
-		tmp[i] = sortIntUint32.KeyVal{v, k}
+		k = int(r.Read64Variable())
+		v = uint32(r.Read64Variable())
+		tmp[i] = sortIntUint32.KeyVal{k, v}
 	}
 	t.key = tmp
 }
@@ -7607,7 +7607,7 @@ func (t *KeyValUint16) Next() (uint16, int, bool) {
 func (t *KeyValUint16) Keys() []uint16 {
 	keys := make([]uint16, len(t.key))
 	for i, v := range t.key {
-		keys[i] = v.K
+		keys[i] = v.V
 	}
 	return keys
 }
@@ -7755,9 +7755,9 @@ func (t *CounterUint16) Keys() []uint16 {
 // ------------- export ---------------
 
 func (t *KeyUint16) Write(w *custom.Writer) {
-	w.Write64Variable(uint16(len(t.key)))
+	w.Write64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(v)
+		w.Write16(v)
 	}
 }
 
@@ -7765,49 +7765,49 @@ func (t *KeyUint16) Read(r *custom.Reader) {
 	l := int(r.Read64Variable())
 	tmp := make([]uint16, l)
 	for i:=0; i<l; i++ {
-		tmp[i] = r.Read64Variable()
+		tmp[i] = r.Read16()
 	}
 	t.key = tmp
 }
 
 func (t *KeyValUint16) Write(w *custom.Writer) {
-	w.Write64Variable(uint16(len(t.key)))
+	w.Write64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(uint16(v.K))
-		w.Write64Variable(v.V)
+		w.Write64Variable(uint64(v.K))
+		w.Write16(v.V)
 	}
 }
 
 func (t *KeyValUint16) Read(r *custom.Reader) {
-	var v int
-	var k uint16
+	var k int
+	var v uint16
 	l := int(r.Read64Variable())
 	tmp := make([]sortIntUint16.KeyVal, l)
 	for i:=0; i<l; i++ {
-		v = int(r.Read64Variable())
-		k = r.Read64Variable()
-		tmp[i] = sortIntUint16.KeyVal{v, k}
+		k = int(r.Read64Variable())
+		v = r.Read16()
+		tmp[i] = sortIntUint16.KeyVal{k, v}
 	}
 	t.key = tmp
 }
 
 func (t *CounterUint16) Write(w *custom.Writer) {
-	w.Write64Variable(uint16(len(t.key)))
+	w.Write64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(uint16(v.K))
-		w.Write64Variable(v.V)
+		w.Write64Variable(uint64(v.K))
+		w.Write16(v.V)
 	}
 }
 
 func (t *CounterUint16) Read(r *custom.Reader) {
-	var v int
-	var k uint16
+	var k int
+	var v uint16
 	l := int(r.Read64Variable())
 	tmp := make([]sortIntUint16.KeyVal, l)
 	for i:=0; i<l; i++ {
-		v = int(r.Read64Variable())
-		k = r.Read64Variable()
-		tmp[i] = sortIntUint16.KeyVal{v, k}
+		k = int(r.Read64Variable())
+		v = r.Read16()
+		tmp[i] = sortIntUint16.KeyVal{k, v}
 	}
 	t.key = tmp
 }
@@ -8054,7 +8054,7 @@ func (t *KeyValUint8) Next() (uint8, int, bool) {
 func (t *KeyValUint8) Keys() []uint8 {
 	keys := make([]uint8, len(t.key))
 	for i, v := range t.key {
-		keys[i] = v.K
+		keys[i] = v.V
 	}
 	return keys
 }
@@ -8202,9 +8202,9 @@ func (t *CounterUint8) Keys() []uint8 {
 // ------------- export ---------------
 
 func (t *KeyUint8) Write(w *custom.Writer) {
-	w.Write64Variable(uint8(len(t.key)))
+	w.Write64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(v)
+		w.Write8(v)
 	}
 }
 
@@ -8212,49 +8212,49 @@ func (t *KeyUint8) Read(r *custom.Reader) {
 	l := int(r.Read64Variable())
 	tmp := make([]uint8, l)
 	for i:=0; i<l; i++ {
-		tmp[i] = r.Read64Variable()
+		tmp[i] = r.Read8()
 	}
 	t.key = tmp
 }
 
 func (t *KeyValUint8) Write(w *custom.Writer) {
-	w.Write64Variable(uint8(len(t.key)))
+	w.Write64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(uint8(v.K))
-		w.Write64Variable(v.V)
+		w.Write64Variable(uint64(v.K))
+		w.Write8(v.V)
 	}
 }
 
 func (t *KeyValUint8) Read(r *custom.Reader) {
-	var v int
-	var k uint8
+	var k int
+	var v uint8
 	l := int(r.Read64Variable())
 	tmp := make([]sortIntUint8.KeyVal, l)
 	for i:=0; i<l; i++ {
-		v = int(r.Read64Variable())
-		k = r.Read64Variable()
-		tmp[i] = sortIntUint8.KeyVal{v, k}
+		k = int(r.Read64Variable())
+		v = r.Read8()
+		tmp[i] = sortIntUint8.KeyVal{k, v}
 	}
 	t.key = tmp
 }
 
 func (t *CounterUint8) Write(w *custom.Writer) {
-	w.Write64Variable(uint8(len(t.key)))
+	w.Write64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(uint8(v.K))
-		w.Write64Variable(v.V)
+		w.Write64Variable(uint64(v.K))
+		w.Write8(v.V)
 	}
 }
 
 func (t *CounterUint8) Read(r *custom.Reader) {
-	var v int
-	var k uint8
+	var k int
+	var v uint8
 	l := int(r.Read64Variable())
 	tmp := make([]sortIntUint8.KeyVal, l)
 	for i:=0; i<l; i++ {
-		v = int(r.Read64Variable())
-		k = r.Read64Variable()
-		tmp[i] = sortIntUint8.KeyVal{v, k}
+		k = int(r.Read64Variable())
+		v = r.Read8()
+		tmp[i] = sortIntUint8.KeyVal{k, v}
 	}
 	t.key = tmp
 }
@@ -8501,7 +8501,7 @@ func (t *KeyValInt) Next() (int, int, bool) {
 func (t *KeyValInt) Keys() []int {
 	keys := make([]int, len(t.key))
 	for i, v := range t.key {
-		keys[i] = v.K
+		keys[i] = v.V
 	}
 	return keys
 }
@@ -8649,59 +8649,59 @@ func (t *CounterInt) Keys() []int {
 // ------------- export ---------------
 
 func (t *KeyInt) Write(w *custom.Writer) {
-	w.Write64Variable(int(len(t.key)))
+	w.Write64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(v)
+		w.Write64Variable(uint64(v))
 	}
 }
 
 func (t *KeyInt) Read(r *custom.Reader) {
 	l := int(r.Read64Variable())
-	tmp := make([]int, l)
+	tmp := make([]uint8, l)
 	for i:=0; i<l; i++ {
-		tmp[i] = r.Read64Variable()
+		tmp[i] = int(r.Read64Variable())
 	}
 	t.key = tmp
 }
 
 func (t *KeyValInt) Write(w *custom.Writer) {
-	w.Write64Variable(int(len(t.key)))
+	w.Write64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(int(v.K))
-		w.Write64Variable(v.V)
+		w.Write64Variable(uint64(v.K))
+		w.Write64Variable(uint64(v.V))
 	}
 }
 
 func (t *KeyValInt) Read(r *custom.Reader) {
-	var v int
 	var k int
+	var v int
 	l := int(r.Read64Variable())
 	tmp := make([]sortIntInt.KeyVal, l)
 	for i:=0; i<l; i++ {
+		k = int(r.Read64Variable())
 		v = int(r.Read64Variable())
-		k = r.Read64Variable()
-		tmp[i] = sortIntInt.KeyVal{v, k}
+		tmp[i] = sortIntInt.KeyVal{k, v}
 	}
 	t.key = tmp
 }
 
 func (t *CounterInt) Write(w *custom.Writer) {
-	w.Write64Variable(int(len(t.key)))
+	w.Write64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(int(v.K))
-		w.Write64Variable(v.V)
+		w.Write64Variable(uint64(v.K))
+		w.Write64Variable(uint64(v.V))
 	}
 }
 
 func (t *CounterInt) Read(r *custom.Reader) {
-	var v int
 	var k int
+	var v int
 	l := int(r.Read64Variable())
 	tmp := make([]sortIntInt.KeyVal, l)
 	for i:=0; i<l; i++ {
+		k = int(r.Read64Variable())
 		v = int(r.Read64Variable())
-		k = r.Read64Variable()
-		tmp[i] = sortIntInt.KeyVal{v, k}
+		tmp[i] = sortIntInt.KeyVal{k, v}
 	}
 	t.key = tmp
 }
