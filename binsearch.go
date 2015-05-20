@@ -8657,7 +8657,7 @@ func (t *KeyInt) Write(w *custom.Writer) {
 
 func (t *KeyInt) Read(r *custom.Reader) {
 	l := int(r.Read64Variable())
-	tmp := make([]uint8, l)
+	tmp := make([]int, l)
 	for i:=0; i<l; i++ {
 		tmp[i] = int(r.Read64Variable())
 	}
