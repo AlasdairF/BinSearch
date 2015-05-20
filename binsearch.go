@@ -8323,11 +8323,11 @@ func (t *KeyInt) AddAt(thekey int, i int) {
 // Build sorts the keys and returns an array telling you how to sort the values, you must do this yourself.
 func (t *KeyInt) Build() []int {
 	l := len(t.key)
-	temp := make([]sortIntInt.keyVal, l)
+	temp := make([]sortIntInt.KeyVal, l)
 	var i int
 	var k int
 	for i, k = range t.key {
-		temp[i] = sortIntInt.keyVal{i, k}
+		temp[i] = sortIntInt.KeyVal{i, k}
 	}
 	sortIntInt.Asc(temp)
 	imap := make([]int, l)
@@ -8370,7 +8370,7 @@ func (t *KeyInt) Keys() []int {
 
 // Add this to any struct to make it binary searchable.
 type KeyValInt struct {
- key []sortIntInt.keyVal
+ key []sortIntInt.KeyVal
  cursor int
 }
 
@@ -8451,7 +8451,7 @@ func (t *KeyValInt) Add(thekey int, theval int) bool {
 	cur := t.key
 	lc := len(cur)
 	if lc == cap(cur) {
-		tmp := make([]sortIntInt.keyVal, lc + 1, (lc * 2) + 1)
+		tmp := make([]sortIntInt.KeyVal, lc + 1, (lc * 2) + 1)
 		copy(tmp, cur[0:min])
 		copy(tmp[min+1:], cur[min:])
 		cur = tmp
@@ -8459,14 +8459,14 @@ func (t *KeyValInt) Add(thekey int, theval int) bool {
 		cur = cur[0:lc+1]
 		copy(cur[min+1:], cur[min:])
 	}
-	cur[min] = sortIntInt.keyVal{theval, thekey}
+	cur[min] = sortIntInt.KeyVal{theval, thekey}
 	t.key = cur
 	return false
 }
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
 func (t *KeyValInt) AddUnsorted(thekey int, theval int) {
-	t.key = append(t.key, sortIntInt.keyVal{theval, thekey})
+	t.key = append(t.key, sortIntInt.KeyVal{theval, thekey})
 	return
 }
 
@@ -8476,7 +8476,7 @@ func (t *KeyValInt) Build() {
 }
 
 func (t *KeyValInt) Optimize() {
-	temp := make([]sortIntInt.keyVal, len(t.key))
+	temp := make([]sortIntInt.KeyVal, len(t.key))
 	copy(temp, t.key)
 	t.key = temp
 }
@@ -8510,7 +8510,7 @@ func (t *KeyValInt) Keys() []int {
 
 // Add this to any struct to make it binary searchable.
 type CounterInt struct {
- key []sortIntInt.keyVal
+ key []sortIntInt.KeyVal
  cursor int
 }
 
@@ -8526,7 +8526,7 @@ func (t *CounterInt) KeyInt() *KeyInt {
 
 func (t *CounterInt) KeyValInt() *KeyValInt {
 	obj := new(KeyValInt)
-	key := make([]sortIntInt.keyVal, len(t.key))
+	key := make([]sortIntInt.KeyVal, len(t.key))
 	copy(key, t.key)
 	obj.Key = key
 	return obj
@@ -8588,7 +8588,7 @@ func (t *CounterInt) UpdateAll(fn func(int) int) {
 
 // AddUnsorted adds this key to the end of the index for later building with Build.
 func (t *CounterInt) Add(thekey int, theval int) {
-	t.key = append(t.key, sortIntInt.keyVal{theval, thekey})
+	t.key = append(t.key, sortIntInt.KeyVal{theval, thekey})
 }
 
 // Build sorts the keys and values.
@@ -8605,18 +8605,18 @@ func (t *CounterInt) Build() {
 		if k.V == this {
 			n += k.K
 		} else {
-			temp[on] = sortIntInt.keyVal{n, this}
+			temp[on] = sortIntInt.KeyVal{n, this}
 			on++
 			this = k.V
 			n = k.K
 		}
 	}
-	temp[on] = sortIntInt.keyVal{n, this}
+	temp[on] = sortIntInt.KeyVal{n, this}
 	t.key = temp[0:on+1]
 }
 
 func (t *CounterInt) Optimize() {
-	temp := make([]sortIntInt.keyVal, len(t.key))
+	temp := make([]sortIntInt.KeyVal, len(t.key))
 	copy(temp, t.key)
 	t.key = temp
 }
@@ -8676,11 +8676,11 @@ func (t *KeyValInt) Read(r *custom.Reader) {
 	var v int
 	var k int
 	l := int(r.Read64Variable())
-	tmp := make([]sortIntInt.keyVal, l)
+	tmp := make([]sortIntInt.KeyVal, l)
 	for i:=0; i<l; i++ {
 		v = int(r.Read64Variable())
 		k = r.Read64Variable()
-		tmp[i] = sortIntInt.keyVal{v, k}
+		tmp[i] = sortIntInt.KeyVal{v, k}
 	}
 	t.key = tmp
 }
@@ -8697,11 +8697,11 @@ func (t *CounterInt) Read(r *custom.Reader) {
 	var v int
 	var k int
 	l := int(r.Read64Variable())
-	tmp := make([]sortIntInt.keyVal, l)
+	tmp := make([]sortIntInt.KeyVal, l)
 	for i:=0; i<l; i++ {
 		v = int(r.Read64Variable())
 		k = r.Read64Variable()
-		tmp[i] = sortIntInt.keyVal{v, k}
+		tmp[i] = sortIntInt.KeyVal{v, k}
 	}
 	t.key = tmp
 }
