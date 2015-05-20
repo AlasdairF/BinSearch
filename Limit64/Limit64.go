@@ -87,13 +87,13 @@ func medianOfThreeAsc(data Slice, a, b, c int) {
 	m1 := a
 	m2 := c
 	// bubble sort on 3 elements
-	if data.Less(m1, m0) {
+	if data.less(m1, m0) {
 		data[m1], data[m0] = data[m0], data[m1]
 	}
-	if data.Less(m2, m1) {
+	if data.less(m2, m1) {
 		data[m2], data[m1] = data[m1], data[m2]
 	}
-	if data.Less(m1, m0) {
+	if data.less(m1, m0) {
 		data[m1], data[m0] = data[m0], data[m1]
 	}
 }
