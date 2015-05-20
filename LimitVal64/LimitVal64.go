@@ -10,21 +10,21 @@ type Slice [][9]uint64
 
 func (a Slice) less(i, j int) bool {
 	switch {
-		a[i][0] < a[j][0]: return true
-		a[i][0] > a[j][0]: return false
-		a[i][1] < a[j][1]: return true
-		a[i][1] > a[j][1]: return false
-		a[i][2] < a[j][2]: return true
-		a[i][2] > a[j][2]: return false
-		a[i][3] < a[j][3]: return true
-		a[i][3] > a[j][3]: return false
-		a[i][4] < a[j][4]: return true
-		a[i][4] > a[j][4]: return false
-		a[i][5] < a[j][5]: return true
-		a[i][5] > a[j][5]: return false
-		a[i][6] < a[j][6]: return true
-		a[i][6] > a[j][6]: return false
-		a[i][7] < a[j][7]: return true
+		case a[i][0] < a[j][0]: return true
+		case a[i][0] > a[j][0]: return false
+		case a[i][1] < a[j][1]: return true
+		case a[i][1] > a[j][1]: return false
+		case a[i][2] < a[j][2]: return true
+		case a[i][2] > a[j][2]: return false
+		case a[i][3] < a[j][3]: return true
+		case a[i][3] > a[j][3]: return false
+		case a[i][4] < a[j][4]: return true
+		case a[i][4] > a[j][4]: return false
+		case a[i][5] < a[j][5]: return true
+		case a[i][5] > a[j][5]: return false
+		case a[i][6] < a[j][6]: return true
+		case a[i][6] > a[j][6]: return false
+		case a[i][7] < a[j][7]: return true
 		default: return false
 	}
 }

@@ -14,15 +14,15 @@ type KeyVal struct {
 
 func (a Slice) less(i, j int) bool {
 	switch {
-		a[i].V[0] < a[j].V[0]: return true
-		a[i].V[0] > a[j].V[0]: return false
-		a[i].V[1] < a[j].V[1]: return true
-		a[i].V[1] > a[j].V[1]: return false
-		a[i].V[2] < a[j].V[2]: return true
-		a[i].V[2] > a[j].V[2]: return false
-		a[i].V[3] < a[j].V[3]: return true
-		a[i].V[3] > a[j].V[3]: return false
-		a[i].V[4] < a[j].V[4]: return true
+		case a[i].V[0] < a[j].V[0]: return true
+		case a[i].V[0] > a[j].V[0]: return false
+		case a[i].V[1] < a[j].V[1]: return true
+		case a[i].V[1] > a[j].V[1]: return false
+		case a[i].V[2] < a[j].V[2]: return true
+		case a[i].V[2] > a[j].V[2]: return false
+		case a[i].V[3] < a[j].V[3]: return true
+		case a[i].V[3] > a[j].V[3]: return false
+		case a[i].V[4] < a[j].V[4]: return true
 		default: return false
 	}
 }

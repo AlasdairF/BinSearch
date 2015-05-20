@@ -10,9 +10,9 @@ type Slice [][3]uint64
 
 func (a Slice) less(i, j int) bool {
 	switch {
-		a[i][0] < a[j][0]: return true
-		a[i][0] > a[j][0]: return false
-		a[i][1] < a[j][1]: return true
+		case a[i][0] < a[j][0]: return true
+		case a[i][0] > a[j][0]: return false
+		case a[i][1] < a[j][1]: return true
 		default: return false
 	}
 }
