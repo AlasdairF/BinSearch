@@ -1,4 +1,4 @@
-package sortLimit64
+package sortLimitVal64
 
 /*
 	This package is specifically used by github.com/AlasdairF/BinSearch

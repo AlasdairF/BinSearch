@@ -1,4 +1,4 @@
-package sortLimit16
+package sortLimitVal8
 
 /*
 	This package is specifically used by github.com/AlasdairF/BinSearch

@@ -1,4 +1,4 @@
-package sortLimit40
+package sortLimitVal32
 
 /*
 	This package is specifically used by github.com/AlasdairF/BinSearch
