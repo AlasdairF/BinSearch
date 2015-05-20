@@ -4536,55 +4536,41 @@ func (t *CounterBytes) KeyValBytes() *KeyValBytes {
 		cpy := make([][2]uint64, len(t.limit8[run]))
 		copy(cpy, t.limit8[run])
 		obj.limit8[run] = cpy
-		obj.count[run + 1] = len(cpy)
 	}
 	for run=0; run<8; run++ {
 		cpy := make([][3]uint64, len(t.limit16[run]))
 		copy(cpy, t.limit16[run])
 		obj.limit16[run] = cpy
-		obj.count[run + 9] = len(cpy)
 	}
 	for run=0; run<8; run++ {
 		cpy := make([][4]uint64, len(t.limit24[run]))
 		copy(cpy, t.limit24[run])
 		obj.limit24[run] = cpy
-		obj.count[run + 17] = len(cpy)
 	}
 	for run=0; run<8; run++ {
 		cpy := make([][5]uint64, len(t.limit32[run]))
 		copy(cpy, t.limit32[run])
 		obj.limit32[run] = cpy
-		obj.count[run + 25] = len(cpy)
 	}
 	for run=0; run<8; run++ {
 		cpy := make([][6]uint64, len(t.limit40[run]))
 		copy(cpy, t.limit40[run])
 		obj.limit40[run] = cpy
-		obj.count[run + 33] = len(cpy)
 	}
 	for run=0; run<8; run++ {
 		cpy := make([][7]uint64, len(t.limit48[run]))
 		copy(cpy, t.limit48[run])
 		obj.limit48[run] = cpy
-		obj.count[run + 41] = len(cpy)
 	}
 	for run=0; run<8; run++ {
 		cpy := make([][8]uint64, len(t.limit56[run]))
 		copy(cpy, t.limit56[run])
 		obj.limit56[run] = cpy
-		obj.count[run + 49] = len(cpy)
 	}
 	for run=0; run<8; run++ {
 		cpy := make([][9]uint64, len(t.limit64[run]))
 		copy(cpy, t.limit64[run])
 		obj.limit64[run] = cpy
-		if run < 7 {
-			obj.count[run + 57] = len(cpy)
-		}
-	}
-	// Correct all the counts
-	for run=2; run<64; run++ {
-		obj.count[run] += obj.count[run-1]
 	}
 	return obj
 }
