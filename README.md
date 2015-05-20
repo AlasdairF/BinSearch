@@ -54,6 +54,7 @@ The Counter type adds up all of the values associated with every identical key e
 		func (t *KeyBytes) AddAt(thekey []byte, i int) error				Returns error if thekey > 64 bytes
 		func (t *KeyBytes) AddUnsorted(thekey []byte) error					Returns error if thekey > 64 bytes
 		func (t *KeyBytes) Build() ([]int, error)							Returns slice mapping old indexes to new indexes. Can only be used after AddUnsorted, otherwise returns an error.
+		func (t *KeyBytes) Optimize()										Copies all the data to new slices with capacity equal to length.
 		func (t *KeyBytes) Reset() bool										Returns false if the structure is empty (Len() == 0)
 		func (t *KeyBytes) Next() ([]byte, bool)							Returns: original slice of bytes, EOF (true = EOF)
 		func (t *KeyBytes) Keys() [][]byte									Returns slice containing all the keys in order
@@ -68,6 +69,7 @@ The Counter type adds up all of the values associated with every identical key e
 		func (t *KeyValBytes) Add(thekey []byte, theval int) bool			Returns whether it exists. Replaces old value with the new value if it exists, otherwise adds it in place.
 		func (t *KeyValBytes) AddUnsorted(thekey []byte, theval int) error	Returns error if thekey > 64 bytes
 		func (t *KeyValBytes) Build()										Only required to be called after AddUnsorted, otherwise it will shrink array capacity to length.
+		func (t *KeyValBytes) Optimize()									Copies all the data to new slices with capacity equal to length.
 		func (t *KeyValBytes) Reset() bool									Returns false if the structure is empty (Len() == 0)
 		func (t *KeyValBytes) Next() ([]byte, int, bool)					Returns: original slice of bytes, value, EOF (true = EOF)
 		func (t *KeyValBytes) Keys() [][]byte								Returns slice containing all the keys in order
@@ -81,12 +83,14 @@ The Counter type adds up all of the values associated with every identical key e
 		func (t *CounterBytes) UpdateAll(fn func(int) int)					Modifies all values by the fn function
 		func (t *CounterBytes) Add(thekey []byte, theval int) error			Returns an error if thekey > 64 bytes
 		func (t *CounterBytes) Build()										Always required before Find.
+		func (t *CounterBytes) Optimize()									Copies all the data to new slices with capacity equal to length.
 		func (t *CounterBytes) Reset() bool									Returns false if the structure is empty (Len() == 0)
 		func (t *CounterBytes) Next() ([]byte, int, bool)					Returns: original slice of bytes, value, EOF (true = EOF)
 		func (t *CounterBytes) Keys() [][]byte								Returns slice containing all the keys in order
 		func (t *CounterBytes) Write(w *custom.Writer)						Writes built structure out to custom.Writer (requires github.com/AlasdairF/Custom)
 		func (t *CounterBytes) Read(r *custom.Reader)						Reads structure in from custom.Reader (requires github.com/AlasdairF/Custom)
-		func (t *CounterBytes) Copy() *KeyBytes								Copies keys to a KeyBytes structure
+		func (t *CounterBytes) KeyBytes() *KeyBytes							Copies keys to a KeyBytes structure
+		func (t *CounterBytes) KeyValBytes() *KeyBytes						Copies keys and values to a KeyValBytes structure
 		
 	KeyInt, KeyUint64, KeyUint32, KeyUint16, KeyUint8
 		func (t *KeyInt) Len() int
@@ -95,6 +99,7 @@ The Counter type adds up all of the values associated with every identical key e
 		func (t *KeyInt) AddAt(thekey []byte, i int)
 		func (t *KeyInt) AddUnsorted(thekey []byte)
 		func (t *KeyInt) Build() []int										Returns slice mapping old indexes to new indexes. Only required if AddUnsorted was used, otherwise it will shrink array capacity to length.
+		func (t *KeyInt) Optimize()											Copies all the data to new slices with capacity equal to length.
 		func (t *KeyInt) Reset() bool										Returns false if the structure is empty (Len() == 0)
 		func (t *KeyInt) Next() (uint64, bool)								Returns: key, EOF (true = EOF)
 		func (t *KeyInt) Keys() []uint64									Returns slice containing all the keys in order
@@ -109,6 +114,7 @@ The Counter type adds up all of the values associated with every identical key e
 		func (t *KeyValInt) Add(thekey uint64, theval int) bool				Returns whether it exists. Replaces old value with the new value if it exists, otherwise adds it in place.
 		func (t *KeyValInt) AddUnsorted(thekey uint64, theval int)
 		func (t *KeyValInt) Build()											Only required to be called after AddUnsorted, otherwise it will shrink array capacity to length.
+		func (t *KeyValInt) Optimize()										Copies all the data to new slices with capacity equal to length.
 		func (t *KeyValInt) Reset() bool									Returns false if the structure is empty (Len() == 0)
 		func (t *KeyValInt) Next() ([]byte, int, bool)						Returns: original slice of bytes, value, EOF (true = EOF)
 		func (t *KeyValInt) Keys() []uint64									Returns slice containing all the keys in order
@@ -122,6 +128,7 @@ The Counter type adds up all of the values associated with every identical key e
 		func (t *CounterInt) UpdateAll(fn func(int) int)					Modifies all values by the fn function
 		func (t *CounterInt) Add(thekey uint64, theval int)
 		func (t *CounterInt) Build()										Always required before Find.
+		func (t *CounterInt) Optimize()										Copies all the data to new slices with capacity equal to length.
 		func (t *CounterInt) Reset() bool									Returns false if the structure is empty (Len() == 0)
 		func (t *CounterInt) Next() ([]byte, int, bool)						Returns: original slice of bytes, value, EOF (true = EOF)
 		func (t *CounterInt) Keys() []uint64								Returns slice containing all the keys in order
