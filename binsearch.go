@@ -6480,6 +6480,10 @@ type KeyUint64 struct {
  cursor int
 }
 
+func (t *KeyUint64) Len() int {
+	return len(t.key)
+}
+
 // Find returns the index based on the key.
 func (t *KeyUint64) Find(thekey uint64) (int, bool) {
 	var min, at int
@@ -6925,6 +6929,10 @@ func (t *CounterUint64) Read(r *custom.Reader) {
 type KeyUint32 struct {
  key []uint32
  cursor int
+}
+
+func (t *KeyUint32) Len() int {
+	return len(t.key)
 }
 
 // Find returns the index based on the key.
@@ -7374,6 +7382,10 @@ type KeyUint16 struct {
  cursor int
 }
 
+func (t *KeyUint16) Len() int {
+	return len(t.key)
+}
+
 // Find returns the index based on the key.
 func (t *KeyUint16) Find(thekey uint16) (int, bool) {
 	var min, at int
@@ -7821,6 +7833,10 @@ type KeyUint8 struct {
  cursor int
 }
 
+func (t *KeyUint8) Len() int {
+	return len(t.key)
+}
+
 // Find returns the index based on the key.
 func (t *KeyUint8) Find(thekey uint8) (int, bool) {
 	var min, at int
@@ -8266,6 +8282,10 @@ func (t *CounterUint8) Read(r *custom.Reader) {
 type KeyInt struct {
  key []int
  cursor int
+}
+
+func (t *KeyInt) Len() int {
+	return len(t.key)
 }
 
 // Find returns the index based on the key.
