@@ -2143,103 +2143,103 @@ func (t *KeyBytes) Write(w *custom.Writer) {
 	var i, run int
 
 	// Write total
-	w.Write64Variable(uint64(t.total))
+	w.WriteUint64Variable(uint64(t.total))
 	
 	// Write count
 	for i=0; i<64; i++ {
-		w.Write64Variable(uint64(t.count[i]))
+		w.WriteUint64Variable(uint64(t.count[i]))
 	}
 	
 	// Write t.limit8
 	for run=0; run<8; run++ {
 		tmp := t.limit8[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v)
+			w.WriteUint64(v)
 		}
 	}
 	// Write t.limit16
 	for run=0; run<8; run++ {
 		tmp := t.limit16[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v[0])
-			w.Write64(v[1])
+			w.WriteUint64(v[0])
+			w.WriteUint64(v[1])
 		}
 	}
 	// Write t.limit24
 	for run=0; run<8; run++ {
 		tmp := t.limit24[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v[0])
-			w.Write64(v[1])
-			w.Write64(v[2])
+			w.WriteUint64(v[0])
+			w.WriteUint64(v[1])
+			w.WriteUint64(v[2])
 		}
 	}
 	// Write t.limit32
 	for run=0; run<8; run++ {
 		tmp := t.limit32[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v[0])
-			w.Write64(v[1])
-			w.Write64(v[2])
-			w.Write64(v[3])
+			w.WriteUint64(v[0])
+			w.WriteUint64(v[1])
+			w.WriteUint64(v[2])
+			w.WriteUint64(v[3])
 		}
 	}
 	// Write t.limit40
 	for run=0; run<8; run++ {
 		tmp := t.limit40[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v[0])
-			w.Write64(v[1])
-			w.Write64(v[2])
-			w.Write64(v[3])
-			w.Write64(v[4])
+			w.WriteUint64(v[0])
+			w.WriteUint64(v[1])
+			w.WriteUint64(v[2])
+			w.WriteUint64(v[3])
+			w.WriteUint64(v[4])
 		}
 	}
 	// Write t.limit48
 	for run=0; run<8; run++ {
 		tmp := t.limit48[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v[0])
-			w.Write64(v[1])
-			w.Write64(v[2])
-			w.Write64(v[3])
-			w.Write64(v[4])
-			w.Write64(v[5])
+			w.WriteUint64(v[0])
+			w.WriteUint64(v[1])
+			w.WriteUint64(v[2])
+			w.WriteUint64(v[3])
+			w.WriteUint64(v[4])
+			w.WriteUint64(v[5])
 		}
 	}
 	// Write t.limit56
 	for run=0; run<8; run++ {
 		tmp := t.limit56[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v[0])
-			w.Write64(v[1])
-			w.Write64(v[2])
-			w.Write64(v[3])
-			w.Write64(v[4])
-			w.Write64(v[5])
-			w.Write64(v[6])
+			w.WriteUint64(v[0])
+			w.WriteUint64(v[1])
+			w.WriteUint64(v[2])
+			w.WriteUint64(v[3])
+			w.WriteUint64(v[4])
+			w.WriteUint64(v[5])
+			w.WriteUint64(v[6])
 		}
 	}
 	// Write t.limit64
 	for run=0; run<8; run++ {
 		tmp := t.limit64[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v[0])
-			w.Write64(v[1])
-			w.Write64(v[2])
-			w.Write64(v[3])
-			w.Write64(v[4])
-			w.Write64(v[5])
-			w.Write64(v[6])
-			w.Write64(v[7])
+			w.WriteUint64(v[0])
+			w.WriteUint64(v[1])
+			w.WriteUint64(v[2])
+			w.WriteUint64(v[3])
+			w.WriteUint64(v[4])
+			w.WriteUint64(v[5])
+			w.WriteUint64(v[6])
+			w.WriteUint64(v[7])
 		}
 	}
 	
@@ -2250,116 +2250,116 @@ func (t *KeyBytes) Read(r *custom.Reader) {
 	var i, l, a, b, c, d, e, f, g, h uint64
 
 	// Write total
-	t.total = int(r.Read64Variable())
+	t.total = int(r.ReadUint64Variable())
 	
 	// Read count
 	for i=0; i<64; i++ {
-		t.count[i] = int(r.Read64Variable())
+		t.count[i] = int(r.ReadUint64Variable())
 	}
 	
 	// Read t.limit8
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([]uint64, l)
 		for i=0; i<l; i++ {
-			tmp[i] = r.Read64()
+			tmp[i] = r.ReadUint64()
 		}
 		t.limit8[run] = tmp
 	}
 	// Read t.limit16
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([][2]uint64, l)
 		for i=0; i<l; i++ {
-			a = r.Read64()
-			b = r.Read64()
+			a = r.ReadUint64()
+			b = r.ReadUint64()
 			tmp[i] = [2]uint64{a, b}
 		}
 		t.limit16[run] = tmp
 	}
 	// Read t.limit24
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([][3]uint64, l)
 		for i=0; i<l; i++ {
-			a = r.Read64()
-			b = r.Read64()
-			c = r.Read64()
+			a = r.ReadUint64()
+			b = r.ReadUint64()
+			c = r.ReadUint64()
 			tmp[i] = [3]uint64{a, b, c}
 		}
 		t.limit24[run] = tmp
 	}
 	// Read t.limit32
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([][4]uint64, l)
 		for i=0; i<l; i++ {
-			a = r.Read64()
-			b = r.Read64()
-			c = r.Read64()
-			d = r.Read64()
+			a = r.ReadUint64()
+			b = r.ReadUint64()
+			c = r.ReadUint64()
+			d = r.ReadUint64()
 			tmp[i] = [4]uint64{a, b, c, d}
 		}
 		t.limit32[run] = tmp
 	}
 	// Read t.limit40
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([][5]uint64, l)
 		for i=0; i<l; i++ {
-			a = r.Read64()
-			b = r.Read64()
-			c = r.Read64()
-			d = r.Read64()
-			e = r.Read64()
+			a = r.ReadUint64()
+			b = r.ReadUint64()
+			c = r.ReadUint64()
+			d = r.ReadUint64()
+			e = r.ReadUint64()
 			tmp[i] = [5]uint64{a, b, c, d, e}
 		}
 		t.limit40[run] = tmp
 	}
 	// Read t.limit48
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([][6]uint64, l)
 		for i=0; i<l; i++ {
-			a = r.Read64()
-			b = r.Read64()
-			c = r.Read64()
-			d = r.Read64()
-			e = r.Read64()
-			f = r.Read64()
+			a = r.ReadUint64()
+			b = r.ReadUint64()
+			c = r.ReadUint64()
+			d = r.ReadUint64()
+			e = r.ReadUint64()
+			f = r.ReadUint64()
 			tmp[i] = [6]uint64{a, b, c, d, e, f}
 		}
 		t.limit48[run] = tmp
 	}
 	// Read t.limit56
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([][7]uint64, l)
 		for i=0; i<l; i++ {
-			a = r.Read64()
-			b = r.Read64()
-			c = r.Read64()
-			d = r.Read64()
-			e = r.Read64()
-			f = r.Read64()
-			g = r.Read64()
+			a = r.ReadUint64()
+			b = r.ReadUint64()
+			c = r.ReadUint64()
+			d = r.ReadUint64()
+			e = r.ReadUint64()
+			f = r.ReadUint64()
+			g = r.ReadUint64()
 			tmp[i] = [7]uint64{a, b, c, d, e, f, g}
 		}
 		t.limit56[run] = tmp
 	}
 	// Read t.limit64
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([][8]uint64, l)
 		for i=0; i<l; i++ {
-			a = r.Read64()
-			b = r.Read64()
-			c = r.Read64()
-			d = r.Read64()
-			e = r.Read64()
-			f = r.Read64()
-			g = r.Read64()
-			h = r.Read64()
+			a = r.ReadUint64()
+			b = r.ReadUint64()
+			c = r.ReadUint64()
+			d = r.ReadUint64()
+			e = r.ReadUint64()
+			f = r.ReadUint64()
+			g = r.ReadUint64()
+			h = r.ReadUint64()
 			tmp[i] = [8]uint64{a, b, c, d, e, f, g, h}
 		}
 		t.limit64[run] = tmp
@@ -4166,106 +4166,106 @@ func (t *KeyValBytes) Write(w *custom.Writer) {
 	var run int
 
 	// Write total
-	w.Write64Variable(uint64(t.total))
+	w.WriteUint64Variable(uint64(t.total))
 	
 	// Write t.limit8
 	for run=0; run<8; run++ {
 		tmp := t.limit8[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v[0])
-			w.Write64(v[1])
+			w.WriteUint64(v[0])
+			w.WriteUint64(v[1])
 		}
 	}
 	// Write t.limit16
 	for run=0; run<8; run++ {
 		tmp := t.limit16[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v[0])
-			w.Write64(v[1])
-			w.Write64(v[2])
+			w.WriteUint64(v[0])
+			w.WriteUint64(v[1])
+			w.WriteUint64(v[2])
 		}
 	}
 	// Write t.limit24
 	for run=0; run<8; run++ {
 		tmp := t.limit24[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v[0])
-			w.Write64(v[1])
-			w.Write64(v[2])
-			w.Write64(v[3])
+			w.WriteUint64(v[0])
+			w.WriteUint64(v[1])
+			w.WriteUint64(v[2])
+			w.WriteUint64(v[3])
 		}
 	}
 	// Write t.limit32
 	for run=0; run<8; run++ {
 		tmp := t.limit32[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v[0])
-			w.Write64(v[1])
-			w.Write64(v[2])
-			w.Write64(v[3])
-			w.Write64(v[4])
+			w.WriteUint64(v[0])
+			w.WriteUint64(v[1])
+			w.WriteUint64(v[2])
+			w.WriteUint64(v[3])
+			w.WriteUint64(v[4])
 		}
 	}
 	// Write t.limit40
 	for run=0; run<8; run++ {
 		tmp := t.limit40[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v[0])
-			w.Write64(v[1])
-			w.Write64(v[2])
-			w.Write64(v[3])
-			w.Write64(v[4])
-			w.Write64(v[5])
+			w.WriteUint64(v[0])
+			w.WriteUint64(v[1])
+			w.WriteUint64(v[2])
+			w.WriteUint64(v[3])
+			w.WriteUint64(v[4])
+			w.WriteUint64(v[5])
 		}
 	}
 	// Write t.limit48
 	for run=0; run<8; run++ {
 		tmp := t.limit48[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v[0])
-			w.Write64(v[1])
-			w.Write64(v[2])
-			w.Write64(v[3])
-			w.Write64(v[4])
-			w.Write64(v[5])
-			w.Write64(v[6])
+			w.WriteUint64(v[0])
+			w.WriteUint64(v[1])
+			w.WriteUint64(v[2])
+			w.WriteUint64(v[3])
+			w.WriteUint64(v[4])
+			w.WriteUint64(v[5])
+			w.WriteUint64(v[6])
 		}
 	}
 	// Write t.limit56
 	for run=0; run<8; run++ {
 		tmp := t.limit56[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v[0])
-			w.Write64(v[1])
-			w.Write64(v[2])
-			w.Write64(v[3])
-			w.Write64(v[4])
-			w.Write64(v[5])
-			w.Write64(v[6])
-			w.Write64(v[7])
+			w.WriteUint64(v[0])
+			w.WriteUint64(v[1])
+			w.WriteUint64(v[2])
+			w.WriteUint64(v[3])
+			w.WriteUint64(v[4])
+			w.WriteUint64(v[5])
+			w.WriteUint64(v[6])
+			w.WriteUint64(v[7])
 		}
 	}
 	// Write t.limit64
 	for run=0; run<8; run++ {
 		tmp := t.limit64[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v[0])
-			w.Write64(v[1])
-			w.Write64(v[2])
-			w.Write64(v[3])
-			w.Write64(v[4])
-			w.Write64(v[5])
-			w.Write64(v[6])
-			w.Write64(v[7])
-			w.Write64(v[8])
+			w.WriteUint64(v[0])
+			w.WriteUint64(v[1])
+			w.WriteUint64(v[2])
+			w.WriteUint64(v[3])
+			w.WriteUint64(v[4])
+			w.WriteUint64(v[5])
+			w.WriteUint64(v[6])
+			w.WriteUint64(v[7])
+			w.WriteUint64(v[8])
 		}
 	}
 }
@@ -4275,120 +4275,120 @@ func (t *KeyValBytes) Read(r *custom.Reader) {
 	var i, l, a, b, c, d, e, f, g, h, z uint64
 
 	// Write total
-	t.total = int(r.Read64Variable())
+	t.total = int(r.ReadUint64Variable())
 	
 	// Read t.limit8
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([][2]uint64, l)
 		for i=0; i<l; i++ {
-			a = r.Read64()
-			b = r.Read64()
+			a = r.ReadUint64()
+			b = r.ReadUint64()
 			tmp[i] = [2]uint64{a, b}
 		}
 		t.limit8[run] = tmp
 	}
 	// Read t.limit16
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([][3]uint64, l)
 		for i=0; i<l; i++ {
-			a = r.Read64()
-			b = r.Read64()
-			c = r.Read64()
+			a = r.ReadUint64()
+			b = r.ReadUint64()
+			c = r.ReadUint64()
 			tmp[i] = [3]uint64{a, b, c}
 		}
 		t.limit16[run] = tmp
 	}
 	// Read t.limit24
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([][4]uint64, l)
 		for i=0; i<l; i++ {
-			a = r.Read64()
-			b = r.Read64()
-			c = r.Read64()
-			d = r.Read64()
+			a = r.ReadUint64()
+			b = r.ReadUint64()
+			c = r.ReadUint64()
+			d = r.ReadUint64()
 			tmp[i] = [4]uint64{a, b, c, d}
 		}
 		t.limit24[run] = tmp
 	}
 	// Read t.limit32
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([][5]uint64, l)
 		for i=0; i<l; i++ {
-			a = r.Read64()
-			b = r.Read64()
-			c = r.Read64()
-			d = r.Read64()
-			e = r.Read64()
+			a = r.ReadUint64()
+			b = r.ReadUint64()
+			c = r.ReadUint64()
+			d = r.ReadUint64()
+			e = r.ReadUint64()
 			tmp[i] = [5]uint64{a, b, c, d, e}
 		}
 		t.limit32[run] = tmp
 	}
 	// Read t.limit40
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([][6]uint64, l)
 		for i=0; i<l; i++ {
-			a = r.Read64()
-			b = r.Read64()
-			c = r.Read64()
-			d = r.Read64()
-			e = r.Read64()
-			f = r.Read64()
+			a = r.ReadUint64()
+			b = r.ReadUint64()
+			c = r.ReadUint64()
+			d = r.ReadUint64()
+			e = r.ReadUint64()
+			f = r.ReadUint64()
 			tmp[i] = [6]uint64{a, b, c, d, e, f}
 		}
 		t.limit40[run] = tmp
 	}
 	// Read t.limit48
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([][7]uint64, l)
 		for i=0; i<l; i++ {
-			a = r.Read64()
-			b = r.Read64()
-			c = r.Read64()
-			d = r.Read64()
-			e = r.Read64()
-			f = r.Read64()
-			g = r.Read64()
+			a = r.ReadUint64()
+			b = r.ReadUint64()
+			c = r.ReadUint64()
+			d = r.ReadUint64()
+			e = r.ReadUint64()
+			f = r.ReadUint64()
+			g = r.ReadUint64()
 			tmp[i] = [7]uint64{a, b, c, d, e, f, g}
 		}
 		t.limit48[run] = tmp
 	}
 	// Read t.limit56
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([][8]uint64, l)
 		for i=0; i<l; i++ {
-			a = r.Read64()
-			b = r.Read64()
-			c = r.Read64()
-			d = r.Read64()
-			e = r.Read64()
-			f = r.Read64()
-			g = r.Read64()
-			h = r.Read64()
+			a = r.ReadUint64()
+			b = r.ReadUint64()
+			c = r.ReadUint64()
+			d = r.ReadUint64()
+			e = r.ReadUint64()
+			f = r.ReadUint64()
+			g = r.ReadUint64()
+			h = r.ReadUint64()
 			tmp[i] = [8]uint64{a, b, c, d, e, f, g, h}
 		}
 		t.limit56[run] = tmp
 	}
 	// Read t.limit64
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([][9]uint64, l)
 		for i=0; i<l; i++ {
-			a = r.Read64()
-			b = r.Read64()
-			c = r.Read64()
-			d = r.Read64()
-			e = r.Read64()
-			f = r.Read64()
-			g = r.Read64()
-			h = r.Read64()
-			z = r.Read64()
+			a = r.ReadUint64()
+			b = r.ReadUint64()
+			c = r.ReadUint64()
+			d = r.ReadUint64()
+			e = r.ReadUint64()
+			f = r.ReadUint64()
+			g = r.ReadUint64()
+			h = r.ReadUint64()
+			z = r.ReadUint64()
 			tmp[i] = [9]uint64{a, b, c, d, e, f, g, h, z}
 		}
 		t.limit64[run] = tmp
@@ -5964,106 +5964,106 @@ func (t *CounterBytes) Write(w *custom.Writer) {
 	var run int
 
 	// Write total
-	w.Write64Variable(uint64(t.total))
+	w.WriteUint64Variable(uint64(t.total))
 	
 	// Write t.limit8
 	for run=0; run<8; run++ {
 		tmp := t.limit8[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v[0])
-			w.Write64(v[1])
+			w.WriteUint64(v[0])
+			w.WriteUint64(v[1])
 		}
 	}
 	// Write t.limit16
 	for run=0; run<8; run++ {
 		tmp := t.limit16[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v[0])
-			w.Write64(v[1])
-			w.Write64(v[2])
+			w.WriteUint64(v[0])
+			w.WriteUint64(v[1])
+			w.WriteUint64(v[2])
 		}
 	}
 	// Write t.limit24
 	for run=0; run<8; run++ {
 		tmp := t.limit24[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v[0])
-			w.Write64(v[1])
-			w.Write64(v[2])
-			w.Write64(v[3])
+			w.WriteUint64(v[0])
+			w.WriteUint64(v[1])
+			w.WriteUint64(v[2])
+			w.WriteUint64(v[3])
 		}
 	}
 	// Write t.limit32
 	for run=0; run<8; run++ {
 		tmp := t.limit32[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v[0])
-			w.Write64(v[1])
-			w.Write64(v[2])
-			w.Write64(v[3])
-			w.Write64(v[4])
+			w.WriteUint64(v[0])
+			w.WriteUint64(v[1])
+			w.WriteUint64(v[2])
+			w.WriteUint64(v[3])
+			w.WriteUint64(v[4])
 		}
 	}
 	// Write t.limit40
 	for run=0; run<8; run++ {
 		tmp := t.limit40[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v[0])
-			w.Write64(v[1])
-			w.Write64(v[2])
-			w.Write64(v[3])
-			w.Write64(v[4])
-			w.Write64(v[5])
+			w.WriteUint64(v[0])
+			w.WriteUint64(v[1])
+			w.WriteUint64(v[2])
+			w.WriteUint64(v[3])
+			w.WriteUint64(v[4])
+			w.WriteUint64(v[5])
 		}
 	}
 	// Write t.limit48
 	for run=0; run<8; run++ {
 		tmp := t.limit48[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v[0])
-			w.Write64(v[1])
-			w.Write64(v[2])
-			w.Write64(v[3])
-			w.Write64(v[4])
-			w.Write64(v[5])
-			w.Write64(v[6])
+			w.WriteUint64(v[0])
+			w.WriteUint64(v[1])
+			w.WriteUint64(v[2])
+			w.WriteUint64(v[3])
+			w.WriteUint64(v[4])
+			w.WriteUint64(v[5])
+			w.WriteUint64(v[6])
 		}
 	}
 	// Write t.limit56
 	for run=0; run<8; run++ {
 		tmp := t.limit56[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v[0])
-			w.Write64(v[1])
-			w.Write64(v[2])
-			w.Write64(v[3])
-			w.Write64(v[4])
-			w.Write64(v[5])
-			w.Write64(v[6])
-			w.Write64(v[7])
+			w.WriteUint64(v[0])
+			w.WriteUint64(v[1])
+			w.WriteUint64(v[2])
+			w.WriteUint64(v[3])
+			w.WriteUint64(v[4])
+			w.WriteUint64(v[5])
+			w.WriteUint64(v[6])
+			w.WriteUint64(v[7])
 		}
 	}
 	// Write t.limit64
 	for run=0; run<8; run++ {
 		tmp := t.limit64[run]
-		w.Write64Variable(uint64(len(tmp)))
+		w.WriteUint64Variable(uint64(len(tmp)))
 		for _, v := range tmp {
-			w.Write64(v[0])
-			w.Write64(v[1])
-			w.Write64(v[2])
-			w.Write64(v[3])
-			w.Write64(v[4])
-			w.Write64(v[5])
-			w.Write64(v[6])
-			w.Write64(v[7])
-			w.Write64(v[8])
+			w.WriteUint64(v[0])
+			w.WriteUint64(v[1])
+			w.WriteUint64(v[2])
+			w.WriteUint64(v[3])
+			w.WriteUint64(v[4])
+			w.WriteUint64(v[5])
+			w.WriteUint64(v[6])
+			w.WriteUint64(v[7])
+			w.WriteUint64(v[8])
 		}
 	}
 }
@@ -6073,120 +6073,120 @@ func (t *CounterBytes) Read(r *custom.Reader) {
 	var i, l, a, b, c, d, e, f, g, h, z uint64
 
 	// Write total
-	t.total = int(r.Read64Variable())
+	t.total = int(r.ReadUint64Variable())
 	
 	// Read t.limit8
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([][2]uint64, l)
 		for i=0; i<l; i++ {
-			a = r.Read64()
-			b = r.Read64()
+			a = r.ReadUint64()
+			b = r.ReadUint64()
 			tmp[i] = [2]uint64{a, b}
 		}
 		t.limit8[run] = tmp
 	}
 	// Read t.limit16
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([][3]uint64, l)
 		for i=0; i<l; i++ {
-			a = r.Read64()
-			b = r.Read64()
-			c = r.Read64()
+			a = r.ReadUint64()
+			b = r.ReadUint64()
+			c = r.ReadUint64()
 			tmp[i] = [3]uint64{a, b, c}
 		}
 		t.limit16[run] = tmp
 	}
 	// Read t.limit24
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([][4]uint64, l)
 		for i=0; i<l; i++ {
-			a = r.Read64()
-			b = r.Read64()
-			c = r.Read64()
-			d = r.Read64()
+			a = r.ReadUint64()
+			b = r.ReadUint64()
+			c = r.ReadUint64()
+			d = r.ReadUint64()
 			tmp[i] = [4]uint64{a, b, c, d}
 		}
 		t.limit24[run] = tmp
 	}
 	// Read t.limit32
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([][5]uint64, l)
 		for i=0; i<l; i++ {
-			a = r.Read64()
-			b = r.Read64()
-			c = r.Read64()
-			d = r.Read64()
-			e = r.Read64()
+			a = r.ReadUint64()
+			b = r.ReadUint64()
+			c = r.ReadUint64()
+			d = r.ReadUint64()
+			e = r.ReadUint64()
 			tmp[i] = [5]uint64{a, b, c, d, e}
 		}
 		t.limit32[run] = tmp
 	}
 	// Read t.limit40
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([][6]uint64, l)
 		for i=0; i<l; i++ {
-			a = r.Read64()
-			b = r.Read64()
-			c = r.Read64()
-			d = r.Read64()
-			e = r.Read64()
-			f = r.Read64()
+			a = r.ReadUint64()
+			b = r.ReadUint64()
+			c = r.ReadUint64()
+			d = r.ReadUint64()
+			e = r.ReadUint64()
+			f = r.ReadUint64()
 			tmp[i] = [6]uint64{a, b, c, d, e, f}
 		}
 		t.limit40[run] = tmp
 	}
 	// Read t.limit48
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([][7]uint64, l)
 		for i=0; i<l; i++ {
-			a = r.Read64()
-			b = r.Read64()
-			c = r.Read64()
-			d = r.Read64()
-			e = r.Read64()
-			f = r.Read64()
-			g = r.Read64()
+			a = r.ReadUint64()
+			b = r.ReadUint64()
+			c = r.ReadUint64()
+			d = r.ReadUint64()
+			e = r.ReadUint64()
+			f = r.ReadUint64()
+			g = r.ReadUint64()
 			tmp[i] = [7]uint64{a, b, c, d, e, f, g}
 		}
 		t.limit48[run] = tmp
 	}
 	// Read t.limit56
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([][8]uint64, l)
 		for i=0; i<l; i++ {
-			a = r.Read64()
-			b = r.Read64()
-			c = r.Read64()
-			d = r.Read64()
-			e = r.Read64()
-			f = r.Read64()
-			g = r.Read64()
-			h = r.Read64()
+			a = r.ReadUint64()
+			b = r.ReadUint64()
+			c = r.ReadUint64()
+			d = r.ReadUint64()
+			e = r.ReadUint64()
+			f = r.ReadUint64()
+			g = r.ReadUint64()
+			h = r.ReadUint64()
 			tmp[i] = [8]uint64{a, b, c, d, e, f, g, h}
 		}
 		t.limit56[run] = tmp
 	}
 	// Read t.limit64
 	for run=0; run<8; run++ {
-		l = r.Read64Variable()
+		l = r.ReadUint64Variable()
 		tmp := make([][9]uint64, l)
 		for i=0; i<l; i++ {
-			a = r.Read64()
-			b = r.Read64()
-			c = r.Read64()
-			d = r.Read64()
-			e = r.Read64()
-			f = r.Read64()
-			g = r.Read64()
-			h = r.Read64()
-			z = r.Read64()
+			a = r.ReadUint64()
+			b = r.ReadUint64()
+			c = r.ReadUint64()
+			d = r.ReadUint64()
+			e = r.ReadUint64()
+			f = r.ReadUint64()
+			g = r.ReadUint64()
+			h = r.ReadUint64()
+			z = r.ReadUint64()
 			tmp[i] = [9]uint64{a, b, c, d, e, f, g, h, z}
 		}
 		t.limit64[run] = tmp
@@ -6865,58 +6865,58 @@ func (t *CounterUint64) Keys() []uint64 {
 // ------------- export ---------------
 
 func (t *KeyUint64) Write(w *custom.Writer) {
-	w.Write64Variable(uint64(len(t.key)))
+	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(v)
+		w.WriteUint64Variable(v)
 	}
 }
 
 func (t *KeyUint64) Read(r *custom.Reader) {
-	l := int(r.Read64Variable())
+	l := int(r.ReadUint64Variable())
 	tmp := make([]uint64, l)
 	for i:=0; i<l; i++ {
-		tmp[i] = r.Read64Variable()
+		tmp[i] = r.ReadUint64Variable()
 	}
 	t.key = tmp
 }
 
 func (t *KeyValUint64) Write(w *custom.Writer) {
-	w.Write64Variable(uint64(len(t.key)))
+	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(uint64(v.K))
-		w.Write64Variable(v.V)
+		w.WriteUint64Variable(uint64(v.K))
+		w.WriteUint64Variable(v.V)
 	}
 }
 
 func (t *KeyValUint64) Read(r *custom.Reader) {
 	var k int
 	var v uint64
-	l := int(r.Read64Variable())
+	l := int(r.ReadUint64Variable())
 	tmp := make([]sortIntUint64.KeyVal, l)
 	for i:=0; i<l; i++ {
-		k = int(r.Read64Variable())
-		v = r.Read64Variable()
+		k = int(r.ReadUint64Variable())
+		v = r.ReadUint64Variable()
 		tmp[i] = sortIntUint64.KeyVal{k, v}
 	}
 	t.key = tmp
 }
 
 func (t *CounterUint64) Write(w *custom.Writer) {
-	w.Write64Variable(uint64(len(t.key)))
+	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(uint64(v.K))
-		w.Write64Variable(v.V)
+		w.WriteUint64Variable(uint64(v.K))
+		w.WriteUint64Variable(v.V)
 	}
 }
 
 func (t *CounterUint64) Read(r *custom.Reader) {
 	var k int
 	var v uint64
-	l := int(r.Read64Variable())
+	l := int(r.ReadUint64Variable())
 	tmp := make([]sortIntUint64.KeyVal, l)
 	for i:=0; i<l; i++ {
-		k = int(r.Read64Variable())
-		v = r.Read64Variable()
+		k = int(r.ReadUint64Variable())
+		v = r.ReadUint64Variable()
 		tmp[i] = sortIntUint64.KeyVal{k, v}
 	}
 	t.key = tmp
@@ -7316,58 +7316,58 @@ func (t *CounterUint32) Keys() []uint32 {
 // ------------- export ---------------
 
 func (t *KeyUint32) Write(w *custom.Writer) {
-	w.Write64Variable(uint64(len(t.key)))
+	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(uint64(v))
+		w.WriteUint64Variable(uint64(v))
 	}
 }
 
 func (t *KeyUint32) Read(r *custom.Reader) {
-	l := int(r.Read64Variable())
+	l := int(r.ReadUint64Variable())
 	tmp := make([]uint32, l)
 	for i:=0; i<l; i++ {
-		tmp[i] = uint32(r.Read64Variable())
+		tmp[i] = uint32(r.ReadUint64Variable())
 	}
 	t.key = tmp
 }
 
 func (t *KeyValUint32) Write(w *custom.Writer) {
-	w.Write64Variable(uint64(len(t.key)))
+	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(uint64(v.K))
-		w.Write64Variable(uint64(v.V))
+		w.WriteUint64Variable(uint64(v.K))
+		w.WriteUint64Variable(uint64(v.V))
 	}
 }
 
 func (t *KeyValUint32) Read(r *custom.Reader) {
 	var k int
 	var v uint32
-	l := int(r.Read64Variable())
+	l := int(r.ReadUint64Variable())
 	tmp := make([]sortIntUint32.KeyVal, l)
 	for i:=0; i<l; i++ {
-		k = int(r.Read64Variable())
-		v = uint32(r.Read64Variable())
+		k = int(r.ReadUint64Variable())
+		v = uint32(r.ReadUint64Variable())
 		tmp[i] = sortIntUint32.KeyVal{k, v}
 	}
 	t.key = tmp
 }
 
 func (t *CounterUint32) Write(w *custom.Writer) {
-	w.Write64Variable(uint64(len(t.key)))
+	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(uint64(v.K))
-		w.Write64Variable(uint64(v.V))
+		w.WriteUint64Variable(uint64(v.K))
+		w.WriteUint64Variable(uint64(v.V))
 	}
 }
 
 func (t *CounterUint32) Read(r *custom.Reader) {
 	var k int
 	var v uint32
-	l := int(r.Read64Variable())
+	l := int(r.ReadUint64Variable())
 	tmp := make([]sortIntUint32.KeyVal, l)
 	for i:=0; i<l; i++ {
-		k = int(r.Read64Variable())
-		v = uint32(r.Read64Variable())
+		k = int(r.ReadUint64Variable())
+		v = uint32(r.ReadUint64Variable())
 		tmp[i] = sortIntUint32.KeyVal{k, v}
 	}
 	t.key = tmp
@@ -7767,58 +7767,58 @@ func (t *CounterUint16) Keys() []uint16 {
 // ------------- export ---------------
 
 func (t *KeyUint16) Write(w *custom.Writer) {
-	w.Write64Variable(uint64(len(t.key)))
+	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write16(v)
+		w.WriteUint16(v)
 	}
 }
 
 func (t *KeyUint16) Read(r *custom.Reader) {
-	l := int(r.Read64Variable())
+	l := int(r.ReadUint64Variable())
 	tmp := make([]uint16, l)
 	for i:=0; i<l; i++ {
-		tmp[i] = r.Read16()
+		tmp[i] = r.ReadUint16()
 	}
 	t.key = tmp
 }
 
 func (t *KeyValUint16) Write(w *custom.Writer) {
-	w.Write64Variable(uint64(len(t.key)))
+	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(uint64(v.K))
-		w.Write16(v.V)
+		w.WriteUint64Variable(uint64(v.K))
+		w.WriteUint16(v.V)
 	}
 }
 
 func (t *KeyValUint16) Read(r *custom.Reader) {
 	var k int
 	var v uint16
-	l := int(r.Read64Variable())
+	l := int(r.ReadUint64Variable())
 	tmp := make([]sortIntUint16.KeyVal, l)
 	for i:=0; i<l; i++ {
-		k = int(r.Read64Variable())
-		v = r.Read16()
+		k = int(r.ReadUint64Variable())
+		v = r.ReadUint16()
 		tmp[i] = sortIntUint16.KeyVal{k, v}
 	}
 	t.key = tmp
 }
 
 func (t *CounterUint16) Write(w *custom.Writer) {
-	w.Write64Variable(uint64(len(t.key)))
+	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(uint64(v.K))
-		w.Write16(v.V)
+		w.WriteUint64Variable(uint64(v.K))
+		w.WriteUint16(v.V)
 	}
 }
 
 func (t *CounterUint16) Read(r *custom.Reader) {
 	var k int
 	var v uint16
-	l := int(r.Read64Variable())
+	l := int(r.ReadUint64Variable())
 	tmp := make([]sortIntUint16.KeyVal, l)
 	for i:=0; i<l; i++ {
-		k = int(r.Read64Variable())
-		v = r.Read16()
+		k = int(r.ReadUint64Variable())
+		v = r.ReadUint16()
 		tmp[i] = sortIntUint16.KeyVal{k, v}
 	}
 	t.key = tmp
@@ -8218,58 +8218,58 @@ func (t *CounterUint8) Keys() []uint8 {
 // ------------- export ---------------
 
 func (t *KeyUint8) Write(w *custom.Writer) {
-	w.Write64Variable(uint64(len(t.key)))
+	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write8(v)
+		w.WriteByte(v)
 	}
 }
 
 func (t *KeyUint8) Read(r *custom.Reader) {
-	l := int(r.Read64Variable())
+	l := int(r.ReadUint64Variable())
 	tmp := make([]uint8, l)
 	for i:=0; i<l; i++ {
-		tmp[i] = r.Read8()
+		tmp[i] = r.ReadByte()
 	}
 	t.key = tmp
 }
 
 func (t *KeyValUint8) Write(w *custom.Writer) {
-	w.Write64Variable(uint64(len(t.key)))
+	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(uint64(v.K))
-		w.Write8(v.V)
+		w.WriteUint64Variable(uint64(v.K))
+		w.WriteByte(v.V)
 	}
 }
 
 func (t *KeyValUint8) Read(r *custom.Reader) {
 	var k int
 	var v uint8
-	l := int(r.Read64Variable())
+	l := int(r.ReadUint64Variable())
 	tmp := make([]sortIntUint8.KeyVal, l)
 	for i:=0; i<l; i++ {
-		k = int(r.Read64Variable())
-		v = r.Read8()
+		k = int(r.ReadUint64Variable())
+		v = r.ReadByte()
 		tmp[i] = sortIntUint8.KeyVal{k, v}
 	}
 	t.key = tmp
 }
 
 func (t *CounterUint8) Write(w *custom.Writer) {
-	w.Write64Variable(uint64(len(t.key)))
+	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(uint64(v.K))
-		w.Write8(v.V)
+		w.WriteUint64Variable(uint64(v.K))
+		w.WriteByte(v.V)
 	}
 }
 
 func (t *CounterUint8) Read(r *custom.Reader) {
 	var k int
 	var v uint8
-	l := int(r.Read64Variable())
+	l := int(r.ReadUint64Variable())
 	tmp := make([]sortIntUint8.KeyVal, l)
 	for i:=0; i<l; i++ {
-		k = int(r.Read64Variable())
-		v = r.Read8()
+		k = int(r.ReadUint64Variable())
+		v = r.ReadByte()
 		tmp[i] = sortIntUint8.KeyVal{k, v}
 	}
 	t.key = tmp
@@ -8669,58 +8669,58 @@ func (t *CounterInt) Keys() []int {
 // ------------- export ---------------
 
 func (t *KeyInt) Write(w *custom.Writer) {
-	w.Write64Variable(uint64(len(t.key)))
+	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(uint64(v))
+		w.WriteUint64Variable(uint64(v))
 	}
 }
 
 func (t *KeyInt) Read(r *custom.Reader) {
-	l := int(r.Read64Variable())
+	l := int(r.ReadUint64Variable())
 	tmp := make([]int, l)
 	for i:=0; i<l; i++ {
-		tmp[i] = int(r.Read64Variable())
+		tmp[i] = int(r.ReadUint64Variable())
 	}
 	t.key = tmp
 }
 
 func (t *KeyValInt) Write(w *custom.Writer) {
-	w.Write64Variable(uint64(len(t.key)))
+	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(uint64(v.K))
-		w.Write64Variable(uint64(v.V))
+		w.WriteUint64Variable(uint64(v.K))
+		w.WriteUint64Variable(uint64(v.V))
 	}
 }
 
 func (t *KeyValInt) Read(r *custom.Reader) {
 	var k int
 	var v int
-	l := int(r.Read64Variable())
+	l := int(r.ReadUint64Variable())
 	tmp := make([]sortIntInt.KeyVal, l)
 	for i:=0; i<l; i++ {
-		k = int(r.Read64Variable())
-		v = int(r.Read64Variable())
+		k = int(r.ReadUint64Variable())
+		v = int(r.ReadUint64Variable())
 		tmp[i] = sortIntInt.KeyVal{k, v}
 	}
 	t.key = tmp
 }
 
 func (t *CounterInt) Write(w *custom.Writer) {
-	w.Write64Variable(uint64(len(t.key)))
+	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
-		w.Write64Variable(uint64(v.K))
-		w.Write64Variable(uint64(v.V))
+		w.WriteUint64Variable(uint64(v.K))
+		w.WriteUint64Variable(uint64(v.V))
 	}
 }
 
 func (t *CounterInt) Read(r *custom.Reader) {
 	var k int
 	var v int
-	l := int(r.Read64Variable())
+	l := int(r.ReadUint64Variable())
 	tmp := make([]sortIntInt.KeyVal, l)
 	for i:=0; i<l; i++ {
-		k = int(r.Read64Variable())
-		v = int(r.Read64Variable())
+		k = int(r.ReadUint64Variable())
+		v = int(r.ReadUint64Variable())
 		tmp[i] = sortIntInt.KeyVal{k, v}
 	}
 	t.key = tmp
