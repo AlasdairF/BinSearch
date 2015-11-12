@@ -315,11 +315,7 @@ The Counter type adds up all of the values associated with every identical key e
 		}
 		defer fi.Close()
 		// Attach reader
-		r, err := custom.NewReader(fi, 20480)
-		if err != nil {
-			return nil, err
-		}
-		defer r.Close()
+		r := custom.NewReader(fi, 20480)
 		// Load binsearch.KeyRunes
 		obj := new(binsearch.KeyValBytes)
 		obj.Read(r) // do the reading
