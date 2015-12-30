@@ -6730,6 +6730,14 @@ type CounterUint64 struct {
  cursor int
 }
 
+func NewCounterUint64(size int) *CounterUint64 {
+	return &CounterUint64{key: make([]sortIntUint64.KeyVal, 0, size)}
+}
+
+func (t *CounterUint64) RawKey() []sortIntUint64.KeyVal {
+	return t.key
+}
+
 func (t *CounterUint64) KeyUint64() *KeyUint64 {
 	obj := new(KeyUint64)
 	key := make([]uint64, len(t.key))
@@ -7179,6 +7187,14 @@ func (t *KeyValUint32) Keys() []uint32 {
 type CounterUint32 struct {
  key []sortIntUint32.KeyVal
  cursor int
+}
+
+func NewCounterUint32(size int) *CounterUint32 {
+	return &CounterUint32{key: make([]sortIntUint32.KeyVal, 0, size)}
+}
+
+func (t *CounterUint32) RawKey() []sortIntUint32.KeyVal {
+	return t.key
 }
 
 func (t *CounterUint32) KeyUint32() *KeyUint32 {
@@ -7632,6 +7648,14 @@ type CounterUint16 struct {
  cursor int
 }
 
+func NewCounterUint16(size int) *CounterUint16 {
+	return &CounterUint16{key: make([]sortIntUint16.KeyVal, 0, size)}
+}
+
+func (t *CounterUint16) RawKey() []sortIntUint16.KeyVal {
+	return t.key
+}
+
 func (t *CounterUint16) KeyUint16() *KeyUint16 {
 	obj := new(KeyUint16)
 	key := make([]uint16, len(t.key))
@@ -8083,6 +8107,14 @@ type CounterUint8 struct {
  cursor int
 }
 
+func NewCounterUint8(size int) *CounterUint8 {
+	return &CounterUint8{key: make([]sortIntUint8.KeyVal, 0, size)}
+}
+
+func (t *CounterUint32) RawKey() []sortIntUint32.KeyVal {
+	return t.key
+}
+
 func (t *CounterUint8) KeyUint8() *KeyUint8 {
 	obj := new(KeyUint8)
 	key := make([]uint8, len(t.key))
@@ -8532,6 +8564,14 @@ func (t *KeyValInt) Keys() []int {
 type CounterInt struct {
  key []sortIntInt.KeyVal
  cursor int
+}
+
+func NewCounterInt(size int) *CounterInt {
+	return &CounterInt{key: make([]sortIntInt.KeyVal, 0, size)}
+}
+
+func (t *CounterInt) RawKey() []sortIntInt.KeyVal {
+	return t.key
 }
 
 func (t *CounterInt) KeyInt() *KeyInt {
