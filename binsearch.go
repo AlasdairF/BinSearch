@@ -8111,7 +8111,7 @@ func NewCounterUint8(ar []sortIntUint8.KeyVal) *CounterUint8 {
 	return &CounterUint8{key: ar[0:0]}
 }
 
-func (t *CounterUint32) RawKey() []sortIntUint32.KeyVal {
+func (t *CounterUint8) RawKey() []sortIntUint8.KeyVal {
 	return t.key
 }
 
