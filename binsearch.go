@@ -2390,6 +2390,70 @@ func (t *KeyValBytes) Len() int {
 	return t.total
 }
 
+func (t *KeyValBytes) GreatestVal() int {
+	var l, i2, this int
+	var max int = -9223372036854775808
+	for i:=0; i<8; i++ {
+		l = len(t.limit8[i])
+		for i2=0; i2<l; i2++ {
+			this = int(t.limit8[i][i2][1])
+			if this > max {
+				max = this
+			}
+		}
+		l = len(t.limit16[i])
+		for i2=0; i2<l; i2++ {
+			this = int(t.limit16[i][i2][2])
+			if this > max {
+				max = this
+			}
+		}
+		l = len(t.limit24[i])
+		for i2=0; i2<l; i2++ {
+			this = int(t.limit24[i][i2][3])
+			if this > max {
+				max = this
+			}
+		}
+		l = len(t.limit32[i])
+		for i2=0; i2<l; i2++ {
+			this = int(t.limit32[i][i2][4])
+			if this > max {
+				max = this
+			}
+		}
+		l = len(t.limit40[i])
+		for i2=0; i2<l; i2++ {
+			this = int(t.limit40[i][i2][5])
+			if this > max {
+				max = this
+			}
+		}
+		l = len(t.limit48[i])
+		for i2=0; i2<l; i2++ {
+			this = int(t.limit48[i][i2][6])
+			if this > max {
+				max = this
+			}
+		}
+		l = len(t.limit56[i])
+		for i2=0; i2<l; i2++ {
+			this = int(t.limit56[i][i2][7])
+			if this > max {
+				max = this
+			}
+		}
+		l = len(t.limit64[i])
+		for i2=0; i2<l; i2++ {
+			this = int(t.limit64[i][i2][8])
+			if this > max {
+				max = this
+			}
+		}
+	}
+	return max
+}
+
 // Find returns the index based on the key.
 func (t *KeyValBytes) Find(thekey []byte) (int, bool) {
 	
