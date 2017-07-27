@@ -55,7 +55,7 @@ import (
 		func (t *KeyBytes) Reset() bool										Returns false if the structure is empty (Len() == 0)
 		func (t *KeyBytes) Next() ([]byte, bool)							Returns: original slice of bytes, EOF (true = EOF)
 		func (t *KeyBytes) Keys() [][]byte									Returns slice containing all the keys in order
-		func (t *KeyBytes) Write(w *custom.Writer)							Writes built structure out to custom.Writer (requires github.com/AlasdairF/Custom)
+		func (t *KeyBytes) Write(w custom.Interface)							Writes built structure out to custom.Writer (requires github.com/AlasdairF/Custom)
 		func (t *KeyBytes) Read(r *custom.Reader)							Reads structure in from custom.Reader (requires github.com/AlasdairF/Custom)
 		
 	KeyValBytes, KeyValRunes
@@ -70,7 +70,7 @@ import (
 		func (t *KeyValBytes) Reset() bool									Returns false if the structure is empty (Len() == 0)
 		func (t *KeyValBytes) Next() ([]byte, int, bool)					Returns: original slice of bytes, value, EOF (true = EOF)
 		func (t *KeyValBytes) Keys() [][]byte								Returns slice containing all the keys in order
-		func (t *KeyValBytes) Write(w *custom.Writer)						Writes built structure out to custom.Writer (requires github.com/AlasdairF/Custom)
+		func (t *KeyValBytes) Write(w custom.Interface)						Writes built structure out to custom.Writer (requires github.com/AlasdairF/Custom)
 		func (t *KeyValBytes) Read(r *custom.Reader)						Reads structure in from custom.Reader (requires github.com/AlasdairF/Custom)
 		
 	CounterBytes, CounterRunes
@@ -84,7 +84,7 @@ import (
 		func (t *CounterBytes) Reset() bool									Returns false if the structure is empty (Len() == 0)
 		func (t *CounterBytes) Next() ([]byte, int, bool)					Returns: original slice of bytes, value, EOF (true = EOF)
 		func (t *CounterBytes) Keys() [][]byte								Returns slice containing all the keys in order
-		func (t *CounterBytes) Write(w *custom.Writer)						Writes built structure out to custom.Writer (requires github.com/AlasdairF/Custom)
+		func (t *CounterBytes) Write(w custom.Interface)						Writes built structure out to custom.Writer (requires github.com/AlasdairF/Custom)
 		func (t *CounterBytes) Read(r *custom.Reader)						Reads structure in from custom.Reader (requires github.com/AlasdairF/Custom)
 		func (t *CounterBytes) KeyBytes() *KeyBytes							Copies keys to a KeyBytes structure
 		func (t *CounterBytes) KeyValBytes() *KeyBytes						Copies keys and values to a KeyValBytes structure
@@ -100,7 +100,7 @@ import (
 		func (t *KeyInt) Reset() bool										Returns false if the structure is empty (Len() == 0)
 		func (t *KeyInt) Next() (uint64, bool)								Returns: key, EOF (true = EOF)
 		func (t *KeyInt) Keys() []uint64									Returns slice containing all the keys in order
-		func (t *KeyInt) Write(w *custom.Writer)							Writes built structure out to custom.Writer (requires github.com/AlasdairF/Custom)
+		func (t *KeyInt) Write(w custom.Interface)							Writes built structure out to custom.Writer (requires github.com/AlasdairF/Custom)
 		func (t *KeyInt) Read(r *custom.Reader)								Reads structure in from custom.Reader (requires github.com/AlasdairF/Custom)
 		
 	KeyValInt, KeyValUint64, KeyValUint32, KeyValUint16, KeyValUint8
@@ -115,7 +115,7 @@ import (
 		func (t *KeyValInt) Reset() bool									Returns false if the structure is empty (Len() == 0)
 		func (t *KeyValInt) Next() ([]byte, int, bool)						Returns: original slice of bytes, value, EOF (true = EOF)
 		func (t *KeyValInt) Keys() []uint64									Returns slice containing all the keys in order
-		func (t *KeyValInt) Write(w *custom.Writer)							Writes built structure out to custom.Writer (requires github.com/AlasdairF/Custom)
+		func (t *KeyValInt) Write(w custom.Interface)							Writes built structure out to custom.Writer (requires github.com/AlasdairF/Custom)
 		func (t *KeyValInt) Read(r *custom.Reader)							Reads structure in from custom.Reader (requires github.com/AlasdairF/Custom))
 		
 	CounterInt, CounterUint64, CounterUint32, CounterUint16, CounterUint8
@@ -129,7 +129,7 @@ import (
 		func (t *CounterInt) Reset() bool									Returns false if the structure is empty (Len() == 0)
 		func (t *CounterInt) Next() ([]byte, int, bool)						Returns: original slice of bytes, value, EOF (true = EOF)
 		func (t *CounterInt) Keys() []uint64								Returns slice containing all the keys in order
-		func (t *CounterInt) Write(w *custom.Writer)						Writes built structure out to custom.Writer (requires github.com/AlasdairF/Custom)
+		func (t *CounterInt) Write(w custom.Interface)						Writes built structure out to custom.Writer (requires github.com/AlasdairF/Custom)
 		func (t *CounterInt) Read(r *custom.Reader)							Reads structure in from custom.Reader (requires github.com/AlasdairF/Custom)
 		func (t *CounterInt) Copy() *KeyInt									Copies keys to a KeyInt structure
 
@@ -2139,7 +2139,7 @@ func (t *KeyBytes) Keys() [][]byte {
 	return keys
 }
 
-func (t *KeyBytes) Write(w *custom.Writer) {
+func (t *KeyBytes) Write(w custom.Interface) {
 	var i, run int
 
 	// Write total
@@ -4226,7 +4226,7 @@ func (t *KeyValBytes) Keys() [][]byte {
 }
 
 
-func (t *KeyValBytes) Write(w *custom.Writer) {
+func (t *KeyValBytes) Write(w custom.Interface) {
 	var run int
 
 	// Write total
@@ -6024,7 +6024,7 @@ func (t *CounterBytes) Keys() [][]byte {
 }
 
 
-func (t *CounterBytes) Write(w *custom.Writer) {
+func (t *CounterBytes) Write(w custom.Interface) {
 	var run int
 
 	// Write total
@@ -6394,7 +6394,7 @@ func (t *KeyRunes) Keys() [][]rune {
 	return newkeys
 }
 
-func (t *KeyRunes) Write(w *custom.Writer) {
+func (t *KeyRunes) Write(w custom.Interface) {
 	t.child.Write(w)
 }
 
@@ -6456,7 +6456,7 @@ func (t *KeyValRunes) Keys() [][]rune {
 	return newkeys
 }
 
-func (t *KeyValRunes) Write(w *custom.Writer) {
+func (t *KeyValRunes) Write(w custom.Interface) {
 	t.child.Write(w)
 }
 
@@ -6513,7 +6513,7 @@ func (t *CounterRunes) Keys() [][]rune {
 	return newkeys
 }
 
-func (t *CounterRunes) Write(w *custom.Writer) {
+func (t *CounterRunes) Write(w custom.Interface) {
 	t.child.Write(w)
 }
 
@@ -6936,7 +6936,7 @@ func (t *CounterUint64) Keys() []uint64 {
 
 // ------------- export ---------------
 
-func (t *KeyUint64) Write(w *custom.Writer) {
+func (t *KeyUint64) Write(w custom.Interface) {
 	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
 		w.WriteUint64Variable(v)
@@ -6952,7 +6952,7 @@ func (t *KeyUint64) Read(r *custom.Reader) {
 	t.key = tmp
 }
 
-func (t *KeyValUint64) Write(w *custom.Writer) {
+func (t *KeyValUint64) Write(w custom.Interface) {
 	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
 		w.WriteUint64Variable(uint64(v.K))
@@ -6973,7 +6973,7 @@ func (t *KeyValUint64) Read(r *custom.Reader) {
 	t.key = tmp
 }
 
-func (t *CounterUint64) Write(w *custom.Writer) {
+func (t *CounterUint64) Write(w custom.Interface) {
 	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
 		w.WriteUint64Variable(uint64(v.K))
@@ -7395,7 +7395,7 @@ func (t *CounterUint32) Keys() []uint32 {
 
 // ------------- export ---------------
 
-func (t *KeyUint32) Write(w *custom.Writer) {
+func (t *KeyUint32) Write(w custom.Interface) {
 	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
 		w.WriteUint64Variable(uint64(v))
@@ -7411,7 +7411,7 @@ func (t *KeyUint32) Read(r *custom.Reader) {
 	t.key = tmp
 }
 
-func (t *KeyValUint32) Write(w *custom.Writer) {
+func (t *KeyValUint32) Write(w custom.Interface) {
 	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
 		w.WriteUint64Variable(uint64(v.K))
@@ -7432,7 +7432,7 @@ func (t *KeyValUint32) Read(r *custom.Reader) {
 	t.key = tmp
 }
 
-func (t *CounterUint32) Write(w *custom.Writer) {
+func (t *CounterUint32) Write(w custom.Interface) {
 	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
 		w.WriteUint64Variable(uint64(v.K))
@@ -7854,7 +7854,7 @@ func (t *CounterUint16) Keys() []uint16 {
 
 // ------------- export ---------------
 
-func (t *KeyUint16) Write(w *custom.Writer) {
+func (t *KeyUint16) Write(w custom.Interface) {
 	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
 		w.WriteUint16(v)
@@ -7870,7 +7870,7 @@ func (t *KeyUint16) Read(r *custom.Reader) {
 	t.key = tmp
 }
 
-func (t *KeyValUint16) Write(w *custom.Writer) {
+func (t *KeyValUint16) Write(w custom.Interface) {
 	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
 		w.WriteUint64Variable(uint64(v.K))
@@ -7891,7 +7891,7 @@ func (t *KeyValUint16) Read(r *custom.Reader) {
 	t.key = tmp
 }
 
-func (t *CounterUint16) Write(w *custom.Writer) {
+func (t *CounterUint16) Write(w custom.Interface) {
 	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
 		w.WriteUint64Variable(uint64(v.K))
@@ -8313,7 +8313,7 @@ func (t *CounterUint8) Keys() []uint8 {
 
 // ------------- export ---------------
 
-func (t *KeyUint8) Write(w *custom.Writer) {
+func (t *KeyUint8) Write(w custom.Interface) {
 	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
 		w.WriteByte(v)
@@ -8329,7 +8329,7 @@ func (t *KeyUint8) Read(r *custom.Reader) {
 	t.key = tmp
 }
 
-func (t *KeyValUint8) Write(w *custom.Writer) {
+func (t *KeyValUint8) Write(w custom.Interface) {
 	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
 		w.WriteUint64Variable(uint64(v.K))
@@ -8350,7 +8350,7 @@ func (t *KeyValUint8) Read(r *custom.Reader) {
 	t.key = tmp
 }
 
-func (t *CounterUint8) Write(w *custom.Writer) {
+func (t *CounterUint8) Write(w custom.Interface) {
 	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
 		w.WriteUint64Variable(uint64(v.K))
@@ -8772,7 +8772,7 @@ func (t *CounterInt) Keys() []int {
 
 // ------------- export ---------------
 
-func (t *KeyInt) Write(w *custom.Writer) {
+func (t *KeyInt) Write(w custom.Interface) {
 	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
 		w.WriteUint64Variable(uint64(v))
@@ -8788,7 +8788,7 @@ func (t *KeyInt) Read(r *custom.Reader) {
 	t.key = tmp
 }
 
-func (t *KeyValInt) Write(w *custom.Writer) {
+func (t *KeyValInt) Write(w custom.Interface) {
 	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
 		w.WriteUint64Variable(uint64(v.K))
@@ -8809,7 +8809,7 @@ func (t *KeyValInt) Read(r *custom.Reader) {
 	t.key = tmp
 }
 
-func (t *CounterInt) Write(w *custom.Writer) {
+func (t *CounterInt) Write(w custom.Interface) {
 	w.WriteUint64Variable(uint64(len(t.key)))
 	for _, v := range t.key {
 		w.WriteUint64Variable(uint64(v.K))
