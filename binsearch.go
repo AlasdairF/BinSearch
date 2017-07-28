@@ -7007,6 +7007,10 @@ func (t *KeyUint32) Len() int {
 	return len(t.key)
 }
 
+func NewKeyUint32(i int) *KeyUint32 {
+	return &KeyUint32{key:make([]uint32, 0, i), cursor:0}
+}
+
 // Find returns the index based on the key.
 func (t *KeyUint32) Find(thekey uint32) (int, bool) {
 	var min, at int
